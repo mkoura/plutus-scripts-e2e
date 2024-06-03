@@ -18,6 +18,8 @@ import PlutusTx qualified
 import PlutusTx.Builtins qualified as BI
 import PlutusTx.Prelude qualified as P
 
+import GHC.ByteOrder (ByteOrder (BigEndian, LittleEndian))
+
 data ByteStringToIntegerParams = ByteStringToIntegerParams
   { bsByteOrder :: Bool
   , byteString :: P.BuiltinByteString
@@ -36,22 +38,24 @@ PlutusTx.unstableMakeIsData ''IntegerToByteStringParams
 {-# INLINEABLE mkByteStringToIntegerPolicy #-}
 mkByteStringToIntegerPolicy :: ByteStringToIntegerParams -> sc -> Bool
 mkByteStringToIntegerPolicy ByteStringToIntegerParams{..} _sc = do
-  let int = BI.byteStringToInteger bsByteOrder byteString
+  let byteOrder = if bsByteOrder then BigEndian else LittleEndian
+  let int = BI.byteStringToInteger byteOrder byteString
   int P.== expInteger
 
 {-# INLINEABLE mkIntegerToByteStringPolicy #-}
 mkIntegerToByteStringPolicy :: IntegerToByteStringParams -> sc -> Bool
 mkIntegerToByteStringPolicy IntegerToByteStringParams{..} _sc = do
-  let bs = BI.integerToByteString intByteOrder outputMinSize integer
+  let byteOrder = if intByteOrder then BigEndian else LittleEndian
+  let bs = BI.integerToByteString byteOrder outputMinSize integer
   bs P.== expByteString
 
 {-# INLINEABLE mkByteStringToIntegerRoundtripPolicy #-}
 mkByteStringToIntegerRoundtripPolicy :: P.BuiltinByteString -> sc -> Bool
 mkByteStringToIntegerRoundtripPolicy bs _sc = do
-  let intBE = BI.byteStringToInteger True bs
-      bsBE = BI.integerToByteString True 0 intBE
-      intLE = BI.byteStringToInteger False bs
-      bsLE = BI.integerToByteString False 0 intLE
+  let intBE = BI.byteStringToInteger BigEndian bs
+      bsBE = BI.integerToByteString BigEndian 0 intBE
+      intLE = BI.byteStringToInteger LittleEndian bs
+      bsLE = BI.integerToByteString LittleEndian 0 intLE
   bs P.== bsBE P.&& bs P.== bsLE
 
 bitwiseAssetName :: C.AssetName

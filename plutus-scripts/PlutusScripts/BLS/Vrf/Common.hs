@@ -18,6 +18,8 @@ import PlutusTx qualified
 import PlutusTx.Builtins qualified as BI
 import PlutusTx.Prelude qualified as P
 
+import GHC.ByteOrder (ByteOrder (BigEndian))
+
 {-# INLINEABLE vrfPrivKey #-}
 vrfPrivKey :: Integer
 vrfPrivKey = 50166937291276222007610100461546392414157570314060957244808461481762532157524 :: Integer
@@ -83,12 +85,12 @@ verifyBlsVrfScript (BlsParams pubKey message (VrfProofWithOutput beta (VrfProof 
     -- do the following calculation
     u =
       P.bls12_381_G2_add
-        (P.bls12_381_G2_scalarMul (BI.byteStringToInteger True c) pubKey)
+        (P.bls12_381_G2_scalarMul (BI.byteStringToInteger BigEndian c) pubKey)
         (P.bls12_381_G2_scalarMul s uncompressedG2)
     h = P.bls12_381_G2_hashToGroup message P.emptyByteString
     v =
       P.bls12_381_G2_add
-        (P.bls12_381_G2_scalarMul (BI.byteStringToInteger True c) gamma)
+        (P.bls12_381_G2_scalarMul (BI.byteStringToInteger BigEndian c) gamma)
         (P.bls12_381_G2_scalarMul s h)
 
   -- and check
@@ -138,7 +140,7 @@ generateVrfProofWithOutput privKey message = do
 
     -- define the third and last element of a proof of correct VRF
     s =
-      (k - (BI.byteStringToInteger True c) * privKey)
+      (k - (BI.byteStringToInteger BigEndian c) * privKey)
         `P.modulo` 52435875175126190479447740508185965837690552500527637822603658699938581184513
 
     -- cofactor of G2

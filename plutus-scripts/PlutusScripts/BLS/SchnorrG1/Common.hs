@@ -21,6 +21,8 @@ import PlutusTx qualified
 import PlutusTx.Builtins qualified as BI
 import PlutusTx.Prelude qualified as P
 
+import GHC.ByteOrder (ByteOrder (LittleEndian))
+
 data BlsParams = BlsParams
   { message :: P.BuiltinByteString
   , pubKey :: P.BuiltinByteString
@@ -68,7 +70,7 @@ verifySchnorrG1Script bs16Null BlsParams{..} _sc = do
     r = P.snd signature
     c =
       BI.byteStringToInteger
-        False
+        LittleEndian
         ( P.sliceByteString
             0
             16
@@ -77,7 +79,7 @@ verifySchnorrG1Script bs16Null BlsParams{..} _sc = do
         )
     pkDeser = P.bls12_381_G1_uncompress pubKey
     aDeser = P.bls12_381_G1_uncompress a
-    rDeser = BI.byteStringToInteger False r
+    rDeser = BI.byteStringToInteger LittleEndian r
   (rDeser `P.bls12_381_G1_scalarMul` P.bls12_381_G1_uncompress P.bls12_381_G1_compressed_generator)
     `P.bls12_381_G1_equals` (aDeser `P.bls12_381_G1_add` (c `P.bls12_381_G1_scalarMul` pkDeser))
     -- additional check using negation is for testing the function

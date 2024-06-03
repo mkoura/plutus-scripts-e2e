@@ -16,6 +16,8 @@ import PlutusScripts.Helpers qualified as H
 import PlutusTx.Builtins qualified as BI
 import PlutusTx.Prelude qualified as P
 
+import GHC.ByteOrder (ByteOrder (LittleEndian))
+
 blsAssetName :: C.AssetName
 blsAssetName = C.AssetName "BLS"
 
@@ -31,7 +33,7 @@ byteString16Null = P.toBuiltin $ H.bytesFromHex "0000000000000000000000000000000
 -- Little-endian bytestring to integer conversion #-}
 {-# INLINEABLE byteStringToIntegerLE #-}
 byteStringToIntegerLE :: P.BuiltinByteString -> Integer
-byteStringToIntegerLE = BI.byteStringToInteger False
+byteStringToIntegerLE = BI.byteStringToInteger LittleEndian
 
 -- original PlutusTx implementation used before CIP-0087 support with https://github.com/IntersectMBO/plutus/pull/5654
 -- {-# INLINEABLE byteStringToInteger #-}

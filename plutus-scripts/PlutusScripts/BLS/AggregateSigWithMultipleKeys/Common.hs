@@ -21,6 +21,8 @@ import PlutusTx qualified
 import PlutusTx.Builtins qualified as BI
 import PlutusTx.Prelude qualified as P
 
+import GHC.ByteOrder (ByteOrder (LittleEndian))
+
 data BlsParams = BlsParams
   { message :: P.BuiltinByteString
   , pubKeys :: [P.BuiltinByteString]
@@ -119,7 +121,7 @@ aggregateMultiKeyG2Script bs16Null dst BlsParams{..} _sc = do
     -- scalar calcuates to (142819114285630344964654001480828217341 :: Integer)
     dsScalar =
       BI.byteStringToInteger
-        False
+        LittleEndian
         ( P.sliceByteString
             0
             16
