@@ -7,6 +7,7 @@ module PlutusScripts.Basic.V_1_1 where
 
 import Cardano.Api qualified as C
 import Cardano.Api.Shelley qualified as C
+import Helpers.ScriptUtils (mkUntypedMintingPolicy)
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusLedgerApi.V1 (Redeemer, ScriptPurpose (Minting))
 import PlutusLedgerApi.V2 qualified as PlutusV2 (Map)
@@ -170,7 +171,9 @@ writeTokenNamePolicyScriptV3 = writeSerialisedScript "mintTokenNamePolicyScriptV
 -- Time range policy --
 
 timeRangePolicyV3 :: SerialisedScript
-timeRangePolicyV3 = serialiseCompiledCode $$(PlutusTx.compile [||mkTimeRangePolicyV3||])
+timeRangePolicyV3 = serialiseCompiledCode $$(PlutusTx.compile [||wrap||])
+  where
+    wrap = mkUntypedMintingPolicy mkTimeRangePolicyV3
 
 timeRangePolicyScriptV3 :: C.PlutusScript C.PlutusScriptV3
 timeRangePolicyScriptV3 = C.PlutusScriptSerialised timeRangePolicyV3
@@ -181,7 +184,9 @@ writeTimeRangePolicyScriptV3 = writeSerialisedScript "timeRangePolicyScriptV3" t
 -- Witness redeemer policy --
 
 witnessRedeemerPolicyV3 :: SerialisedScript
-witnessRedeemerPolicyV3 = serialiseCompiledCode $$(PlutusTx.compile [||mkWitnessRedeemerPolicyV3||])
+witnessRedeemerPolicyV3 = serialiseCompiledCode $$(PlutusTx.compile [||wrap||])
+  where
+    wrap = mkUntypedMintingPolicy mkWitnessRedeemerPolicyV3
 
 witnessRedeemerPolicyScriptV3 :: C.PlutusScript C.PlutusScriptV3
 witnessRedeemerPolicyScriptV3 = C.PlutusScriptSerialised witnessRedeemerPolicyV3
