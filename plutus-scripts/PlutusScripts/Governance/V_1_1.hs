@@ -27,12 +27,12 @@ import PlutusScripts.Governance.Common (
   currentTreasuryAmountAssetName,
   mkVerifyCurrentTreasuryAmount,
   mkVerifyProposalProcedures,
-  mkVerifyScriptPurpose,
+  mkVerifyScriptInfo,
   mkVerifyTreasuryDonation,
   mkVerifyTxCerts,
   mkVerifyVotes,
   proposalProceduresAssetName,
-  scriptPurposeAssetName,
+  scriptInfoAssetName,
   treasuryDonationAssetName,
   txCertsAssetName,
   votesAssetName,
@@ -45,26 +45,27 @@ import PlutusScripts.Helpers (
  )
 import PlutusTx qualified
 
--- ScriptPurpose --
+-- ScriptInfo --
 
-verifyScriptPurposePolicy :: SerialisedScript
-verifyScriptPurposePolicy = serialiseCompiledCode $$(PlutusTx.compile [||wrap||])
-  where
-    wrap = mkUntypedMintingPolicy mkVerifyScriptPurpose
+verifyScriptInfoPolicy :: SerialisedScript
+verifyScriptInfoPolicy = serialiseCompiledCode
+  $$(PlutusTx.compile [||
+    mkUntypedMintingPolicy mkVerifyScriptInfo
+  ||])
 
-verifyScriptPurposeScriptV3 :: C.PlutusScript C.PlutusScriptV3
-verifyScriptPurposeScriptV3 = C.PlutusScriptSerialised verifyScriptPurposePolicy
+verifyScriptInfoScriptV3 :: C.PlutusScript C.PlutusScriptV3
+verifyScriptInfoScriptV3 = C.PlutusScriptSerialised verifyScriptInfoPolicy
 
-verifyScriptPurposeAssetIdV3 :: C.AssetId
-verifyScriptPurposeAssetIdV3 = C.AssetId (policyIdV3 verifyScriptPurposePolicy) scriptPurposeAssetName
+verifyScriptInfoAssetIdV3 :: C.AssetId
+verifyScriptInfoAssetIdV3 = C.AssetId (policyIdV3 verifyScriptInfoPolicy) scriptInfoAssetName
 
-verifyScriptPurposeMintWitnessV3
+verifyScriptInfoMintWitnessV3
   :: C.ShelleyBasedEra era
-  -> V3.ScriptPurpose
+  -> V3.ScriptInfo
   -> (C.PolicyId, C.ScriptWitness C.WitCtxMint era)
-verifyScriptPurposeMintWitnessV3 sbe redeemer =
-  ( policyIdV3 verifyScriptPurposePolicy
-  , mintScriptWitness sbe plutusL3 (Left verifyScriptPurposeScriptV3) (toScriptData redeemer)
+verifyScriptInfoMintWitnessV3 sbe redeemer =
+  ( policyIdV3 verifyScriptInfoPolicy
+  , mintScriptWitness sbe plutusL3 (Left verifyScriptInfoScriptV3) (toScriptData redeemer)
   )
 
 -- TxCert --

@@ -8,6 +8,8 @@
 -- Not using all CardanoEra
 {-# OPTIONS_GHC -fno-warn-incomplete-patterns #-}
 {-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.1.0 #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Move brackets to avoid $" #-}
 
 module PlutusScripts.BLS.Groth16.V_1_1 where
 
@@ -46,7 +48,8 @@ verifyBlsGroth16PolicyV3 =
     $$( PlutusTx.compile
           [||
           \a b c d e f g h i ->
-            mkUntypedMintingPolicy @PlutusV3.ScriptContext (verifyBlsGroth16Script a b c d e f g h i)
+            mkUntypedMintingPolicy @PlutusV3.ScriptContext
+              (verifyBlsGroth16Script a b c d e f g h i)
           ||]
       )
       `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode PLC.plcVersion110 $ compressedG1 groth16alpha)

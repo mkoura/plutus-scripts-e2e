@@ -29,7 +29,10 @@ verifyBlsAggregateSigMultiKeyG2PolicyV3 :: SerialisedScript
 verifyBlsAggregateSigMultiKeyG2PolicyV3 =
   serialiseCompiledCode $
     $$( PlutusTx.compile
-          [||\a b -> mkUntypedMintingPolicy @PlutusV3.ScriptContext (aggregateMultiKeyG2Script a b)||]
+          [||\a b -> 
+            mkUntypedMintingPolicy @PlutusV3.ScriptContext
+              (aggregateMultiKeyG2Script a b)
+          ||]
       )
       `PlutusTx.unsafeApplyCode` PlutusTx.liftCode PLC.plcVersion110 byteString16Null
       `PlutusTx.unsafeApplyCode` PlutusTx.liftCode PLC.plcVersion110 blsSigBls12381G2XmdSha256SswuRoNul

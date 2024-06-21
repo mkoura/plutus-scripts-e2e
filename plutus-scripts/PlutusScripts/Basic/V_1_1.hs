@@ -2,12 +2,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.1.0 #-}
+{-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:conservative-optimisation #-} -- preserves traces
 
 module PlutusScripts.Basic.V_1_1 where
 
 import Cardano.Api qualified as C
 import Cardano.Api.Shelley qualified as C
-import Helpers.ScriptUtils (mkUntypedMintingPolicy)
+import Helpers.ScriptUtils (IsScriptContext (mkUntypedMintingPolicy))
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusLedgerApi.V1 (Redeemer, ScriptPurpose (Minting))
 import PlutusLedgerApi.V2 qualified as PlutusV2 (Map)
@@ -105,8 +106,8 @@ alwaysSucceedSpendWitnessV3 era mRefScript mDatum =
     spendScriptWitness
       era
       plutusL3
-      (maybe (Left alwaysSucceedSpendScriptV3) (\refScript -> Right refScript) mRefScript) -- script or reference script
-      (maybe C.InlineScriptDatum (\datum -> C.ScriptDatumForTxIn datum) mDatum) -- inline datum or datum value
+      (maybe (Left alwaysSucceedSpendScriptV3) Right mRefScript) -- script or reference script
+      (maybe C.InlineScriptDatum C.ScriptDatumForTxIn mDatum) -- inline datum or datum value
       (toScriptData ()) -- redeemer
 
 -- AlwaysFails minting policy --

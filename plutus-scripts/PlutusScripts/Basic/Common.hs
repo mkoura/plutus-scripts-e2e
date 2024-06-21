@@ -3,6 +3,7 @@
 {-# OPTIONS_GHC -O0 #-}
 {-# OPTIONS_GHC -fno-ignore-interface-pragmas #-}
 {-# OPTIONS_GHC -fno-omit-interface-pragmas #-}
+{-# LANGUAGE LambdaCase #-}
 
 module PlutusScripts.Basic.Common where
 
@@ -11,6 +12,7 @@ import PlutusLedgerApi.V1.Interval qualified as P
 import PlutusLedgerApi.V1.Value qualified as P
 import PlutusLedgerApi.V3 qualified as PV3
 import PlutusTx.Prelude qualified as P
+import Helpers.ScriptUtils (check)
 
 -- AlwaysSucceeds minting policy --
 
@@ -28,7 +30,7 @@ mkAlwaysSucceedSpend _datum _redeemer _sc = ()
 
 {-# INLINEABLE mkAlwaysFailsPolicy #-}
 mkAlwaysFailsPolicy :: P.BuiltinData -> P.BuiltinData -> ()
-mkAlwaysFailsPolicy _datum _sc = P.check $ P.error ()
+mkAlwaysFailsPolicy _datum _sc = check $ P.error ()
 
 -- Mint token name policy --
 
@@ -41,8 +43,9 @@ mkMintTokenNamePolicyV3 tn ctx = P.traceIfFalse "wrong token name" checkTokenNam
 
     -- TODO: Use builtin when available in PV3
     ownCurrencySymbol :: PV3.ScriptContext -> PV3.CurrencySymbol
-    ownCurrencySymbol PV3.ScriptContext{PV3.scriptContextPurpose = PV3.Minting cs} = cs
-    ownCurrencySymbol _ = P.traceError "Lh"
+    ownCurrencySymbol = \case
+      PV3.ScriptContext{PV3.scriptContextScriptInfo = PV3.MintingScript cs} -> cs
+      _ -> P.traceError "Lh"
 
     checkTokenName :: Bool
     checkTokenName = P.valueOf (PV3.txInfoMint info) (ownCurrencySymbol ctx) tn P.> 0
@@ -51,7 +54,7 @@ mkMintTokenNamePolicyV3 tn ctx = P.traceIfFalse "wrong token name" checkTokenNam
 
 {-# INLINEABLE mkTimeRangePolicyV3 #-}
 mkTimeRangePolicyV3 :: P.POSIXTime -> PV3.ScriptContext -> Bool
-mkTimeRangePolicyV3 dl ctx = (P.to dl) `P.contains` range
+mkTimeRangePolicyV3 dl ctx = P.to dl `P.contains` range
   where
     info :: PV3.TxInfo
     info = PV3.scriptContextTxInfo ctx
@@ -63,16 +66,18 @@ mkTimeRangePolicyV3 dl ctx = (P.to dl) `P.contains` range
 
 {-# INLINEABLE mkWitnessRedeemerPolicyV3 #-}
 mkWitnessRedeemerPolicyV3 :: P.PubKeyHash -> PV3.ScriptContext -> Bool
-mkWitnessRedeemerPolicyV3 pkh ctx = P.traceIfFalse "not signed by redeemer pubkeyhash" checkWitness
+mkWitnessRedeemerPolicyV3 pkh ctx =
+    P.traceIfFalse "not signed by redeemer pubkeyhash" checkWitness
   where
     info :: PV3.TxInfo
     info = PV3.scriptContextTxInfo ctx
 
     -- TODO: Use builtin when available in PV3
     txSignedBy :: PV3.TxInfo -> PV3.PubKeyHash -> Bool
-    txSignedBy PV3.TxInfo{PV3.txInfoSignatories} k = case P.find ((P.==) k) txInfoSignatories of
-      P.Just _ -> P.True
-      P.Nothing -> P.False
+    txSignedBy PV3.TxInfo{PV3.txInfoSignatories} k =
+      case P.find (k P.==) txInfoSignatories of
+        P.Just _ -> P.True
+        P.Nothing -> P.False
 
     checkWitness :: Bool
     checkWitness = txSignedBy info pkh
