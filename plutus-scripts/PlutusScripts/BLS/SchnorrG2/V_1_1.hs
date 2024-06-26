@@ -26,7 +26,7 @@ verifyBlsSchnorrG2PolicyV3 :: SerialisedScript
 verifyBlsSchnorrG2PolicyV3 =
   serialiseCompiledCode $
     $$( PlutusTx.compile
-          [||\a -> mkUntypedMintingPolicy @PlutusV3.ScriptContext (verifySchnorrG2Script a)||]
+          [|| mkUntypedMintingPolicy @PlutusV3.ScriptContext . verifySchnorrG2Script ||]
       )
       `PlutusTx.unsafeApplyCode` PlutusTx.liftCode PLC.plcVersion110 byteString16Null
 

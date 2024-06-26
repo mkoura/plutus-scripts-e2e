@@ -164,7 +164,7 @@ aggregateMultiKeyG2Script bs16Null dst BlsParams{..} _sc = do
       -> P.BuiltinBLS12_381_G2_Element
       -> P.BuiltinBLS12_381_G2_Element
     go _ [] _ acc = acc
-    go i (x : xs) (x' : xs') acc = go (i P.+ 1) xs xs' (acc `P.bls12_381_G2_add` (calcAggregatedPubkey x x'))
+    go i (x : xs) (x' : xs') acc = go (i P.+ 1) xs xs' (acc `P.bls12_381_G2_add` calcAggregatedPubkey x x')
     go _ _ _ _ = P.traceError "go: unexpected"
 
     calcAggregatedPubkey :: P.BuiltinBLS12_381_G2_Element -> Integer -> P.BuiltinBLS12_381_G2_Element

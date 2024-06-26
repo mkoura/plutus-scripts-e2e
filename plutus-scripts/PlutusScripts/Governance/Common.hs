@@ -36,32 +36,23 @@ listEq rs cs =
     P.== P.length cs
     P.&& P.all (P.== True) (P.zipWith (P.==) rs cs)
 
--- ScriptPurpose --
+-- ScriptInfo --
 
--- data ScriptPurpose
---   = Minting CurrencySymbol
---   | Spending TxOutRef
---   | Rewarding Credential
---   | Certifying TxCert
---   | Voting Voter GovernanceActionId -- PlutusV3 still to be implemented for script DRep evaluation
---   | Proposing -- Constitution script (proposal policy) still TODO in caradno-api (8.33)
---   deriving (Show, Eq)
+{-# INLINEABLE mkVerifyScriptInfo #-}
+mkVerifyScriptInfo :: V3.ScriptInfo -> V3.ScriptContext -> Bool
+mkVerifyScriptInfo r sc = False
 
-{-# INLINEABLE mkVerifyScriptPurpose #-}
-mkVerifyScriptPurpose :: V3.ScriptPurpose -> V3.ScriptContext -> Bool
-mkVerifyScriptPurpose r sc = r P.== V3.scriptContextPurpose sc
+scriptInfoAssetName :: C.AssetName
+scriptInfoAssetName = C.AssetName "ScriptInfo"
 
-scriptPurposeAssetName :: C.AssetName
-scriptPurposeAssetName = C.AssetName "ScriptPurpose"
-
-verifyScriptPurposeRedeemer :: V3.ScriptPurpose -> C.HashableScriptData
-verifyScriptPurposeRedeemer = toScriptData
+verifyScriptInfoRedeemer :: V3.ScriptInfo -> C.HashableScriptData
+verifyScriptInfoRedeemer = toScriptData
 
 -- TxCert --
 
 {-# INLINEABLE mkVerifyTxCerts #-}
 mkVerifyTxCerts :: [V3.TxCert] -> V3.ScriptContext -> Bool
-mkVerifyTxCerts r sc = r P.== (V3.txInfoTxCerts P.$ V3.scriptContextTxInfo sc)
+mkVerifyTxCerts r sc = r P.== V3.txInfoTxCerts (V3.scriptContextTxInfo sc)
 
 txCertsAssetName :: C.AssetName
 txCertsAssetName = C.AssetName "TxCerts"
@@ -83,27 +74,29 @@ mkVerifyVotes r sc = do
   listEq redeemerVoters contextVoters
     P.&& emListEq redeemerGovActionIds contextGovActionIds
     P.&& emListEq redeemerVotes contextVotes
-  where
-    {-# INLINEABLE emListEq #-}
-    emListEq :: (P.Eq a) => [[a]] -> [[a]] -> Bool
-    emListEq rs cs =
-      P.length rs
-        P.== P.length cs
-        -- lengthEq rs cs -- alternate implementation
-        P.&& P.all (P.== True) (P.zipWith listEq rs cs)
+ where
+  {-# INLINEABLE emListEq #-}
+  emListEq :: (P.Eq a) => [[a]] -> [[a]] -> Bool
+  emListEq rs cs =
+    P.length rs
+      P.== P.length cs
+      -- lengthEq rs cs -- alternate implementation
+      P.&& P.all (P.== True) (P.zipWith listEq rs cs)
 
 votesAssetName :: C.AssetName
 votesAssetName = C.AssetName "Votes"
 
-verifyVotesRedeemer
-  :: V3.Map V3.Voter (V3.Map V3.GovernanceActionId V3.Vote) -> C.HashableScriptData
+verifyVotesRedeemer ::
+  V3.Map V3.Voter (V3.Map V3.GovernanceActionId V3.Vote) -> C.HashableScriptData
 verifyVotesRedeemer = toScriptData
 
 -- txInfoProposalProcedures --
 
 {-# INLINEABLE mkVerifyProposalProcedures #-}
 mkVerifyProposalProcedures :: [V3.ProposalProcedure] -> V3.ScriptContext -> Bool
-mkVerifyProposalProcedures r sc = listEq r (V3.txInfoProposalProcedures P.$ V3.scriptContextTxInfo sc)
+mkVerifyProposalProcedures r sc =
+  -- r P.== V3.txInfoProposalProcedures (V3.scriptContextTxInfo sc)
+  False
 
 proposalProceduresAssetName :: C.AssetName
 proposalProceduresAssetName = C.AssetName "ProposalProcedures"
@@ -115,7 +108,8 @@ verifyProposalProceduresRedeemer = toScriptData
 
 {-# INLINEABLE mkVerifyCurrentTreasuryAmount #-}
 mkVerifyCurrentTreasuryAmount :: P.Maybe V3.Lovelace -> V3.ScriptContext -> Bool
-mkVerifyCurrentTreasuryAmount r sc = r P.== (V3.txInfoCurrentTreasuryAmount P.$ V3.scriptContextTxInfo sc)
+mkVerifyCurrentTreasuryAmount r sc =
+  r P.== V3.txInfoCurrentTreasuryAmount (V3.scriptContextTxInfo sc)
 
 currentTreasuryAmountAssetName :: C.AssetName
 currentTreasuryAmountAssetName = C.AssetName "CurrentTreasuryAmount"
@@ -127,7 +121,8 @@ currentTreasuryAmountRedeemer = toScriptData
 
 {-# INLINEABLE mkVerifyTreasuryDonation #-}
 mkVerifyTreasuryDonation :: P.Maybe V3.Lovelace -> V3.ScriptContext -> Bool
-mkVerifyTreasuryDonation r sc = r P.== (V3.txInfoTreasuryDonation P.$ V3.scriptContextTxInfo sc)
+mkVerifyTreasuryDonation r sc =
+  r P.== V3.txInfoTreasuryDonation (V3.scriptContextTxInfo sc)
 
 treasuryDonationAssetName :: C.AssetName
 treasuryDonationAssetName = C.AssetName "TreasuryDonationAssetName"
