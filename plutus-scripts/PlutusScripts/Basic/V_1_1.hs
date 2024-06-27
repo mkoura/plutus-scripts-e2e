@@ -1,20 +1,21 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
+-- preserves traces
+{-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:conservative-optimisation #-}
 {-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.1.0 #-}
-{-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:conservative-optimisation #-} -- preserves traces
 
 module PlutusScripts.Basic.V_1_1 where
 
 import Cardano.Api qualified as C
 import Cardano.Api.Shelley qualified as C
-import Helpers.ScriptUtils (IsScriptContext (mkUntypedMintingPolicy))
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusLedgerApi.V1 (Redeemer, ScriptPurpose (Minting))
 import PlutusLedgerApi.V2 qualified as PlutusV2 (Map)
+import PlutusLedgerApi.V3 qualified as PlutusV3 (serialiseCompiledCode)
 import PlutusScripts.Basic.Common (
-  mkAlwaysFailsPolicy,
-  mkAlwaysSucceedPolicy,
+  mkAlwaysFailsPolicyV3,
+  mkAlwaysSucceedPolicyV3,
   mkAlwaysSucceedSpend,
   mkMintTokenNamePolicyV3,
   mkTimeRangePolicyV3,
@@ -37,7 +38,7 @@ import PlutusTx.AssocMap qualified as AMap
 -- AlwaysSucceeds minting policy --
 
 alwaysSucceedPolicy :: SerialisedScript
-alwaysSucceedPolicy = serialiseCompiledCode $$(PlutusTx.compile [||mkAlwaysSucceedPolicy||])
+alwaysSucceedPolicy = serialiseCompiledCode $$(PlutusTx.compile [||mkAlwaysSucceedPolicyV3||])
 
 alwaysSucceedPolicyScriptV3 :: C.PlutusScript C.PlutusScriptV3
 alwaysSucceedPolicyScriptV3 = C.PlutusScriptSerialised alwaysSucceedPolicy
@@ -60,10 +61,10 @@ alwaysSucceedPolicyTxInfoRedeemerV3 =
 {- | Witness token mint for including in txbody's txMintValue
 Use Nothing to include script in witness, else provide TxIn to reference script
 -}
-alwaysSucceedMintWitnessV3
-  :: C.ShelleyBasedEra era
-  -> Maybe C.TxIn -- maybe reference input
-  -> (C.PolicyId, C.ScriptWitness C.WitCtxMint era)
+alwaysSucceedMintWitnessV3 ::
+  C.ShelleyBasedEra era ->
+  Maybe C.TxIn -> -- maybe reference input
+  (C.PolicyId, C.ScriptWitness C.WitCtxMint era)
 alwaysSucceedMintWitnessV3 sbe Nothing =
   ( policyIdV3 alwaysSucceedPolicy
   , mintScriptWitness sbe plutusL3 (Left alwaysSucceedPolicyScriptV3) (toScriptData ())
@@ -73,10 +74,10 @@ alwaysSucceedMintWitnessV3 sbe (Just refTxIn) =
   , mintScriptWitness sbe plutusL3 (Right refTxIn) (toScriptData ())
   )
 
-alwaysSucceedMintWitnessV3'
-  :: C.ShelleyBasedEra era
-  -> C.ExecutionUnits
-  -> (C.PolicyId, C.ScriptWitness C.WitCtxMint era)
+alwaysSucceedMintWitnessV3' ::
+  C.ShelleyBasedEra era ->
+  C.ExecutionUnits ->
+  (C.PolicyId, C.ScriptWitness C.WitCtxMint era)
 alwaysSucceedMintWitnessV3' sbe exunits =
   ( policyIdV3 alwaysSucceedPolicy
   , mintScriptWitness' sbe plutusL3 (Left alwaysSucceedPolicyScriptV3) (toScriptData ()) exunits
@@ -90,17 +91,17 @@ alwaysSucceedSpend = serialiseCompiledCode $$(PlutusTx.compile [||mkAlwaysSuccee
 alwaysSucceedSpendScriptV3 :: C.PlutusScript C.PlutusScriptV3
 alwaysSucceedSpendScriptV3 = C.PlutusScriptSerialised alwaysSucceedSpend
 
-writeAlwaysSucceedSpendScriptV3 :: IO ()
-writeAlwaysSucceedSpendScriptV3 = writeSerialisedScript "alwaysSucceedSpendScriptV3" alwaysSucceedSpendScriptV3
+-- writeAlwaysSucceedSpendScriptV3 :: IO ()
+-- writeAlwaysSucceedSpendScriptV3 = writeSerialisedScript "alwaysSucceedSpendScriptV3" alwaysSucceedSpendScriptV3
 
 alwaysSucceedSpendScriptHashV3 :: C.ScriptHash
 alwaysSucceedSpendScriptHashV3 = C.hashScript $ C.PlutusScript C.PlutusScriptV3 alwaysSucceedSpendScriptV3
 
-alwaysSucceedSpendWitnessV3
-  :: C.ShelleyBasedEra era
-  -> Maybe C.TxIn
-  -> Maybe C.HashableScriptData
-  -> C.Witness C.WitCtxTxIn era
+alwaysSucceedSpendWitnessV3 ::
+  C.ShelleyBasedEra era ->
+  Maybe C.TxIn ->
+  Maybe C.HashableScriptData ->
+  C.Witness C.WitCtxTxIn era
 alwaysSucceedSpendWitnessV3 era mRefScript mDatum =
   C.ScriptWitness C.ScriptWitnessForSpending $
     spendScriptWitness
@@ -113,7 +114,7 @@ alwaysSucceedSpendWitnessV3 era mRefScript mDatum =
 -- AlwaysFails minting policy --
 
 alwaysFailsPolicy :: SerialisedScript
-alwaysFailsPolicy = serialiseCompiledCode $$(PlutusTx.compile [||mkAlwaysFailsPolicy||])
+alwaysFailsPolicy = serialiseCompiledCode $$(PlutusTx.compile [||mkAlwaysFailsPolicyV3||])
 
 alwaysFailsPolicyScriptV3 :: C.PlutusScript C.PlutusScriptV3
 alwaysFailsPolicyScriptV3 = C.PlutusScriptSerialised alwaysFailsPolicy
@@ -136,10 +137,10 @@ alwaysFailsPolicyTxInfoRedeemerV3 =
 {- | Witness token mint for including in txbody's txMintValue
 Use Nothing to include script in witness, else provide TxIn to reference script
 -}
-alwaysFailsMintWitnessV3
-  :: C.ShelleyBasedEra era
-  -> Maybe C.TxIn -- maybe reference input
-  -> (C.PolicyId, C.ScriptWitness C.WitCtxMint era)
+alwaysFailsMintWitnessV3 ::
+  C.ShelleyBasedEra era ->
+  Maybe C.TxIn -> -- maybe reference input
+  (C.PolicyId, C.ScriptWitness C.WitCtxMint era)
 alwaysFailsMintWitnessV3 sbe Nothing =
   ( policyIdV3 alwaysFailsPolicy
   , mintScriptWitness sbe plutusL3 (Left alwaysFailsPolicyScriptV3) (toScriptData ())
@@ -149,10 +150,10 @@ alwaysFailsMintWitnessV3 sbe (Just refTxIn) =
   , mintScriptWitness sbe plutusL3 (Right refTxIn) (toScriptData ())
   )
 
-alwaysFailsMintWitnessV3'
-  :: C.ShelleyBasedEra era
-  -> C.ExecutionUnits
-  -> (C.PolicyId, C.ScriptWitness C.WitCtxMint era)
+alwaysFailsMintWitnessV3' ::
+  C.ShelleyBasedEra era ->
+  C.ExecutionUnits ->
+  (C.PolicyId, C.ScriptWitness C.WitCtxMint era)
 alwaysFailsMintWitnessV3' sbe exunits =
   ( policyIdV3 alwaysFailsPolicy
   , mintScriptWitness' sbe plutusL3 (Left alwaysFailsPolicyScriptV3) (toScriptData ()) exunits
@@ -161,7 +162,7 @@ alwaysFailsMintWitnessV3' sbe exunits =
 -- Mint token name policy --
 
 mintTokenNamePolicyV3 :: SerialisedScript
-mintTokenNamePolicyV3 = serialiseCompiledCode $$(PlutusTx.compile [||mkMintTokenNamePolicyV3||])
+mintTokenNamePolicyV3 = PlutusV3.serialiseCompiledCode $$(PlutusTx.compile [||mkMintTokenNamePolicyV3||])
 
 mintTokenNamePolicyScriptV3 :: C.PlutusScript C.PlutusScriptV3
 mintTokenNamePolicyScriptV3 = C.PlutusScriptSerialised mintTokenNamePolicyV3
@@ -172,9 +173,7 @@ writeTokenNamePolicyScriptV3 = writeSerialisedScript "mintTokenNamePolicyScriptV
 -- Time range policy --
 
 timeRangePolicyV3 :: SerialisedScript
-timeRangePolicyV3 = serialiseCompiledCode $$(PlutusTx.compile [||wrap||])
-  where
-    wrap = mkUntypedMintingPolicy mkTimeRangePolicyV3
+timeRangePolicyV3 = PlutusV3.serialiseCompiledCode $$(PlutusTx.compile [||mkTimeRangePolicyV3||])
 
 timeRangePolicyScriptV3 :: C.PlutusScript C.PlutusScriptV3
 timeRangePolicyScriptV3 = C.PlutusScriptSerialised timeRangePolicyV3
@@ -185,9 +184,7 @@ writeTimeRangePolicyScriptV3 = writeSerialisedScript "timeRangePolicyScriptV3" t
 -- Witness redeemer policy --
 
 witnessRedeemerPolicyV3 :: SerialisedScript
-witnessRedeemerPolicyV3 = serialiseCompiledCode $$(PlutusTx.compile [||wrap||])
-  where
-    wrap = mkUntypedMintingPolicy mkWitnessRedeemerPolicyV3
+witnessRedeemerPolicyV3 = PlutusV3.serialiseCompiledCode $$(PlutusTx.compile [||mkWitnessRedeemerPolicyV3||])
 
 witnessRedeemerPolicyScriptV3 :: C.PlutusScript C.PlutusScriptV3
 witnessRedeemerPolicyScriptV3 = C.PlutusScriptSerialised witnessRedeemerPolicyV3

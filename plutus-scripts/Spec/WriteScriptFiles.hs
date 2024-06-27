@@ -16,7 +16,6 @@ import PlutusScripts.SECP256k1.V_1_1 qualified as PS_1_1
 writeV3ScriptFiles :: (MonadIO m) => m ()
 writeV3ScriptFiles = liftIO $ do
   PS_1_1.writeAlwaysSucceedPolicyScriptV3
-  PS_1_1.writeAlwaysSucceedSpendScriptV3
   PS_1_1.writeAlwaysFailsPolicyScriptV3
   PS_1_1.writeVerifySchnorrPolicyScriptV3
   PS_1_1.writeVerifyEcdsaPolicyScriptV3

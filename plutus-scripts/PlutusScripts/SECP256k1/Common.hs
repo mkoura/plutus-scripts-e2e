@@ -12,12 +12,18 @@
 module PlutusScripts.SECP256k1.Common where
 
 import Cardano.Api qualified as C
+import Helpers.ScriptUtils (constrArgs)
+import PlutusLedgerApi.V3 qualified as PV3
 import PlutusScripts.Helpers (
   bytesFromHex,
   toScriptData,
  )
 import PlutusTx qualified
 import PlutusTx.Builtins qualified as BI
+import PlutusTx.Builtins.Internal qualified as BI (
+  BuiltinList,
+  unitval,
+ )
 import PlutusTx.Prelude qualified as P
 
 ---- SECP256k1 ----
@@ -33,10 +39,26 @@ PlutusTx.makeLift ''Secp256Params
 
 -- Schnorr minting policy --
 
--- Use redeemer once PlutusV3 is fully implemented in the ledger
--- {-# INLINEABLE mkVerifySchnorrPolicy #-}
--- mkVerifySchnorrPolicy :: Secp256Params -> sc -> Bool
--- mkVerifySchnorrPolicy Secp256Params{..} _sc = BI.verifySchnorrSecp256k1Signature vkey msg sig
+{-# INLINEABLE mkVerifySchnorrPolicyV3 #-}
+mkVerifySchnorrPolicyV3 :: P.BuiltinData -> P.BuiltinUnit
+mkVerifySchnorrPolicyV3 arg = if checkSignature then BI.unitval else P.traceError "wrong signature"
+ where
+  context :: BI.BuiltinList P.BuiltinData
+  context = constrArgs arg
+
+  redeemerFollowedByScriptInfo :: BI.BuiltinList P.BuiltinData
+  redeemerFollowedByScriptInfo = BI.tail context
+
+  redeemerBuiltinData :: P.BuiltinData
+  redeemerBuiltinData = BI.head redeemerFollowedByScriptInfo
+
+  redeemer :: Secp256Params
+  redeemer = PV3.unsafeFromBuiltinData redeemerBuiltinData
+
+  Secp256Params{..} = redeemer
+
+  checkSignature :: Bool
+  checkSignature = BI.verifySchnorrSecp256k1Signature vkey msg sig
 
 {-# INLINEABLE mkVerifySchnorrPolicy #-}
 mkVerifySchnorrPolicy :: Secp256Params -> P.BuiltinData -> P.BuiltinData -> Bool
@@ -69,10 +91,26 @@ verifySchnorrRedeemer = toScriptData verifySchnorrParams
 
 -- ECDSA minting policy --
 
--- Use redeemer once PlutusV3 is fully implemented in the ledger
--- {-# INLINEABLE mkVerifyEcdsaPolicy #-}
--- mkVerifyEcdsaPolicy :: Secp256Params -> sc -> Bool
--- mkVerifyEcdsaPolicy Secp256Params{..} _sc = BI.verifyEcdsaSecp256k1Signature vkey msg sig
+{-# INLINEABLE mkVerifyEcdsaPolicyV3 #-}
+mkVerifyEcdsaPolicyV3 :: P.BuiltinData -> P.BuiltinUnit
+mkVerifyEcdsaPolicyV3 arg = if checkSignature then BI.unitval else P.traceError "wrong signature"
+ where
+  context :: BI.BuiltinList P.BuiltinData
+  context = constrArgs arg
+
+  redeemerFollowedByScriptInfo :: BI.BuiltinList P.BuiltinData
+  redeemerFollowedByScriptInfo = BI.tail context
+
+  redeemerBuiltinData :: P.BuiltinData
+  redeemerBuiltinData = BI.head redeemerFollowedByScriptInfo
+
+  redeemer :: Secp256Params
+  redeemer = PV3.unsafeFromBuiltinData redeemerBuiltinData
+
+  Secp256Params{..} = redeemer
+
+  checkSignature :: Bool
+  checkSignature = BI.verifyEcdsaSecp256k1Signature vkey msg sig
 
 {-# INLINEABLE mkVerifyEcdsaPolicy #-}
 mkVerifyEcdsaPolicy :: Secp256Params -> P.BuiltinData -> P.BuiltinData -> Bool
