@@ -13,6 +13,7 @@ import Cardano.Api qualified as C
 import Cardano.Api.Shelley qualified as C
 import PlutusCore.Version (plcVersion110)
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
+import PlutusLedgerApi.V3 qualified as PlutusV3 (serialiseCompiledCode)
 import PlutusScripts.Helpers (
   mintScriptWitness,
   plutusL3,
@@ -22,7 +23,9 @@ import PlutusScripts.Helpers (
 import PlutusScripts.SECP256k1.Common (
   ecdsaAssetName,
   mkVerifyEcdsaPolicy,
+  mkVerifyEcdsaPolicyV3,
   mkVerifySchnorrPolicy,
+  mkVerifySchnorrPolicyV3,
   schnorrAssetName,
   verifyEcdsaParams,
   verifyEcdsaRedeemer,
@@ -44,8 +47,12 @@ verifySchnorrPolicy =
     $$(PlutusTx.compile [||mkVerifySchnorrPolicy||])
       `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion110 verifySchnorrParams)
 
+verifySchnorrPolicyV3 :: SerialisedScript
+verifySchnorrPolicyV3 =
+  PlutusV3.serialiseCompiledCode $$(PlutusTx.compile [||mkVerifySchnorrPolicyV3||])
+
 verifySchnorrPolicyScriptV3 :: C.PlutusScript C.PlutusScriptV3
-verifySchnorrPolicyScriptV3 = C.PlutusScriptSerialised verifySchnorrPolicy
+verifySchnorrPolicyScriptV3 = C.PlutusScriptSerialised verifySchnorrPolicyV3
 
 writeVerifySchnorrPolicyScriptV3 :: IO ()
 writeVerifySchnorrPolicyScriptV3 = writeSerialisedScript "verifySchnorrPolicyScriptV3" verifySchnorrPolicyScriptV3
@@ -53,9 +60,9 @@ writeVerifySchnorrPolicyScriptV3 = writeSerialisedScript "verifySchnorrPolicyScr
 verifySchnorrAssetIdV3 :: C.AssetId
 verifySchnorrAssetIdV3 = C.AssetId (policyIdV3 verifySchnorrPolicy) schnorrAssetName
 
-verifySchnorrMintWitnessV3
-  :: C.ShelleyBasedEra era
-  -> (C.PolicyId, C.ScriptWitness C.WitCtxMint era)
+verifySchnorrMintWitnessV3 ::
+  C.ShelleyBasedEra era ->
+  (C.PolicyId, C.ScriptWitness C.WitCtxMint era)
 verifySchnorrMintWitnessV3 era =
   ( policyIdV3 verifySchnorrPolicy
   , mintScriptWitness era plutusL3 (Left verifySchnorrPolicyScriptV3) verifySchnorrRedeemer
@@ -74,8 +81,12 @@ verifyEcdsaPolicy =
     $$(PlutusTx.compile [||mkVerifyEcdsaPolicy||])
       `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion110 verifyEcdsaParams)
 
+verifyEcdsaPolicyV3 :: SerialisedScript
+verifyEcdsaPolicyV3 =
+  PlutusV3.serialiseCompiledCode $$(PlutusTx.compile [||mkVerifyEcdsaPolicyV3||])
+
 verifyEcdsaPolicyScriptV3 :: C.PlutusScript C.PlutusScriptV3
-verifyEcdsaPolicyScriptV3 = C.PlutusScriptSerialised verifyEcdsaPolicy
+verifyEcdsaPolicyScriptV3 = C.PlutusScriptSerialised verifyEcdsaPolicyV3
 
 writeVerifyEcdsaPolicyScriptV3 :: IO ()
 writeVerifyEcdsaPolicyScriptV3 = writeSerialisedScript "verifyEcdsaPolicyScriptV3" verifyEcdsaPolicyScriptV3
@@ -83,9 +94,9 @@ writeVerifyEcdsaPolicyScriptV3 = writeSerialisedScript "verifyEcdsaPolicyScriptV
 verifyEcdsaAssetIdV3 :: C.AssetId
 verifyEcdsaAssetIdV3 = C.AssetId (policyIdV3 verifyEcdsaPolicy) ecdsaAssetName
 
-verifyEcdsaMintWitnessV3
-  :: C.ShelleyBasedEra era
-  -> (C.PolicyId, C.ScriptWitness C.WitCtxMint era)
+verifyEcdsaMintWitnessV3 ::
+  C.ShelleyBasedEra era ->
+  (C.PolicyId, C.ScriptWitness C.WitCtxMint era)
 verifyEcdsaMintWitnessV3 sbe =
   ( policyIdV3 verifyEcdsaPolicy
   , mintScriptWitness sbe plutusL3 (Left verifyEcdsaPolicyScriptV3) verifyEcdsaRedeemer
