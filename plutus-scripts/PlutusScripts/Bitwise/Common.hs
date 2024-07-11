@@ -13,6 +13,7 @@
 module PlutusScripts.Bitwise.Common where
 
 import Cardano.Api qualified as C
+import PlutusLedgerApi.V1 qualified as PV1
 import PlutusScripts.Helpers (bytesFromHex)
 import PlutusTx qualified
 import PlutusTx.Builtins qualified as BI
@@ -48,6 +49,14 @@ mkIntegerToByteStringPolicy IntegerToByteStringParams{..} _sc = do
   let byteOrder = if intByteOrder then BigEndian else LittleEndian
   let bs = BI.integerToByteString byteOrder outputMinSize integer
   bs P.== expByteString
+
+{-# INLINEABLE mkIntegerToByteStringPolicySimple #-}
+mkIntegerToByteStringPolicySimple :: P.BuiltinData -> P.BuiltinData -> ()
+mkIntegerToByteStringPolicySimple r _sc = do
+  let oInt = PV1.unsafeFromBuiltinData r :: Integer
+      bs = BI.integerToByteString BigEndian 0 oInt
+      intBE = BI.byteStringToInteger BigEndian bs
+  if intBE P.== oInt then () else P.traceError "PT5"
 
 {-# INLINEABLE mkByteStringToIntegerRoundtripPolicy #-}
 mkByteStringToIntegerRoundtripPolicy :: P.BuiltinByteString -> sc -> Bool
