@@ -50,9 +50,9 @@ mkIntegerToByteStringPolicy IntegerToByteStringParams{..} _sc = do
   let bs = BI.integerToByteString byteOrder outputMinSize integer
   bs P.== expByteString
 
-{-# INLINEABLE mkIntegerToByteStringPolicySimple #-}
-mkIntegerToByteStringPolicySimple :: P.BuiltinData -> P.BuiltinData -> ()
-mkIntegerToByteStringPolicySimple r _sc = do
+{-# INLINEABLE mkByteStringToIntegerRoundtripPolicySimple #-}
+mkByteStringToIntegerRoundtripPolicySimple :: P.BuiltinData -> P.BuiltinData -> ()
+mkByteStringToIntegerRoundtripPolicySimple r _sc = do
   let oInt = PV1.unsafeFromBuiltinData r :: Integer
       bs = BI.integerToByteString BigEndian 0 oInt
       intBE = BI.byteStringToInteger BigEndian bs

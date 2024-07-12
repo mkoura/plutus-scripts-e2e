@@ -15,22 +15,22 @@ import Cardano.Api qualified as C
 import Cardano.Api.Shelley qualified as C
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusScripts.Bitwise.Common (
-  mkIntegerToByteStringPolicySimple,
+  mkByteStringToIntegerRoundtripPolicySimple,
  )
 import PlutusScripts.Helpers (
   writeSerialisedScript,
  )
 import PlutusTx qualified
 
--- Integer to ByteString added to PlutusV2 --
+-- integerToByteString and byteStringToInteger added to PlutusV2 --
 
-integerToByteStringPolicyV2 :: SerialisedScript
-integerToByteStringPolicyV2 =
+byteStringToIntegerRoundtripPolicyV2 :: SerialisedScript
+byteStringToIntegerRoundtripPolicyV2 =
   serialiseCompiledCode
-    $$(PlutusTx.compile [||mkIntegerToByteStringPolicySimple||])
+    $$(PlutusTx.compile [||mkByteStringToIntegerRoundtripPolicySimple||])
 
 integerToByteStringPolicyScriptV2 :: C.PlutusScript C.PlutusScriptV2
-integerToByteStringPolicyScriptV2 = C.PlutusScriptSerialised integerToByteStringPolicyV2
+integerToByteStringPolicyScriptV2 = C.PlutusScriptSerialised byteStringToIntegerRoundtripPolicyV2
 
 writeIntegerToByteStringPolicyScriptV2 :: IO ()
-writeIntegerToByteStringPolicyScriptV2 = writeSerialisedScript "integerToByteStringPolicyV2" integerToByteStringPolicyScriptV2
+writeIntegerToByteStringPolicyScriptV2 = writeSerialisedScript "byteStringToIntegerRoundtripPolicyV2" integerToByteStringPolicyScriptV2
