@@ -40,7 +40,7 @@ listEq rs cs =
 
 {-# INLINEABLE mkVerifyScriptInfo #-}
 mkVerifyScriptInfo :: V3.ScriptInfo -> V3.ScriptContext -> Bool
-mkVerifyScriptInfo r sc = False
+mkVerifyScriptInfo _r _sc = False
 
 scriptInfoAssetName :: C.AssetName
 scriptInfoAssetName = C.AssetName "ScriptInfo"
@@ -94,7 +94,7 @@ verifyVotesRedeemer = toScriptData
 
 {-# INLINEABLE mkVerifyProposalProcedures #-}
 mkVerifyProposalProcedures :: [V3.ProposalProcedure] -> V3.ScriptContext -> Bool
-mkVerifyProposalProcedures r sc =
+mkVerifyProposalProcedures _r _sc =
   -- r P.== V3.txInfoProposalProcedures (V3.scriptContextTxInfo sc)
   False
 

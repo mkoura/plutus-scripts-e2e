@@ -1,0 +1,325 @@
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE RecordWildCards     #-}
+{-# LANGUAGE TemplateHaskell     #-}
+{-# LANGUAGE ViewPatterns        #-}
+
+module PlutusScripts.Bitwise.Logical where
+
+import PlutusTx qualified
+import PlutusTx.Builtins qualified as BI
+import PlutusTx.Builtins.Internal qualified as BI (unitval)
+import PlutusTx.Prelude qualified as P
+
+import PlutusScripts.Helpers (hxs)
+
+-- Logical bitwise operations
+
+-- Parameters for andByteString/orByteString/xorByteString
+data Params = Params
+  { extend :: Bool --- Extend or truncate if inputs are of different lengths?
+  , input1 :: P.BuiltinByteString
+  , input2 :: P.BuiltinByteString
+  , output :: P.BuiltinByteString
+  }
+PlutusTx.unstableMakeIsData ''Params
+PlutusTx.makeLift ''Params
+
+{-# INLINEABLE mkAndByteStringSucceedingPolicy #-}
+mkAndByteStringSucceedingPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
+mkAndByteStringSucceedingPolicy l _ctx = go l
+  where go [] = BI.unitval
+        go (Params{..}:rest) =
+          let out = BI.andByteString extend input1 input2
+          in if out P.== output
+             then go rest
+             else P.traceError "mkAndByteStringSucceedingPolicy"
+  
+{-# INLINEABLE mkOrByteStringSucceedingPolicy #-}
+mkOrByteStringSucceedingPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
+mkOrByteStringSucceedingPolicy l _ctx = go l
+  where go [] = BI.unitval
+        go (Params{..}:rest) =
+          let out = BI.orByteString extend input1 input2
+          in if out P.== output
+             then go rest
+             else P.traceError "mkOrByteStringSucceedingPolicy"
+
+{-# INLINEABLE mkXorByteStringSucceedingPolicy #-}
+mkXorByteStringSucceedingPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
+mkXorByteStringSucceedingPolicy l _ctx = go l
+  where go [] = BI.unitval
+        go (Params{..}:rest) =
+          let out = BI.xorByteString extend input1 input2
+          in if out P.== output
+             then go rest
+             else P.traceError "mkXorByteStringSucceedingPolicy"
+
+-- Test cases adapted from the Plutus Core conformance tests
+-- The `andByteString` function can never fail.
+andByteStringParams :: [Params]
+andByteStringParams =
+ [ Params
+   { extend = False
+   , input1 = hxs ""
+   , input2 = hxs "ff"
+   , output = hxs ""
+   }
+ , Params
+   { extend = False
+   , input1 = hxs "ff"
+   , input2 = hxs ""
+   , output = hxs ""
+   }
+ , Params
+   { extend = False
+   , input1 = hxs "ff"
+   , input2 = hxs "00"
+   , output = hxs "00"
+   }
+ , Params
+   { extend = False
+   , input1 = hxs "00"
+   , input2 = hxs "ff"
+   , output = hxs "00"
+   }
+ , Params
+   { extend = False
+   , input1 = hxs "4f00"
+   , input2 = hxs "f4"
+   , output = hxs "44"
+   }
+ , Params
+   { extend = True
+   , input1 = hxs ""
+   , input2 = hxs "ff"
+   , output = hxs "ff"
+   }
+ , Params
+   { extend = True
+   , input1 = hxs "ff"
+   , input2 = hxs ""
+   , output = hxs "ff"
+   }
+ , Params
+   { extend = True
+   , input1 = hxs "ff"
+   , input2 = hxs "00"
+   , output = hxs "00"
+   }
+ , Params
+   { extend = True
+   , input1 = hxs "00"
+   , input2 = hxs "ff"
+   , output = hxs "00"
+   }
+ , Params
+   { extend = True
+   , input1 = hxs "4f00"
+   , input2 = hxs "f4"
+   , output = hxs "4400"
+   }
+ , Params
+   { extend = False
+   , input1 = hxs "33c2f0d68584803b9dc05b3b0b9cbd6683edc0ce742bb09957613e44150205679d3f61a467b25cc758a3b0"
+   , input2 = hxs "db9c861c98a3d19cb928c22a32aaae0a4f740113dc48734d3c001657cb8fd2b9497faf16a40c1ecdd7d6581b55b625553af3"
+   , output = hxs "13808014808080189900422a0288ac0203640002540830091400164401020021093f210424001cc5508210"
+   }
+ , Params
+   { extend = True
+   , input1 = hxs "33c2f0d68584803b9dc05b3b0b9cbd6683edc0ce742bb09957613e44150205679d3f61a467b25cc758a3b0"
+   , input2 = hxs "db9c861c98a3d19cb928c22a32aaae0a4f740113dc48734d3c001657cb8fd2b9497faf16a40c1ecdd7d6581b55b625553af3"
+   , output = hxs "13808014808080189900422a0288ac0203640002540830091400164401020021093f210424001cc55082101b55b625553af3"
+   }
+ , Params
+   { extend = False
+   , input1 = hxs "db9c861c98a3d19cb928c22a32aaae0a4f740113dc48734d3c001657cb8fd2b9497faf16a40c1ecdd7d6581b55b625553af3"
+   , input2 = hxs "33c2f0d68584803b9dc05b3b0b9cbd6683edc0ce742bb09957613e44150205679d3f61a467b25cc758a3b0"
+   , output = hxs "13808014808080189900422a0288ac0203640002540830091400164401020021093f210424001cc5508210"
+   }
+ , Params
+   { extend = True
+   , input1 = hxs "db9c861c98a3d19cb928c22a32aaae0a4f740113dc48734d3c001657cb8fd2b9497faf16a40c1ecdd7d6581b55b625553af3"
+   , input2 = hxs "33c2f0d68584803b9dc05b3b0b9cbd6683edc0ce742bb09957613e44150205679d3f61a467b25cc758a3b0"
+   , output = hxs "13808014808080189900422a0288ac0203640002540830091400164401020021093f210424001cc55082101b55b625553af3"
+   }
+ ]
+
+-- Test cases adapted from the Plutus Core conformance tests
+-- The `orByteString` function can never fail.
+orByteStringParams :: [Params]
+orByteStringParams =
+  [ Params
+    { extend = False
+    , input1 = hxs ""
+    , input2 = hxs "ff"
+    , output = hxs ""
+    }
+  , Params
+    { extend = False
+    , input1 = hxs "ff"
+    , input2 = hxs ""
+    , output = hxs ""
+    }
+  , Params
+    { extend = False
+    , input1 = hxs "ff"
+    , input2 = hxs "00"
+    , output = hxs "ff"
+    }
+  , Params
+    { extend = False
+    , input1 = hxs "00"
+    , input2 = hxs "ff"
+    , output = hxs "ff"
+    }
+  , Params
+    { extend = False
+    , input1 = hxs "4f00"
+    , input2 = hxs "f4"
+    , output = hxs "ff"
+    }
+  , Params
+    { extend = True
+    , input1 = hxs ""
+    , input2 = hxs "ff"
+    , output = hxs "ff"
+    }
+  , Params
+    { extend = True
+    , input1 = hxs "ff"
+    , input2 = hxs ""
+    , output = hxs "ff"
+    }
+  , Params
+    { extend = True
+    , input1 = hxs "ff"
+    , input2 = hxs "00"
+    , output = hxs "ff"
+    }
+  , Params
+    { extend = True
+    , input1 = hxs "00"
+    , input2 = hxs "ff"
+    , output = hxs "ff"
+    }
+  , Params
+    { extend = True
+    , input1 = hxs "4f00"
+    , input2 = hxs "f4"
+    , output = hxs "ff00"
+    }
+  , Params
+    { extend = False
+    , input1 = hxs "33c2f0d68584803b9dc05b3b0b9cbd6683edc0ce742bb09957613e44150205679d3f61a467b25cc758a3b0"
+    , input2 = hxs "db9c861c98a3d19cb928c22a32aaae0a4f740113dc48734d3c001657cb8fd2b9497faf16a40c1ecdd7d6581b55b625553af3"
+    , output = hxs "fbdef6de9da7d1bfbde8db3b3bbebf6ecffdc1dffc6bf3dd7f613e57df8fd7ffdd7fefb6e7be5ecfdff7f8"
+    }
+  , Params
+    { extend = True
+    , input1 = hxs "33c2f0d68584803b9dc05b3b0b9cbd6683edc0ce742bb09957613e44150205679d3f61a467b25cc758a3b0"
+    , input2 = hxs "db9c861c98a3d19cb928c22a32aaae0a4f740113dc48734d3c001657cb8fd2b9497faf16a40c1ecdd7d6581b55b625553af3"
+    , output = hxs "fbdef6de9da7d1bfbde8db3b3bbebf6ecffdc1dffc6bf3dd7f613e57df8fd7ffdd7fefb6e7be5ecfdff7f81b55b625553af3"
+    }
+  , Params
+    { extend = False
+    , input1 = hxs "db9c861c98a3d19cb928c22a32aaae0a4f740113dc48734d3c001657cb8fd2b9497faf16a40c1ecdd7d6581b55b625553af3"
+    , input2 = hxs "33c2f0d68584803b9dc05b3b0b9cbd6683edc0ce742bb09957613e44150205679d3f61a467b25cc758a3b0"
+    , output = hxs "fbdef6de9da7d1bfbde8db3b3bbebf6ecffdc1dffc6bf3dd7f613e57df8fd7ffdd7fefb6e7be5ecfdff7f8"
+    }
+  , Params
+    { extend = True
+    , input1 = hxs "db9c861c98a3d19cb928c22a32aaae0a4f740113dc48734d3c001657cb8fd2b9497faf16a40c1ecdd7d6581b55b625553af3"
+    , input2 = hxs "33c2f0d68584803b9dc05b3b0b9cbd6683edc0ce742bb09957613e44150205679d3f61a467b25cc758a3b0"
+    , output = hxs "fbdef6de9da7d1bfbde8db3b3bbebf6ecffdc1dffc6bf3dd7f613e57df8fd7ffdd7fefb6e7be5ecfdff7f81b55b625553af3"
+    }
+  ]
+
+-- Test cases adapted from the Plutus Core conformance tests
+-- The `xorByteString` function can never fail.
+xorByteStringParams :: [Params]
+xorByteStringParams =
+  [ Params
+    { extend = False
+    , input1 = hxs ""
+    , input2 = hxs "ff"
+    , output = hxs ""
+    }
+  , Params
+    { extend = False
+    , input1 = hxs "ff"
+    , input2 = hxs ""
+    , output = hxs ""
+    }
+  , Params
+    { extend = False
+    , input1 = hxs "ff"
+    , input2 = hxs "00"
+    , output = hxs "ff"
+    }
+  , Params
+    { extend = False
+    , input1 = hxs "00"
+    , input2 = hxs "ff"
+    , output = hxs "ff"
+    }
+  , Params
+    { extend = False
+    , input1 = hxs "4f00"
+    , input2 = hxs "f4"
+    , output = hxs "bb"
+    }
+  , Params
+    { extend = True
+    , input1 = hxs ""
+    , input2 = hxs "ff"
+    , output = hxs "ff"
+    }
+  , Params
+    { extend = True
+    , input1 = hxs "ff"
+    , input2 = hxs ""
+    , output = hxs "ff"
+    }
+  , Params
+    { extend = True
+    , input1 = hxs "ff"
+    , input2 = hxs "00"
+    , output = hxs "ff"
+    }
+  , Params
+    { extend = True
+    , input1 = hxs "00"
+    , input2 = hxs "ff"
+    , output = hxs "ff"
+    }
+  , Params
+    { extend = True
+    , input1 = hxs "4f00"
+    , input2 = hxs "f4"
+    , output = hxs "bb00"
+    }
+  , Params
+    { extend = False
+    , input1 = hxs "33c2f0d68584803b9dc05b3b0b9cbd6683edc0ce742bb09957613e44150205679d3f61a467b25cc758a3b0"
+    , input2 = hxs "db9c861c98a3d19cb928c22a32aaae0a4f740113dc48734d3c001657cb8fd2b9497faf16a40c1ecdd7d6581b55b625553af3"
+    , output = hxs "e85e76ca1d2751a724e899113936136ccc99c1dda863c3d46b612813de8dd7ded440ceb2c3be420a8f75e8"
+    }
+  , Params
+    { extend = True
+    , input1 = hxs "33c2f0d68584803b9dc05b3b0b9cbd6683edc0ce742bb09957613e44150205679d3f61a467b25cc758a3b0"
+    , input2 = hxs "db9c861c98a3d19cb928c22a32aaae0a4f740113dc48734d3c001657cb8fd2b9497faf16a40c1ecdd7d6581b55b625553af3"
+    , output = hxs "e85e76ca1d2751a724e899113936136ccc99c1dda863c3d46b612813de8dd7ded440ceb2c3be420a8f75e81b55b625553af3"
+    }
+  , Params
+    { extend = False
+    , input1 = hxs "db9c861c98a3d19cb928c22a32aaae0a4f740113dc48734d3c001657cb8fd2b9497faf16a40c1ecdd7d6581b55b625553af3"
+    , input2 = hxs "33c2f0d68584803b9dc05b3b0b9cbd6683edc0ce742bb09957613e44150205679d3f61a467b25cc758a3b0"
+    , output = hxs "e85e76ca1d2751a724e899113936136ccc99c1dda863c3d46b612813de8dd7ded440ceb2c3be420a8f75e8"
+    }
+  , Params
+    { extend = True
+    , input1 = hxs "db9c861c98a3d19cb928c22a32aaae0a4f740113dc48734d3c001657cb8fd2b9497faf16a40c1ecdd7d6581b55b625553af3"
+    , input2 = hxs "33c2f0d68584803b9dc05b3b0b9cbd6683edc0ce742bb09957613e44150205679d3f61a467b25cc758a3b0"
+    , output = hxs "e85e76ca1d2751a724e899113936136ccc99c1dda863c3d46b612813de8dd7ded440ceb2c3be420a8f75e81b55b625553af3"
+    }
+  ]
