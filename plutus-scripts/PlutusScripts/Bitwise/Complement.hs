@@ -3,7 +3,8 @@
 {-# LANGUAGE TemplateHaskell     #-}
 {-# LANGUAGE ViewPatterns        #-}
 
-module PlutusScripts.Bitwise.Complement where
+module PlutusScripts.Bitwise.Complement (mkComplementByteStringPolicy, succeedingComplementByteStringParams)
+where
 
 import PlutusTx.Prelude qualified as P
 import PlutusTx qualified
@@ -19,18 +20,18 @@ data Params = Params
 PlutusTx.unstableMakeIsData ''Params
 PlutusTx.makeLift ''Params
 
-{-# INLINEABLE mkComplementByteStringSucceedingPolicy #-}
-mkComplementByteStringSucceedingPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
-mkComplementByteStringSucceedingPolicy l _ctx = go l
+{-# INLINEABLE mkComplementByteStringPolicy #-}
+mkComplementByteStringPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
+mkComplementByteStringPolicy l _ctx = go l
   where go [] = BI.unitval
         go (Params{..}:rest) =
           let out = BI.complementByteString input
           in if out P.== output
              then go rest
-             else P.traceError "mkComplementByteStringSucceedingPolicy"
-                  
-complementByteStringParams :: [Params]
-complementByteStringParams =
+             else P.traceError "mkComplementByteStringPolicy"
+
+succeedingComplementByteStringParams :: [Params]
+succeedingComplementByteStringParams =
   [ Params
     { input = hxs ""
     , output = hxs ""
@@ -46,20 +47,9 @@ complementByteStringParams =
   , Params
     { input = hxs "db9c861c98a3d19cb928c22a32aaae0a4f740113dc48734d3c001657cb8fd2b9497faf16a40c1ecdd7d6581b55b625553af3"
     , output = hxs "246379e3675c2e6346d73dd5cd5551f5b08bfeec23b78cb2c3ffe9a834702d46b68050e95bf3e1322829a7e4aa49daaac50c"
-    } 
+    }
   , Params
     { input = hxs "246379e3675c2e6346d73dd5cd5551f5b08bfeec23b78cb2c3ffe9a834702d46b68050e95bf3e1322829a7e4aa49daaac50c"
     , output = hxs "db9c861c98a3d19cb928c22a32aaae0a4f740113dc48734d3c001657cb8fd2b9497faf16a40c1ecdd7d6581b55b625553af3"
     }
  ]
-
-{-
-  shiftByteString  : [ bytestring, integer ] -> bytestring
-  rotateByteString : [ bytestring, integer ] -> bytestring
-  countSetBits     : [ bytestring ] -> integer
-  findFirstSetBit  : [ bytestring ] -> integer
-* readBit          : [ bytestring, integer ] -> bool
-* writeBits        : [ bytestring, list(integer), bool ] -> bytestring
-* replicateByte    : [ integer, integer ] -> bytestring
-  ripemd_160       : [ bytestring ] -> bytestring
--}

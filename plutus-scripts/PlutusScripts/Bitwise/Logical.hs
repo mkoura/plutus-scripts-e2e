@@ -3,7 +3,15 @@
 {-# LANGUAGE TemplateHaskell     #-}
 {-# LANGUAGE ViewPatterns        #-}
 
-module PlutusScripts.Bitwise.Logical where
+module PlutusScripts.Bitwise.Logical (
+  mkAndByteStringPolicy,
+  mkOrByteStringPolicy,
+  mkXorByteStringPolicy,
+  succeedingAndByteStringParams,
+  succeedingOrByteStringParams,
+  succeedingXorByteStringParams
+  )
+where
 
 import PlutusTx qualified
 import PlutusTx.Builtins qualified as BI
@@ -24,40 +32,40 @@ data Params = Params
 PlutusTx.unstableMakeIsData ''Params
 PlutusTx.makeLift ''Params
 
-{-# INLINEABLE mkAndByteStringSucceedingPolicy #-}
-mkAndByteStringSucceedingPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
-mkAndByteStringSucceedingPolicy l _ctx = go l
+{-# INLINEABLE mkAndByteStringPolicy #-}
+mkAndByteStringPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
+mkAndByteStringPolicy l _ctx = go l
   where go [] = BI.unitval
         go (Params{..}:rest) =
           let out = BI.andByteString extend input1 input2
           in if out P.== output
              then go rest
-             else P.traceError "mkAndByteStringSucceedingPolicy"
-  
-{-# INLINEABLE mkOrByteStringSucceedingPolicy #-}
-mkOrByteStringSucceedingPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
-mkOrByteStringSucceedingPolicy l _ctx = go l
+             else P.traceError "mkAndByteStringPolicy"
+
+{-# INLINEABLE mkOrByteStringPolicy #-}
+mkOrByteStringPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
+mkOrByteStringPolicy l _ctx = go l
   where go [] = BI.unitval
         go (Params{..}:rest) =
           let out = BI.orByteString extend input1 input2
           in if out P.== output
              then go rest
-             else P.traceError "mkOrByteStringSucceedingPolicy"
+             else P.traceError "mkOrByteStringPolicy"
 
-{-# INLINEABLE mkXorByteStringSucceedingPolicy #-}
-mkXorByteStringSucceedingPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
-mkXorByteStringSucceedingPolicy l _ctx = go l
+{-# INLINEABLE mkXorByteStringPolicy #-}
+mkXorByteStringPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
+mkXorByteStringPolicy l _ctx = go l
   where go [] = BI.unitval
         go (Params{..}:rest) =
           let out = BI.xorByteString extend input1 input2
           in if out P.== output
              then go rest
-             else P.traceError "mkXorByteStringSucceedingPolicy"
+             else P.traceError "mkXorByteStringPolicy"
 
 -- Test cases adapted from the Plutus Core conformance tests
 -- The `andByteString` function can never fail.
-andByteStringParams :: [Params]
-andByteStringParams =
+succeedingAndByteStringParams :: [Params]
+succeedingAndByteStringParams =
  [ Params
    { extend = False
    , input1 = hxs ""
@@ -146,8 +154,8 @@ andByteStringParams =
 
 -- Test cases adapted from the Plutus Core conformance tests
 -- The `orByteString` function can never fail.
-orByteStringParams :: [Params]
-orByteStringParams =
+succeedingOrByteStringParams :: [Params]
+succeedingOrByteStringParams =
   [ Params
     { extend = False
     , input1 = hxs ""
@@ -236,8 +244,8 @@ orByteStringParams =
 
 -- Test cases adapted from the Plutus Core conformance tests
 -- The `xorByteString` function can never fail.
-xorByteStringParams :: [Params]
-xorByteStringParams =
+succeedingXorByteStringParams :: [Params]
+succeedingXorByteStringParams =
   [ Params
     { extend = False
     , input1 = hxs ""

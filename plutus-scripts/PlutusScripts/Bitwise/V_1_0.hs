@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds           #-}
+{-# LANGUAGE FlexibleContexts    #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskell     #-}
 {-# LANGUAGE TypeApplications    #-}
@@ -11,6 +12,7 @@ module PlutusScripts.Bitwise.V_1_0 where
 import Cardano.Api qualified as C
 import Cardano.Api.Shelley qualified as C
 import PlutusCore.Version (plcVersion100)
+import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusScripts.Bitwise.Conversions (
 --  ByteStringToIntegerParams,
@@ -18,16 +20,16 @@ import PlutusScripts.Bitwise.Conversions (
   mkByteStringToIntegerRoundtripPolicySimple
   )
 import PlutusScripts.Bitwise.Complement (
-  mkComplementByteStringSucceedingPolicy,
-  complementByteStringParams
+  mkComplementByteStringPolicy,
+  succeedingComplementByteStringParams
   )
 import PlutusScripts.Bitwise.Logical (
-  mkAndByteStringSucceedingPolicy,
-  mkOrByteStringSucceedingPolicy,
-  mkXorByteStringSucceedingPolicy,
-  andByteStringParams,
-  orByteStringParams,
-  xorByteStringParams
+  mkAndByteStringPolicy,
+  mkOrByteStringPolicy,
+  mkXorByteStringPolicy,
+  succeedingAndByteStringParams,
+  succeedingOrByteStringParams,
+  succeedingXorByteStringParams
   )
 import PlutusScripts.Helpers (writeSerialisedScript)
 import PlutusTx qualified
@@ -45,48 +47,45 @@ integerToByteStringPolicyScriptV2 = C.PlutusScriptSerialised byteStringToInteger
 writeIntegerToByteStringPolicyScriptV2 :: IO ()
 writeIntegerToByteStringPolicyScriptV2 = writeSerialisedScript "byteStringToIntegerRoundtripPolicyV2" integerToByteStringPolicyScriptV2
 
-andByteStringSucceedingPolicyScriptV3 :: C.PlutusScript C.PlutusScriptV3
-andByteStringSucceedingPolicyScriptV3 =
-  let params = PlutusTx.liftCode plcVersion100 andByteStringParams
-  in C.PlutusScriptSerialised $
-     serialiseCompiledCode $ $$(PlutusTx.compile [|| mkAndByteStringSucceedingPolicy ||])
-     `PlutusTx.unsafeApplyCode` params
+-- Simple end-to-end tests for bitwise builtins in PlutusV3.  All of these are
+-- self-contained: the inputs are compiled into the script rather than being
+-- obtained from a redeemer.
+
+writeV3Script
+  :: PlutusTx.Lift DefaultUni params
+  => String
+  -> (PlutusTx.CompiledCodeIn  DefaultUni DefaultFun (params -> r))
+  -> params
+  -> IO ()
+writeV3Script name code params =
+  let script :: C.PlutusScript C.PlutusScriptV3
+      script = C.PlutusScriptSerialised $ serialiseCompiledCode (code `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion100 params))
+  in writeSerialisedScript name script
 
 writeAndByteStringPolicyScriptsV3 :: IO ()
 writeAndByteStringPolicyScriptsV3 =
-  writeSerialisedScript "andByteStringSucceedingPolicyV3" andByteStringSucceedingPolicyScriptV3
-
-orByteStringSucceedingPolicyScriptV3 :: C.PlutusScript C.PlutusScriptV3
-orByteStringSucceedingPolicyScriptV3 =
-  let params = PlutusTx.liftCode plcVersion100 orByteStringParams
-  in C.PlutusScriptSerialised $
-     serialiseCompiledCode $ $$(PlutusTx.compile [|| mkOrByteStringSucceedingPolicy ||])
-     `PlutusTx.unsafeApplyCode` params
+  writeV3Script
+  "andByteStringPolicyScriptV3"
+  $$(PlutusTx.compile [|| mkAndByteStringPolicy ||])
+  succeedingAndByteStringParams
 
 writeOrByteStringPolicyScriptsV3 :: IO ()
 writeOrByteStringPolicyScriptsV3 =
-  writeSerialisedScript "orByteStringSucceedingPolicyV3" orByteStringSucceedingPolicyScriptV3
-
-xorByteStringSucceedingPolicyScriptV3 :: C.PlutusScript C.PlutusScriptV3
-xorByteStringSucceedingPolicyScriptV3 =
-  let params = PlutusTx.liftCode plcVersion100 xorByteStringParams
-  in C.PlutusScriptSerialised $
-     serialiseCompiledCode $ $$(PlutusTx.compile [|| mkXorByteStringSucceedingPolicy ||])
-     `PlutusTx.unsafeApplyCode` params
+  writeV3Script
+  "orByteStringPolicyScriptV3"
+  $$(PlutusTx.compile [|| mkOrByteStringPolicy ||])
+  succeedingOrByteStringParams
 
 writeXorByteStringPolicyScriptsV3 :: IO ()
 writeXorByteStringPolicyScriptsV3 =
-  writeSerialisedScript "xorByteStringSucceedingPolicyV3" xorByteStringSucceedingPolicyScriptV3
+  writeV3Script
+  "xorByteStringPolicyScriptV3"
+  $$(PlutusTx.compile [|| mkXorByteStringPolicy ||])
+  succeedingXorByteStringParams
 
-complementByteStringSucceedingPolicyScriptV3 :: C.PlutusScript C.PlutusScriptV3
-complementByteStringSucceedingPolicyScriptV3 =
-  let params = PlutusTx.liftCode plcVersion100 complementByteStringParams
-  in C.PlutusScriptSerialised $
-     serialiseCompiledCode $ $$(PlutusTx.compile [|| mkComplementByteStringSucceedingPolicy ||])
-     `PlutusTx.unsafeApplyCode` params
-
-writeComplementByteStringSucceedingPolicyScriptsV3 :: IO ()
-writeComplementByteStringSucceedingPolicyScriptsV3 =
-  writeSerialisedScript "complementByteStringSucceedingPolicyV3" complementByteStringSucceedingPolicyScriptV3
-
-
+writeComplementByteStringPolicyScriptsV3 :: IO ()
+writeComplementByteStringPolicyScriptsV3 =
+  writeV3Script
+  "complementByteStringPolicyScriptV3"
+  $$(PlutusTx.compile [|| mkComplementByteStringPolicy ||])
+  succeedingComplementByteStringParams

@@ -25,10 +25,4 @@ writeScriptFiles = liftIO $ do
   PS_1_1.writeTimeRangePolicyScriptV3
   PS_1_1.writeWitnessRedeemerPolicyScriptV3
   PS_1_0.writeIntegerToByteStringPolicyScriptV2
---  PS_1_0.writeAndByteStringPolicyScriptsV3
---  PS_1_0.writeOrByteStringPolicyScriptsV3
---  PS_1_0.writeXorByteStringPolicyScriptsV3
-  PS_1_1.writeAndByteStringPolicyScriptsV3
-  PS_1_1.writeOrByteStringPolicyScriptsV3
-  PS_1_1.writeXorByteStringPolicyScriptsV3
-  PS_1_1.writeComplementByteStringSucceedingPolicyScriptsV3
+  PS_1_1.writeBitwisePolicyScriptsV3

@@ -1,9 +1,9 @@
 {-# LANGUAGE DataKinds           #-}
+{-# LANGUAGE FlexibleContexts    #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskell     #-}
 {-# LANGUAGE TypeApplications    #-}
--- Not using all CardanoEra
-{-# OPTIONS_GHC -fno-warn-incomplete-patterns #-}
+
 {-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.1.0 #-}
 
 module PlutusScripts.Bitwise.V_1_1 where
@@ -12,8 +12,19 @@ import Cardano.Api qualified as C
 import Cardano.Api.Shelley qualified as C
 import Helpers.ScriptUtils (IsScriptContext (mkUntypedMintingPolicy))
 import PlutusCore.Version (plcVersion110)
+import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusLedgerApi.V3 qualified as PlutusV3
+import PlutusScripts.Bitwise.Complement (
+  mkComplementByteStringPolicy,
+  succeedingComplementByteStringParams
+  )
+import PlutusScripts.Bitwise.CountFindFirstSet (
+  mkCountSetBitsPolicy,
+  mkFindFirstSetBitPolicy,
+  succeedingCountSetBitsParams,
+  succeedingFindFirstSetBitParams
+  )
 import PlutusScripts.Bitwise.Conversions (
     ByteStringToIntegerParams,
     IntegerToByteStringParams,
@@ -22,17 +33,34 @@ import PlutusScripts.Bitwise.Conversions (
     mkByteStringToIntegerRoundtripPolicy,
     mkIntegerToByteStringPolicy
   )
-import PlutusScripts.Bitwise.Complement (
-  mkComplementByteStringSucceedingPolicy,
-  complementByteStringParams
-  )
 import PlutusScripts.Bitwise.Logical (
-  mkAndByteStringSucceedingPolicy,
-  mkOrByteStringSucceedingPolicy,
-  mkXorByteStringSucceedingPolicy,
-  andByteStringParams,
-  orByteStringParams,
-  xorByteStringParams
+  mkAndByteStringPolicy,
+  mkOrByteStringPolicy,
+  mkXorByteStringPolicy,
+  succeedingAndByteStringParams,
+  succeedingOrByteStringParams,
+  succeedingXorByteStringParams
+  )
+import PlutusScripts.Bitwise.ShiftRotate (
+  mkRotateByteStringPolicy,
+  mkShiftByteStringPolicy,
+  succeedingRotateByteStringParams,
+  succeedingShiftByteStringParams
+  )
+import PlutusScripts.Bitwise.ReadBit (
+  mkReadBitPolicy,
+  failingReadBitParams,
+  succeedingReadBitParams
+  )
+import PlutusScripts.Bitwise.ReplicateByte (
+  mkReplicateBytePolicy,
+  failingReplicateByteParams,
+  succeedingReplicateByteParams
+  )
+import PlutusScripts.Bitwise.WriteBits (
+  mkWriteBitsPolicy,
+  failingWriteBitsParams,
+  succeedingWriteBitsParams
   )
 import PlutusScripts.Helpers (mintScriptWitness, plutusL3, policyIdV3, toScriptData,
                               writeSerialisedScript)
@@ -115,46 +143,146 @@ byteStringToIntegerAndBackMintWitnessV3 sbe redeemer =
       (toScriptData redeemer)
   )
 
-andByteStringSucceedingPolicyScriptV3 :: C.PlutusScript C.PlutusScriptV3
-andByteStringSucceedingPolicyScriptV3 =
-  let params = PlutusTx.liftCode plcVersion110 andByteStringParams
-  in C.PlutusScriptSerialised $
-     serialiseCompiledCode $ $$(PlutusTx.compile [|| mkAndByteStringSucceedingPolicy ||])
-     `PlutusTx.unsafeApplyCode` params
+-- Simple end-to-end tests for bitwise builtins in PlutusV3.  All of these are
+-- self-contained: the inputs are compiled into the script rather than being
+-- obtained from a redeemer.
+
+-- Each script takes a list of inputs and expected results and iterates over
+-- them, checking that the given inputs produce the expected result.
+writeSuceedingV3Script
+  :: PlutusTx.Lift DefaultUni [param]
+  => String
+  -> (PlutusTx.CompiledCodeIn  DefaultUni DefaultFun ([param] -> r))
+  -> [param]
+  -> IO ()
+writeSuceedingV3Script name code params =
+  let script :: C.PlutusScript C.PlutusScriptV3
+      script = C.PlutusScriptSerialised $ serialiseCompiledCode (code `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion110 params))
+  in writeSerialisedScript name script
+
+-- This takes a list of inputs which are expected to cauase a failure.  For
+-- failing tests, we have to produce a separate script for every set of inputs
+-- because we want to check that *all* cases fail.  We re-use the same script as
+-- for succeeding inputs but supply it with a list containing a single set of
+-- inputs.
+writeFailingV3Scripts
+  :: PlutusTx.Lift DefaultUni [param]
+  => String
+  -> (PlutusTx.CompiledCodeIn  DefaultUni DefaultFun ([param] -> r))
+  -> [param]
+  -> IO ()
+writeFailingV3Scripts name code params =
+  let writeOneScript (n::Integer, param) =
+        let script :: C.PlutusScript C.PlutusScriptV3
+            script = C.PlutusScriptSerialised $
+              serialiseCompiledCode (code `PlutusTx.unsafeApplyCode`
+                                      (PlutusTx.liftCode plcVersion110 [param]))
+        in writeSerialisedScript (name ++ "_" ++ show n) script
+  in mapM_ writeOneScript $ zip [1..] params
 
 writeAndByteStringPolicyScriptsV3 :: IO ()
 writeAndByteStringPolicyScriptsV3 =
-  writeSerialisedScript "andByteStringSucceedingPolicyV3" andByteStringSucceedingPolicyScriptV3
-
-orByteStringSucceedingPolicyScriptV3 :: C.PlutusScript C.PlutusScriptV3
-orByteStringSucceedingPolicyScriptV3 =
-  let params = PlutusTx.liftCode plcVersion110 orByteStringParams
-  in C.PlutusScriptSerialised $
-     serialiseCompiledCode $ $$(PlutusTx.compile [|| mkOrByteStringSucceedingPolicy ||])
-     `PlutusTx.unsafeApplyCode` params
+  writeSuceedingV3Script
+    "succeedingAndByteStringPolicyScriptV3"
+    $$(PlutusTx.compile [|| mkAndByteStringPolicy ||])
+    succeedingAndByteStringParams
 
 writeOrByteStringPolicyScriptsV3 :: IO ()
 writeOrByteStringPolicyScriptsV3 =
-  writeSerialisedScript "orByteStringSucceedingPolicyV3" orByteStringSucceedingPolicyScriptV3
-
-xorByteStringSucceedingPolicyScriptV3 :: C.PlutusScript C.PlutusScriptV3
-xorByteStringSucceedingPolicyScriptV3 =
-  let params = PlutusTx.liftCode plcVersion110 xorByteStringParams
-  in C.PlutusScriptSerialised $
-     serialiseCompiledCode $ $$(PlutusTx.compile [|| mkXorByteStringSucceedingPolicy ||])
-     `PlutusTx.unsafeApplyCode` params
+  writeSuceedingV3Script
+    "succeedingByteStringPolicyScriptV3"
+    $$(PlutusTx.compile [|| mkOrByteStringPolicy ||])
+    succeedingOrByteStringParams
 
 writeXorByteStringPolicyScriptsV3 :: IO ()
 writeXorByteStringPolicyScriptsV3 =
-  writeSerialisedScript "xorByteStringSucceedingPolicyV3" xorByteStringSucceedingPolicyScriptV3
+  writeSuceedingV3Script
+    "succeedingXorByteStringPolicyScriptV3"
+    $$(PlutusTx.compile [|| mkXorByteStringPolicy ||])
+    succeedingXorByteStringParams
 
-complementByteStringSucceedingPolicyScriptV3 :: C.PlutusScript C.PlutusScriptV3
-complementByteStringSucceedingPolicyScriptV3 =
-  let params = PlutusTx.liftCode plcVersion110 complementByteStringParams
-  in C.PlutusScriptSerialised $
-     serialiseCompiledCode $ $$(PlutusTx.compile [|| mkComplementByteStringSucceedingPolicy ||])
-     `PlutusTx.unsafeApplyCode` params
+writeComplementByteStringPolicyScriptsV3 :: IO ()
+writeComplementByteStringPolicyScriptsV3 =
+  writeSuceedingV3Script
+    "succeedingComplementByteStringPolicyScriptV3"
+    $$(PlutusTx.compile [|| mkComplementByteStringPolicy ||])
+    succeedingComplementByteStringParams
 
-writeComplementByteStringSucceedingPolicyScriptsV3 :: IO ()
-writeComplementByteStringSucceedingPolicyScriptsV3 =
-  writeSerialisedScript "complementByteStringSucceedingPolicyV3" complementByteStringSucceedingPolicyScriptV3
+writeShiftByteStringPolicyScriptsV3 :: IO ()
+writeShiftByteStringPolicyScriptsV3 =
+  writeSuceedingV3Script
+    "succeedingShiftByteStringPolicyScriptV3"
+    $$(PlutusTx.compile [|| mkShiftByteStringPolicy ||])
+    succeedingShiftByteStringParams
+
+writeRotateByteStringPolicyScriptsV3 :: IO ()
+writeRotateByteStringPolicyScriptsV3 =
+  writeSuceedingV3Script
+    "succeedingRotateByteStringPolicyScriptV3"
+    $$(PlutusTx.compile [|| mkRotateByteStringPolicy ||])
+    succeedingRotateByteStringParams
+
+writeCountSetBitsPolicyScriptsV3 :: IO ()
+writeCountSetBitsPolicyScriptsV3 =
+  writeSuceedingV3Script
+    "succeedingCountSetBitsPolicyScriptV3"
+    $$(PlutusTx.compile [|| mkCountSetBitsPolicy ||])
+    succeedingCountSetBitsParams
+
+writeFindFirstSetBitPolicyScriptsV3 :: IO ()
+writeFindFirstSetBitPolicyScriptsV3 =
+  writeSuceedingV3Script
+    "succeedingFindFirstSetBitPolicyScriptV3"
+    $$(PlutusTx.compile [|| mkFindFirstSetBitPolicy ||])
+    succeedingFindFirstSetBitParams
+
+writeReadBitPolicyScriptsV3 :: IO ()
+writeReadBitPolicyScriptsV3 = do
+  writeSuceedingV3Script
+    "succeedingReadBitPolicyScriptV3"
+    $$(PlutusTx.compile [|| mkReadBitPolicy ||])
+    succeedingReadBitParams
+  writeFailingV3Scripts
+    "failingReadBitPolicyScriptV3"
+    $$(PlutusTx.compile [|| mkReadBitPolicy ||])
+    failingReadBitParams
+
+writeWriteBitPolicyScriptsV3 :: IO ()
+writeWriteBitPolicyScriptsV3 = do
+  writeSuceedingV3Script
+    "succeedingWriteBitsPolicyScriptV3"
+    $$(PlutusTx.compile [|| mkWriteBitsPolicy ||])
+    succeedingWriteBitsParams
+  writeFailingV3Scripts
+    "failingWriteBitPolicyScriptV3"
+    $$(PlutusTx.compile [|| mkWriteBitsPolicy ||])
+    failingWriteBitsParams
+
+writeReplicateBytePolicyScriptsV3 :: IO ()
+writeReplicateBytePolicyScriptsV3 = do
+  writeSuceedingV3Script
+    "succeedingReplicateBytePolicyScriptV3"
+    $$(PlutusTx.compile [|| mkReplicateBytePolicy ||])
+    succeedingReplicateByteParams
+  writeFailingV3Scripts
+    "failingReplicateBytePolicyScriptV3"
+    $$(PlutusTx.compile [|| mkReplicateBytePolicy ||])
+    failingReplicateByteParams
+
+
+writeReplicateByteStringPolicyScriptsV3 :: IO ()
+writeReplicateByteStringPolicyScriptsV3 = pure()
+
+writeBitwisePolicyScriptsV3 :: IO ()
+writeBitwisePolicyScriptsV3 = do
+  writeAndByteStringPolicyScriptsV3
+  writeOrByteStringPolicyScriptsV3
+  writeXorByteStringPolicyScriptsV3
+  writeComplementByteStringPolicyScriptsV3
+  writeShiftByteStringPolicyScriptsV3
+  writeRotateByteStringPolicyScriptsV3
+  writeCountSetBitsPolicyScriptsV3
+  writeFindFirstSetBitPolicyScriptsV3
+  writeReadBitPolicyScriptsV3
+  writeWriteBitPolicyScriptsV3
+  writeReplicateBytePolicyScriptsV3

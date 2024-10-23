@@ -57,7 +57,12 @@ test-suite plutus-scripts
     PlutusScripts.Basic.V_1_1
     PlutusScripts.Bitwise.Complement
     PlutusScripts.Bitwise.Conversions
+    PlutusScripts.Bitwise.CountFindFirstSet
     PlutusScripts.Bitwise.Logical
+    PlutusScripts.Bitwise.ShiftRotate
+    PlutusScripts.Bitwise.ReplicateByte
+    PlutusScripts.Bitwise.ReadBit
+    PlutusScripts.Bitwise.WriteBits
     PlutusScripts.Bitwise.V_1_0
     PlutusScripts.Bitwise.V_1_1
     PlutusScripts.BLS
