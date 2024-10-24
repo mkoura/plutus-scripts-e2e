@@ -30,6 +30,7 @@ mkComplementByteStringPolicy l _ctx = go l
              then go rest
              else P.traceError "mkComplementByteStringPolicy"
 
+-- Succeeding inputs; `complementByteString` can't fail.
 succeedingComplementByteStringParams :: [Params]
 succeedingComplementByteStringParams =
   [ Params

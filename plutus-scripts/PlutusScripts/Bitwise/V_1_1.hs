@@ -143,16 +143,16 @@ byteStringToIntegerAndBackMintWitnessV3 sbe redeemer =
       (toScriptData redeemer)
   )
 
--- Simple end-to-end tests for bitwise builtins in PlutusV3.  All of these are
--- self-contained: the inputs are compiled into the script rather than being
--- obtained from a redeemer.
+{- Simple end-to-end tests for bitwise builtins in PlutusV3.  All of these are
+   self-contained: the inputs are compiled into the script rather than being
+   obtained from a redeemer or similar. -}
 
 -- Each script takes a list of inputs and expected results and iterates over
 -- them, checking that the given inputs produce the expected result.
 writeSuceedingV3Script
   :: PlutusTx.Lift DefaultUni [param]
   => String
-  -> (PlutusTx.CompiledCodeIn  DefaultUni DefaultFun ([param] -> r))
+  -> (PlutusTx.CompiledCodeIn DefaultUni DefaultFun ([param] -> r))
   -> [param]
   -> IO ()
 writeSuceedingV3Script name code params =
@@ -161,7 +161,7 @@ writeSuceedingV3Script name code params =
   in writeSerialisedScript name script
 
 -- This takes a list of inputs which are expected to cauase a failure.  For
--- failing tests, we have to produce a separate script for every set of inputs
+-- failing tests we have to produce a separate script for every set of inputs
 -- because we want to check that *all* cases fail.  We re-use the same script as
 -- for succeeding inputs but supply it with a list containing a single set of
 -- inputs.

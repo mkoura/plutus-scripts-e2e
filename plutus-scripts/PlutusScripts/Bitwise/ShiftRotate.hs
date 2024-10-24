@@ -46,6 +46,7 @@ mkRotateByteStringPolicy l _ctx = go l
              then go rest
              else P.traceError "mkRotateByteStringPolicy"
 
+-- Succeeding inputs; `shiftByteString` can't fail.
 succeedingShiftByteStringParams :: [Params]
 succeedingShiftByteStringParams =
   [ Params
@@ -120,6 +121,7 @@ succeedingShiftByteStringParams =
     }
  ]
 
+-- Succeeding inputs; `rotateByteString` can't fail.
 succeedingRotateByteStringParams :: [Params]
 succeedingRotateByteStringParams =
   [  Params

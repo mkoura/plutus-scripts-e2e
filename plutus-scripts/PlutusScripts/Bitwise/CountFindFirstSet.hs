@@ -45,6 +45,7 @@ mkFindFirstSetBitPolicy l _ctx = go l
              then go rest
              else P.traceError "mkFindFirstSetBitPolicy"
 
+-- Succeeding inputs; `countSetBits` can't fail.
 succeedingCountSetBitsParams :: [Params]
 succeedingCountSetBitsParams =
   [ Params
@@ -81,6 +82,7 @@ succeedingCountSetBitsParams =
     }
   ]
 
+-- Succeeding inputs; `findFirstSetBit` can't fail.
 succeedingFindFirstSetBitParams :: [Params]
 succeedingFindFirstSetBitParams =
   [ Params
