@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name:          plutus-scripts
-version:       1.0.0.0
+version:       1.0.0.1
 synopsis:      Plutus scripts used for cardano-node-tests
 description:   Plutus scripts used for cardano-node-tests.
 category:
@@ -93,11 +93,13 @@ test-suite plutus-scripts
   -- IOG dependencies
   --------------------------
   build-depends:
-    , cardano-api        ^>=8.48.0.1
-    , plutus-core        ^>=1.30
-    , plutus-ledger-api  ^>=1.30
-    , plutus-tx          ^>=1.30
-    , plutus-tx-plugin   ^>=1.30
+    , cardano-api        ^>=10.1
+    , data-default       <0.8
+    , plutus-core        ^>=1.36
+    , plutus-ledger-api  ^>=1.36
+    , plutus-tx          ^>=1.36
+    , plutus-tx-plugin   ^>=1.36
+
 
   ------------------------
   -- Non-IOG dependencies
