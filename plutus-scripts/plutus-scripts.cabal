@@ -94,10 +94,12 @@ test-suite plutus-scripts
   --------------------------
   build-depends:
     , cardano-api        ^>=10.1
+    , data-default       <0.8
     , plutus-core        ^>=1.36
     , plutus-ledger-api  ^>=1.36
     , plutus-tx          ^>=1.36
     , plutus-tx-plugin   ^>=1.36
+
 
   ------------------------
   -- Non-IOG dependencies
