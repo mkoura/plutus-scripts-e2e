@@ -30,7 +30,7 @@ mkReplicateBytePolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
 mkReplicateBytePolicy l _ctx = go l
   where go [] = BI.unitval
         go (Params{..}:rest) =
-          let out = BI.replicateByte byte count
+          let out = BI.replicateByte count byte
           in if out P.== output
              then go rest
              else P.traceError "mkReplicateBytePolicy"
