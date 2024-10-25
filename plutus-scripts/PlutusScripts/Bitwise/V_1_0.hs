@@ -19,10 +19,6 @@ import PlutusScripts.Bitwise.Conversions (
 --  IntegerToByteStringParams,
   mkByteStringToIntegerRoundtripPolicySimple
   )
-import PlutusScripts.Bitwise.Complement (
-  mkComplementByteStringPolicy,
-  succeedingComplementByteStringParams
-  )
 import PlutusScripts.Bitwise.Logical (
   mkAndByteStringPolicy,
   mkOrByteStringPolicy,
@@ -51,6 +47,10 @@ writeIntegerToByteStringPolicyScriptV2 = writeSerialisedScript "byteStringToInte
 -- self-contained: the inputs are compiled into the script rather than being
 -- obtained from a redeemer.
 
+-- These are not currently used (see Spec.WriteScriptFiles), but they
+-- demonstrate that the code does work.  Note that the script names are the same
+-- as those of the V_1_1 scripts: if we ever need these then they'll have to be
+-- either renamed or written into a different directory.
 writeV3Script
   :: PlutusTx.Lift DefaultUni params
   => String
@@ -82,10 +82,3 @@ writeXorByteStringPolicyScriptsV3 =
   "xorByteStringPolicyScriptV3"
   $$(PlutusTx.compile [|| mkXorByteStringPolicy ||])
   succeedingXorByteStringParams
-
-writeComplementByteStringPolicyScriptsV3 :: IO ()
-writeComplementByteStringPolicyScriptsV3 =
-  writeV3Script
-  "complementByteStringPolicyScriptV3"
-  $$(PlutusTx.compile [|| mkComplementByteStringPolicy ||])
-  succeedingComplementByteStringParams
