@@ -31,20 +31,18 @@ mkShiftByteStringPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
 mkShiftByteStringPolicy l _ctx = go l
   where go [] = BI.unitval
         go (Params{..}:rest) =
-          let out = BI.shiftByteString s n
-          in if out P.== output
-             then go rest
-             else P.traceError "mkShiftByteStringPolicy"
+          if BI.shiftByteString s n P.== output
+          then go rest
+          else P.traceError "mkShiftByteStringPolicy"
 
 {-# INLINEABLE mkRotateByteStringPolicy #-}
 mkRotateByteStringPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
 mkRotateByteStringPolicy l _ctx = go l
   where go [] = BI.unitval
         go (Params{..}:rest) =
-          let out = BI.rotateByteString s n
-          in if out P.== output
-             then go rest
-             else P.traceError "mkRotateByteStringPolicy"
+          if BI.rotateByteString s n P.== output
+          then go rest
+          else P.traceError "mkRotateByteStringPolicy"
 
 -- Succeeding inputs; `shiftByteString` can't fail.
 succeedingShiftByteStringParams :: [Params]

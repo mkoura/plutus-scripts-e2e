@@ -143,7 +143,7 @@ alwaysSucceedSpendWitnessV1 era mRefScript mDatum =
       era
       plutusL1
       (maybe (Left alwaysSucceedSpendScriptV1) (\refScript -> Right refScript) mRefScript) -- script or reference script
-      (maybe C.InlineScriptDatum (\datum -> C.ScriptDatumForTxIn datum) mDatum) -- inline datum or datum value
+      (maybe C.InlineScriptDatum (\datum -> C.ScriptDatumForTxIn $ pure datum) mDatum) -- inline datum or datum value
       (toScriptData ()) -- redeemer
 
 alwaysSucceedSpendWitnessV2
@@ -157,7 +157,7 @@ alwaysSucceedSpendWitnessV2 era mRefScript mDatum =
       era
       plutusL2
       (maybe (Left alwaysSucceedSpendScriptV2) (\refScript -> Right refScript) mRefScript) -- script or reference script
-      (maybe C.InlineScriptDatum (\datum -> C.ScriptDatumForTxIn datum) mDatum) -- inline datum or datum value
+      (maybe C.InlineScriptDatum (\datum -> C.ScriptDatumForTxIn $ pure datum) mDatum) -- inline datum or datum value
       (toScriptData ()) -- redeemer
 
 -- AlwaysFails minting policy --

@@ -30,20 +30,18 @@ mkCountSetBitsPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
 mkCountSetBitsPolicy l _ctx = go l
   where go [] = BI.unitval
         go (Params{..}:rest) =
-          let out = BI.countSetBits input
-          in if out P.== output
-             then go rest
-             else P.traceError "mkCountSetBitsPolicy"
+          if BI.countSetBits input P.== output
+          then go rest
+          else P.traceError "mkCountSetBitsPolicy"
 
 {-# INLINEABLE mkFindFirstSetBitPolicy #-}
 mkFindFirstSetBitPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
 mkFindFirstSetBitPolicy l _ctx = go l
   where go [] = BI.unitval
         go (Params{..}:rest) =
-          let out = BI.findFirstSetBit input
-          in if out P.== output
-             then go rest
-             else P.traceError "mkFindFirstSetBitPolicy"
+          if BI.findFirstSetBit input P.== output
+          then go rest
+          else P.traceError "mkFindFirstSetBitPolicy"
 
 -- Succeeding inputs; `countSetBits` can't fail.
 succeedingCountSetBitsParams :: [Params]

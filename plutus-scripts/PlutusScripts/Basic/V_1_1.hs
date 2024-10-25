@@ -108,7 +108,7 @@ alwaysSucceedSpendWitnessV3 era mRefScript mDatum =
       era
       plutusL3
       (maybe (Left alwaysSucceedSpendScriptV3) Right mRefScript) -- script or reference script
-      (maybe C.InlineScriptDatum C.ScriptDatumForTxIn mDatum) -- inline datum or datum value
+      (maybe C.InlineScriptDatum (C.ScriptDatumForTxIn . pure) mDatum) -- inline datum or datum value
       (toScriptData ()) -- redeemer
 
 -- AlwaysFails minting policy --

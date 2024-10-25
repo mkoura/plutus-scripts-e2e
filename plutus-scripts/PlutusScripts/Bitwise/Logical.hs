@@ -37,30 +37,27 @@ mkAndByteStringPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
 mkAndByteStringPolicy l _ctx = go l
   where go [] = BI.unitval
         go (Params{..}:rest) =
-          let out = BI.andByteString extend input1 input2
-          in if out P.== output
-             then go rest
-             else P.traceError "mkAndByteStringPolicy"
+          if BI.andByteString extend input1 input2 P.== output
+          then go rest
+          else P.traceError "mkAndByteStringPolicy"
 
 {-# INLINEABLE mkOrByteStringPolicy #-}
 mkOrByteStringPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
 mkOrByteStringPolicy l _ctx = go l
   where go [] = BI.unitval
         go (Params{..}:rest) =
-          let out = BI.orByteString extend input1 input2
-          in if out P.== output
-             then go rest
-             else P.traceError "mkOrByteStringPolicy"
+          if BI.orByteString extend input1 input2 P.== output
+          then go rest
+          else P.traceError "mkOrByteStringPolicy"
 
 {-# INLINEABLE mkXorByteStringPolicy #-}
 mkXorByteStringPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
 mkXorByteStringPolicy l _ctx = go l
   where go [] = BI.unitval
         go (Params{..}:rest) =
-          let out = BI.xorByteString extend input1 input2
-          in if out P.== output
-             then go rest
-             else P.traceError "mkXorByteStringPolicy"
+          if BI.xorByteString extend input1 input2 P.== output
+          then go rest
+          else P.traceError "mkXorByteStringPolicy"
 
 -- Test cases adapted from the Plutus Core conformance tests
 -- The `andByteString` function can never fail.

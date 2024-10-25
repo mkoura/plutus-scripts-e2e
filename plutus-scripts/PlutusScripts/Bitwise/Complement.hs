@@ -25,10 +25,9 @@ mkComplementByteStringPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
 mkComplementByteStringPolicy l _ctx = go l
   where go [] = BI.unitval
         go (Params{..}:rest) =
-          let out = BI.complementByteString input
-          in if out P.== output
-             then go rest
-             else P.traceError "mkComplementByteStringPolicy"
+          if BI.complementByteString input P.== output
+          then go rest
+          else P.traceError "mkComplementByteStringPolicy"
 
 -- Succeeding inputs; `complementByteString` can't fail.
 succeedingComplementByteStringParams :: [Params]

@@ -26,10 +26,9 @@ mkReadBitPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
 mkReadBitPolicy l _ctx = go l
   where go [] = BI.unitval
         go (Params{..}:rest) =
-          let out = BI.readBit s i
-          in if out P.== output
-             then go rest
-             else P.traceError "mkReadBitPolicy"
+          if BI.readBit s i P.== output
+          then go rest
+          else P.traceError "mkReadBitPolicy"
 
 succeedingReadBitParams :: [Params]
 succeedingReadBitParams =

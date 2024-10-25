@@ -7,7 +7,7 @@ module PlutusScripts.Bitwise.WriteBits where
 
 import PlutusTx.Prelude qualified as P
 import PlutusTx qualified
--- import PlutusTx.Builtins qualified as BI
+import PlutusTx.Builtins qualified as BI
 import PlutusTx.Builtins.Internal qualified as BI (unitval)
 
 import PlutusScripts.Helpers (hxs)
@@ -22,13 +22,14 @@ PlutusTx.unstableMakeIsData ''Params
 PlutusTx.makeLift ''Params
 
 
--- THIS DOESN'T WORK AT THE MOMENT because this repository has the wrong version of writeBits
 {-# INLINEABLE mkWriteBitsPolicy #-}
 mkWriteBitsPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
 mkWriteBitsPolicy l _ctx = go l
   where go [] = BI.unitval
-        go (_:rest) = go rest
-
+        go (Params{..}:rest) =
+          if BI.writeBits s is b P.== output
+          then go rest
+          else P.traceError "mkWriteBitsPolicy"
 
 -- INCOMPLETE
 succeedingWriteBitsParams :: [Params]
