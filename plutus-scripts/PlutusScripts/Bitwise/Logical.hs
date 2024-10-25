@@ -1,3 +1,7 @@
+{-| Simple end-to-end tests for the Plutus Core `andByteString`, `orByteString`,
+and `xorByteString` builtins.  These are adapted from the `plutus-conformance`
+tests. -}
+
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE RecordWildCards     #-}
 {-# LANGUAGE TemplateHaskell     #-}
@@ -59,8 +63,7 @@ mkXorByteStringPolicy l _ctx = go l
           then go rest
           else P.traceError "mkXorByteStringPolicy"
 
--- Test cases adapted from the Plutus Core conformance tests
--- The `andByteString` function can never fail.
+-- Succeeding inputs; the `andByteString` function can never fail.
 succeedingAndByteStringParams :: [Params]
 succeedingAndByteStringParams =
  [ Params
@@ -149,8 +152,7 @@ succeedingAndByteStringParams =
    }
  ]
 
--- Test cases adapted from the Plutus Core conformance tests
--- The `orByteString` function can never fail.
+-- Succeeding inputs; the `orByteString` function can never fail.
 succeedingOrByteStringParams :: [Params]
 succeedingOrByteStringParams =
   [ Params
@@ -239,8 +241,7 @@ succeedingOrByteStringParams =
     }
   ]
 
--- Test cases adapted from the Plutus Core conformance tests
--- The `xorByteString` function can never fail.
+-- Succeeding inputs; the `xorByteString` function can never fail.
 succeedingXorByteStringParams :: [Params]
 succeedingXorByteStringParams =
   [ Params

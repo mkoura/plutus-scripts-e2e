@@ -1,3 +1,6 @@
+{-| Simple end-to-end tests for the Plutus Core `writeBits` builtin.  These are
+adapted from the `plutus-conformance` tests. -}
+
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE RecordWildCards     #-}
 {-# LANGUAGE TemplateHaskell     #-}
@@ -20,7 +23,6 @@ data Params = Params
   }
 PlutusTx.unstableMakeIsData ''Params
 PlutusTx.makeLift ''Params
-
 
 {-# INLINEABLE mkWriteBitsPolicy #-}
 mkWriteBitsPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
