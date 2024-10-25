@@ -20,7 +20,7 @@ import PlutusTx.Builtins qualified as BI
 import PlutusTx.Prelude qualified as P
 import System.Directory (createDirectoryIfMissing)
 
--- | Treat string of hexidecimal bytes literally, without encoding. Useful for hashes.
+-- | Treat string of hexadecimal bytes literally, without encoding. Useful for hashes.
 bytesFromHex :: BS.ByteString -> BS.ByteString
 bytesFromHex = P.bytes . fromEither . P.fromHex
   where
