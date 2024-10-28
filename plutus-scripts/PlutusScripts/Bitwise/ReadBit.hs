@@ -58,7 +58,7 @@ succeedingReadBitParams =
   , Params
     { s = hxs "f4"
     , i = 4
-    , output = False
+    , output = True
     }
   , Params
     { s = hxs "f4"

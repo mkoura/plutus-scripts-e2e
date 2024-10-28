@@ -190,7 +190,7 @@ writeAndByteStringPolicyScriptsV3 =
 writeOrByteStringPolicyScriptsV3 :: IO ()
 writeOrByteStringPolicyScriptsV3 =
   writeSuceedingV3Script
-    "succeedingByteStringPolicyScriptV3"
+    "succeedingOrByteStringPolicyScriptV3"
     $$(PlutusTx.compile [|| mkOrByteStringPolicy ||])
     succeedingOrByteStringParams
 
@@ -254,7 +254,7 @@ writeWriteBitPolicyScriptsV3 = do
     $$(PlutusTx.compile [|| mkWriteBitsPolicy ||])
     succeedingWriteBitsParams
   writeFailingV3Scripts
-    "failingWriteBitPolicyScriptV3"
+    "failingWriteBitsPolicyScriptV3"
     $$(PlutusTx.compile [|| mkWriteBitsPolicy ||])
     failingWriteBitsParams
 
