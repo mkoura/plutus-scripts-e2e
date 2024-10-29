@@ -14,6 +14,7 @@ import PlutusScripts.Basic.V_1_1 qualified as PS_1_1
 import PlutusScripts.Bitwise.V_1_0 qualified as PS_1_0
 import PlutusScripts.Bitwise.V_1_1 qualified as PS_1_1
 import PlutusScripts.SECP256k1.V_1_1 qualified as PS_1_1
+import PlutusScripts.Hashing.V_1_1 qualified as PS_1_1
 
 writeScriptFiles :: (MonadIO m) => m ()
 writeScriptFiles = liftIO $ do
@@ -26,3 +27,4 @@ writeScriptFiles = liftIO $ do
   PS_1_1.writeWitnessRedeemerPolicyScriptV3
   PS_1_0.writeIntegerToByteStringPolicyScriptV2
   PS_1_1.writeBitwisePolicyScriptsV3
+  PS_1_1.writeRipemd_160PolicyScriptV3

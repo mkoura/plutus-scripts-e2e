@@ -160,7 +160,7 @@ writeSuceedingV3Script name code params =
       script = C.PlutusScriptSerialised $ serialiseCompiledCode (code `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion110 params))
   in writeSerialisedScript name script
 
--- This takes a list of inputs which are expected to cauase a failure.  For
+-- This takes a list of inputs which are expected to cause a failure.  For
 -- failing tests we have to produce a separate script for every set of inputs
 -- because we want to check that *all* cases fail.  We re-use the same script as
 -- for succeeding inputs but supply it with a list containing a single set of

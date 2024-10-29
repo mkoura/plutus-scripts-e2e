@@ -88,6 +88,7 @@ test-suite plutus-scripts
     PlutusScripts.Governance.Common
     PlutusScripts.Governance.V_1_1
     PlutusScripts.Hashing.Common
+    PlutusScripts.Hashing.RIPEMD_160
     PlutusScripts.Hashing.V_1_0
     PlutusScripts.Hashing.V_1_1
     PlutusScripts.Helpers
