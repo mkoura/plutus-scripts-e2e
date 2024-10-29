@@ -18,7 +18,7 @@ import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusCore.Version (plcVersion110)
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusScripts.Hashing.Common (hashingAssetName, hashingParamsV3, mkHashingPolicyV3)
-import PlutusScripts.Hashing.RIPEMD_160 (mkRipemd_160Policy, succeedingRipemd_160Params)
+import PlutusScripts.Hashing.Ripemd_160 (mkRipemd_160Policy, succeedingRipemd_160Params)
 import PlutusScripts.Helpers (
   mintScriptWitness,
   plutusL3,
