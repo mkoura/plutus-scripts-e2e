@@ -45,6 +45,8 @@ data V3_HashingParams = V3_HashingParams
   , blake2b_224Short :: InputOutput
   , keccak_256Long :: InputOutput
   , keccak_256Short :: InputOutput
+  , ripemd_160Short :: InputOutput
+  , ripemd_160Long :: InputOutput
   }
 PlutusTx.unstableMakeIsData ''V3_HashingParams
 PlutusTx.makeLift ''V3_HashingParams
@@ -77,6 +79,8 @@ mkHashingPolicyV3 V3_HashingParams{..} _r _sc =
     , hashAndCheckResult BI.blake2b_224 "blake2b_224Short" blake2b_224Short
     , hashAndCheckResult BI.keccak_256 "keccak_256Long" keccak_256Long
     , hashAndCheckResult BI.keccak_256 "keccak_256Short" keccak_256Short
+    , hashAndCheckResult BI.ripemd_160 "ripemd_160Long" ripemd_160Long
+    , hashAndCheckResult BI.ripemd_160 "ripemd_160Short" ripemd_160Short
     ]
 
 {-# INLINEABLE hashAndCheckResult #-}
@@ -210,6 +214,26 @@ keccak256ShortIO =
           bytesFromHex "352c3f362f64da546ec7482811f67d1a201f71cad2dad21dc701277f09ff605f"
     }
 
+ripemd160LongIO :: InputOutput
+ripemd160LongIO =
+  InputOutput
+    { input =
+        BI.toBuiltin $
+          bytesFromHex "2e7ea84da4bc4d7cfb463e3f2c8647057afff3fbececa1d200"
+    , output =
+        BI.toBuiltin $
+          bytesFromHex "f18921115370b049e99dfdd49fc92b371dd7c7e9"
+    }
+
+ripemd160ShortIO :: InputOutput
+ripemd160ShortIO =
+  InputOutput
+    { input = BI.toBuiltin $ bytesFromHex ""
+    , output =
+        BI.toBuiltin $
+          bytesFromHex "9c1185a5c5e9fc54612808977ee8f548b2258d31"
+    }
+
 hashingParamsV1V2 :: V1_V2_HashingParams
 hashingParamsV1V2 =
   V1_V2_HashingParams
@@ -229,6 +253,8 @@ hashingParamsV3 =
     , blake2b_224Short = blake2b_224ShortIO
     , keccak_256Long = keccak256LongIO
     , keccak_256Short = keccak256ShortIO
+    , ripemd_160Short = ripemd160ShortIO
+    , ripemd_160Long = ripemd160LongIO
     }
 
 -- Test inputs and outputs for PlutusV1 and PlutusV2 hashing functions

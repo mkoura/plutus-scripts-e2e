@@ -1,20 +1,16 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE NumericUnderscores #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE ViewPatterns #-}
-{-# OPTIONS_GHC -Wno-missing-fields #-}
--- Not using all CardanoEra
-{-# OPTIONS_GHC -fno-warn-incomplete-patterns #-}
+-- editorconfig-checker-disable-file
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE RecordWildCards     #-}
+{-# LANGUAGE TemplateHaskell     #-}
+{-# LANGUAGE TypeApplications    #-}
+{-# LANGUAGE ViewPatterns        #-}
 
-module PlutusScripts.Bitwise.Common where
+module PlutusScripts.Bitwise.Conversions where
 
 import Cardano.Api qualified as C
 import PlutusLedgerApi.V1 qualified as PV1
-import PlutusScripts.Helpers (bytesFromHex)
+import PlutusScripts.Helpers (hxs)
+
 import PlutusTx qualified
 import PlutusTx.Builtins qualified as BI
 import PlutusTx.Prelude qualified as P
@@ -23,15 +19,15 @@ import GHC.ByteOrder (ByteOrder (BigEndian, LittleEndian))
 
 data ByteStringToIntegerParams = ByteStringToIntegerParams
   { bsByteOrder :: Bool
-  , byteString :: P.BuiltinByteString
-  , expInteger :: Integer
+  , byteString  :: P.BuiltinByteString
+  , expInteger  :: Integer
   }
 PlutusTx.unstableMakeIsData ''ByteStringToIntegerParams
 
 data IntegerToByteStringParams = IntegerToByteStringParams
-  { intByteOrder :: Bool
+  { intByteOrder  :: Bool
   , outputMinSize :: Integer
-  , integer :: Integer
+  , integer       :: Integer
   , expByteString :: P.BuiltinByteString
   }
 PlutusTx.unstableMakeIsData ''IntegerToByteStringParams
@@ -74,7 +70,7 @@ bsToIParams :: ByteStringToIntegerParams
 bsToIParams =
   ByteStringToIntegerParams
     { bsByteOrder = True
-    , byteString = P.toBuiltin $ bytesFromHex "deadbeef"
+    , byteString = hxs "deadbeef"
     , expInteger = 3735928559
     }
 
@@ -84,5 +80,6 @@ iToBsParams =
     { intByteOrder = True
     , integer = 3735928559
     , outputMinSize = 0
-    , expByteString = P.toBuiltin $ bytesFromHex "deadbeef"
+    , expByteString = hxs "deadbeef"
     }
+

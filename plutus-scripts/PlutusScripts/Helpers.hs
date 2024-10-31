@@ -17,14 +17,19 @@ import PlutusLedgerApi.V1.Scripts (Datum (Datum), Redeemer (Redeemer))
 import PlutusLedgerApi.V1.Value (CurrencySymbol)
 import PlutusTx qualified
 import PlutusTx.Builtins qualified as BI
+import PlutusTx.Prelude qualified as P
 import System.Directory (createDirectoryIfMissing)
 
--- | Treat string of hexidecimal bytes literally, without encoding. Useful for hashes.
+-- | Treat string of hexadecimal bytes literally, without encoding. Useful for hashes.
 bytesFromHex :: BS.ByteString -> BS.ByteString
 bytesFromHex = P.bytes . fromEither . P.fromHex
   where
     fromEither (Left e) = error $ show e
     fromEither (Right b) = b
+
+-- Helper to reduce clutter
+hxs :: BS.ByteString -> P.BuiltinByteString
+hxs = BI.toBuiltin . bytesFromHex
 
 {- | Default execution units with zero values. Needed for valid script witness in txbody.
  Useful when exunits are automatically balanced.

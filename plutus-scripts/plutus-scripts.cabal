@@ -55,7 +55,14 @@ test-suite plutus-scripts
     PlutusScripts.Basic.Common
     PlutusScripts.Basic.V_1_0
     PlutusScripts.Basic.V_1_1
-    PlutusScripts.Bitwise.Common
+    PlutusScripts.Bitwise.Complement
+    PlutusScripts.Bitwise.Conversions
+    PlutusScripts.Bitwise.CountFindFirstSet
+    PlutusScripts.Bitwise.Logical
+    PlutusScripts.Bitwise.ShiftRotate
+    PlutusScripts.Bitwise.ReplicateByte
+    PlutusScripts.Bitwise.ReadBit
+    PlutusScripts.Bitwise.WriteBits
     PlutusScripts.Bitwise.V_1_0
     PlutusScripts.Bitwise.V_1_1
     PlutusScripts.BLS
@@ -81,6 +88,7 @@ test-suite plutus-scripts
     PlutusScripts.Governance.Common
     PlutusScripts.Governance.V_1_1
     PlutusScripts.Hashing.Common
+    PlutusScripts.Hashing.Ripemd_160
     PlutusScripts.Hashing.V_1_0
     PlutusScripts.Hashing.V_1_1
     PlutusScripts.Helpers
