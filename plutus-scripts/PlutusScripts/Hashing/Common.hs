@@ -19,6 +19,7 @@ import PlutusScripts.Helpers (
  )
 import PlutusTx qualified
 import PlutusTx.Builtins qualified as BI
+import PlutusTx.List qualified as List
 import PlutusTx.Prelude qualified as P
 
 data InputOutput = InputOutput
@@ -54,7 +55,7 @@ PlutusTx.makeLift ''V3_HashingParams
 {-# INLINEABLE mkHashingPolicyV1V2 #-}
 mkHashingPolicyV1V2 :: V1_V2_HashingParams -> P.BuiltinData -> P.BuiltinData -> Bool
 mkHashingPolicyV1V2 V1_V2_HashingParams{..} _r _sc =
-  P.all
+  List.all
     (P.== True)
     [ hashAndCheckResult BI.sha2_256 "sha2_256Long" sha2_256Long
     , hashAndCheckResult BI.sha2_256 "sha2_256Short" sha2_256Short
@@ -67,7 +68,7 @@ mkHashingPolicyV1V2 V1_V2_HashingParams{..} _r _sc =
 {-# INLINEABLE mkHashingPolicyV3 #-}
 mkHashingPolicyV3 :: V3_HashingParams -> P.BuiltinData -> P.BuiltinData -> Bool
 mkHashingPolicyV3 V3_HashingParams{..} _r _sc =
-  P.all
+  List.all
     (P.== True)
     [ hashAndCheckResult BI.sha2_256 "sha2_256Long" (sha2_256Long v2HashingParams)
     , hashAndCheckResult BI.sha2_256 "sha2_256Short" (sha2_256Short v2HashingParams)

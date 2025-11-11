@@ -18,6 +18,7 @@ import PlutusScripts.Helpers (
   bytesFromHex,
  )
 import PlutusTx qualified
+import PlutusTx.List qualified as List
 import PlutusTx.Prelude qualified as P
 
 data BlsParams = BlsParams
@@ -73,7 +74,7 @@ aggregateSigSingleKeyG1
   -> Bool
 aggregateSigSingleKeyG1 dst BlsParams{..} _sc = do
   let
-    hashedMsgs = P.map (\x -> P.bls12_381_G2_hashToGroup x dst) messages
+    hashedMsgs = List.map (\x -> P.bls12_381_G2_hashToGroup x dst) messages
     pkDeser = P.bls12_381_G1_uncompress pubKey
     aggrSigDeser = P.bls12_381_G2_uncompress aggregateSignature
     aggrMsg = foldl1' P.bls12_381_G2_add hashedMsgs
@@ -87,4 +88,4 @@ aggregateSigSingleKeyG1 dst BlsParams{..} _sc = do
     foldl1' :: (a -> a -> a) -> [a] -> a
     foldl1' _ [] = P.traceError "foldr1: empty list"
     foldl1' _ [_] = P.traceError "foldr1: only one element in list"
-    foldl1' f (x : xs) = P.foldl f x xs
+    foldl1' f (x : xs) = List.foldl f x xs

@@ -9,8 +9,6 @@ module PlutusScripts.Basic.Common where
 
 import Helpers.ScriptUtils (check, constrArgs)
 import PlutusLedgerApi.V1 qualified as P
-import PlutusLedgerApi.V1.Interval qualified as P
-import PlutusLedgerApi.V1.Value qualified as P
 import PlutusLedgerApi.V3 qualified as PV3
 import PlutusTx.Builtins.Internal qualified as BI (
   BuiltinList,
@@ -18,6 +16,7 @@ import PlutusTx.Builtins.Internal qualified as BI (
   tail,
   unitval,
  )
+import PlutusTx.List qualified as List
 import PlutusTx.Prelude qualified as P
 
 -- AlwaysSucceeds minting policy --
@@ -86,7 +85,7 @@ mkMintTokenNamePolicyV3 arg = if checkTokenName then BI.unitval else P.traceErro
     _ -> P.traceError "Lh"
 
   checkTokenName :: Bool
-  checkTokenName = P.valueOf (PV3.txInfoMint txInfo) (ownCurrencySymbol scriptInfo) redeemer P.> 0
+  checkTokenName = P.valueOf (PV3.mintValueMinted (PV3.txInfoMint txInfo)) (ownCurrencySymbol scriptInfo) redeemer P.> 0
 
 -- Time range policy --
 
@@ -146,7 +145,7 @@ mkWitnessRedeemerPolicyV3 arg =
   -- TODO: Use builtin when available in PV3
   txSignedBy :: PV3.TxInfo -> PV3.PubKeyHash -> Bool
   txSignedBy PV3.TxInfo{PV3.txInfoSignatories} k =
-    case P.find (k P.==) txInfoSignatories of
+    case List.find (k P.==) txInfoSignatories of
       P.Just _ -> P.True
       P.Nothing -> P.False
 

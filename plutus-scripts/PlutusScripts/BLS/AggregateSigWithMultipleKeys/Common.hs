@@ -19,6 +19,7 @@ import PlutusScripts.Helpers (
  )
 import PlutusTx qualified
 import PlutusTx.Builtins qualified as BI
+import PlutusTx.List qualified as List
 import PlutusTx.Prelude qualified as P
 
 import GHC.ByteOrder (ByteOrder (LittleEndian))
@@ -117,7 +118,7 @@ aggregateMultiKeyG2Script
 aggregateMultiKeyG2Script bs16Null dst BlsParams{..} _sc = do
   let
     hashedMsg = P.bls12_381_G1_hashToGroup message dst
-    pksDeser = P.map P.bls12_381_G2_uncompress pubKeys
+    pksDeser = List.map P.bls12_381_G2_uncompress pubKeys
     -- scalar calcuates to (142819114285630344964654001480828217341 :: Integer)
     dsScalar =
       BI.byteStringToInteger
@@ -140,21 +141,21 @@ aggregateMultiKeyG2Script bs16Null dst BlsParams{..} _sc = do
     foldl1' :: (a -> a -> a) -> [a] -> a
     foldl1' _ [] = P.traceError "foldr1: empty list"
     foldl1' _ [_] = P.traceError "foldr1: only one element in list"
-    foldl1' f (x : xs) = P.foldl f x xs
+    foldl1' f (x : xs) = List.foldl f x xs
 
     calcAggregatedPubkeys :: Integer -> [P.BuiltinBLS12_381_G2_Element] -> P.BuiltinBLS12_381_G2_Element
     calcAggregatedPubkeys dsScalar' pksDeser' = do
       let dsScalars = calcDsScalars pksDeser' [dsScalar']
       go
         1
-        (P.drop 1 pksDeser')
-        (P.drop 1 dsScalars)
-        (calcAggregatedPubkey (P.head pksDeser') (P.head dsScalars))
+        (List.drop 1 pksDeser')
+        (List.drop 1 dsScalars)
+        (calcAggregatedPubkey (List.head pksDeser') (List.head dsScalars))
 
     calcDsScalars :: [P.BuiltinBLS12_381_G2_Element] -> [Integer] -> [Integer]
     calcDsScalars [] acc = acc
     calcDsScalars (_ : xs) [x'] = calcDsScalars xs [x', x' P.* x']
-    calcDsScalars (_ : xs) acc@(x' : xs') = calcDsScalars xs (acc P.++ [last' xs' P.* x'])
+    calcDsScalars (_ : xs) acc@(x' : xs') = calcDsScalars xs (acc List.++ [last' xs' P.* x'])
     calcDsScalars _ _ = P.traceError "calcDsScalars: unexpected"
 
     go

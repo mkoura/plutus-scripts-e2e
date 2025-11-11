@@ -20,6 +20,7 @@ import PlutusScripts.Helpers (
   toScriptData,
  )
 import PlutusTx.AssocMap qualified as AM
+import PlutusTx.List qualified as List
 import PlutusTx.Prelude qualified as P
 
 -- TODO: compare cost of this implementation with PlutusTx's length
@@ -32,9 +33,9 @@ _lengthEq _ _ = False
 {-# INLINEABLE listEq #-}
 listEq :: (P.Eq a) => [a] -> [a] -> Bool
 listEq rs cs =
-  P.length rs
-    P.== P.length cs
-    P.&& P.all (P.== True) (P.zipWith (P.==) rs cs)
+  List.length rs
+    P.== List.length cs
+    P.&& List.all (P.== True) (List.zipWith (P.==) rs cs)
 
 -- ScriptInfo --
 
@@ -78,10 +79,10 @@ mkVerifyVotes r sc = do
   {-# INLINEABLE emListEq #-}
   emListEq :: (P.Eq a) => [[a]] -> [[a]] -> Bool
   emListEq rs cs =
-    P.length rs
-      P.== P.length cs
+    List.length rs
+      P.== List.length cs
       -- lengthEq rs cs -- alternate implementation
-      P.&& P.all (P.== True) (P.zipWith listEq rs cs)
+      P.&& List.all (P.== True) (List.zipWith listEq rs cs)
 
 votesAssetName :: C.AssetName
 votesAssetName = C.AssetName "Votes"
