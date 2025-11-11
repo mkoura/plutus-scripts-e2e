@@ -101,12 +101,12 @@ test-suite plutus-scripts
   -- IOG dependencies
   --------------------------
   build-depends:
-    , cardano-api        ^>=10.1
-    , data-default       <0.8
-    , plutus-core        ^>=1.36
-    , plutus-ledger-api  ^>=1.36
-    , plutus-tx          ^>=1.36
-    , plutus-tx-plugin   ^>=1.36
+    , cardano-api        ^>=10.16.3.0
+    , data-default       >=0.8
+    , plutus-core        ^>=1.45.0.0
+    , plutus-ledger-api  ^>=1.45.0.0
+    , plutus-tx          ^>=1.45.0.0
+    , plutus-tx-plugin   ^>=1.45.0.0
 
 
   ------------------------
