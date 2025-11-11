@@ -16,6 +16,7 @@ import Cardano.Api qualified as C
 import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusCore.Version (plcVersion110)
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
+import PlutusLedgerApi.Common.Versions (PlutusLedgerLanguage (PlutusV3))
 import PlutusScripts.Hashing.Common (hashingAssetName, hashingParamsV3, mkHashingPolicyV3)
 import PlutusScripts.Hashing.Ripemd_160 (mkRipemd_160Policy, succeedingRipemd_160Params)
 import PlutusScripts.Helpers (
@@ -23,9 +24,10 @@ import PlutusScripts.Helpers (
   plutusL3,
   policyIdV3,
   toScriptData,
-  writeSerialisedScript
+  writeCompiledScript,
  )
 import PlutusTx qualified
+import PlutusTx.Code (CompiledCodeIn)
 
 -- checkHashingPolicyV3 :: SerialisedScript
 -- checkHashingPolicyV3 =
@@ -62,13 +64,14 @@ checkHashingMintWitnessV3 sbe =
 writeSuceedingV3Script
   :: PlutusTx.Lift DefaultUni [param]
   => String
-  -> (PlutusTx.CompiledCodeIn DefaultUni DefaultFun ([param] -> r))
+  -> (CompiledCodeIn DefaultUni DefaultFun ([param] -> r))
   -> [param]
   -> IO ()
 writeSuceedingV3Script name code params =
-  let script :: C.PlutusScript C.PlutusScriptV3
-      script = C.PlutusScriptSerialised $ serialiseCompiledCode (code `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion110 params))
-  in writeSerialisedScript name script
+  let compiledCode =
+        code
+          `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion110 params)
+   in writeCompiledScript PlutusV3 name compiledCode
 
 writeRipemd_160PolicyScriptV3 :: IO ()
 writeRipemd_160PolicyScriptV3 =

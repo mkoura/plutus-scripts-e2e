@@ -12,12 +12,13 @@ module PlutusScripts.SECP256k1.V_1_1 where
 import Cardano.Api qualified as C
 import PlutusCore.Version (plcVersion110)
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
+import PlutusLedgerApi.Common.Versions (PlutusLedgerLanguage (PlutusV3))
 import PlutusLedgerApi.V3 qualified as PlutusV3 (serialiseCompiledCode)
 import PlutusScripts.Helpers (
   mintScriptWitness,
   plutusL3,
   policyIdV3,
-  writeSerialisedScript,
+  writeCompiledScript,
  )
 import PlutusScripts.SECP256k1.Common (
   ecdsaAssetName,
@@ -32,6 +33,7 @@ import PlutusScripts.SECP256k1.Common (
   verifySchnorrRedeemer,
  )
 import PlutusTx qualified
+import PlutusTx.Prelude qualified as P
 
 -- Schnorr minting policy --
 
@@ -46,15 +48,24 @@ verifySchnorrPolicy =
     $$(PlutusTx.compile [||mkVerifySchnorrPolicy||])
       `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion110 verifySchnorrParams)
 
+verifySchnorrPolicyCompiledV3
+  :: PlutusTx.CompiledCode (P.BuiltinData -> P.BuiltinUnit)
+verifySchnorrPolicyCompiledV3 =
+  $$(PlutusTx.compile [||mkVerifySchnorrPolicyV3||])
+
 verifySchnorrPolicyV3 :: SerialisedScript
 verifySchnorrPolicyV3 =
-  PlutusV3.serialiseCompiledCode $$(PlutusTx.compile [||mkVerifySchnorrPolicyV3||])
+  PlutusV3.serialiseCompiledCode verifySchnorrPolicyCompiledV3
 
 verifySchnorrPolicyScriptV3 :: C.PlutusScript C.PlutusScriptV3
 verifySchnorrPolicyScriptV3 = C.PlutusScriptSerialised verifySchnorrPolicyV3
 
 writeVerifySchnorrPolicyScriptV3 :: IO ()
-writeVerifySchnorrPolicyScriptV3 = writeSerialisedScript "verifySchnorrPolicyScriptV3" verifySchnorrPolicyScriptV3
+writeVerifySchnorrPolicyScriptV3 =
+  writeCompiledScript
+    PlutusV3
+    "verifySchnorrPolicyScriptV3"
+    verifySchnorrPolicyCompiledV3
 
 verifySchnorrAssetIdV3 :: C.AssetId
 verifySchnorrAssetIdV3 = C.AssetId (policyIdV3 verifySchnorrPolicy) schnorrAssetName
@@ -80,15 +91,24 @@ verifyEcdsaPolicy =
     $$(PlutusTx.compile [||mkVerifyEcdsaPolicy||])
       `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion110 verifyEcdsaParams)
 
+verifyEcdsaPolicyCompiledV3
+  :: PlutusTx.CompiledCode (P.BuiltinData -> P.BuiltinUnit)
+verifyEcdsaPolicyCompiledV3 =
+  $$(PlutusTx.compile [||mkVerifyEcdsaPolicyV3||])
+
 verifyEcdsaPolicyV3 :: SerialisedScript
 verifyEcdsaPolicyV3 =
-  PlutusV3.serialiseCompiledCode $$(PlutusTx.compile [||mkVerifyEcdsaPolicyV3||])
+  PlutusV3.serialiseCompiledCode verifyEcdsaPolicyCompiledV3
 
 verifyEcdsaPolicyScriptV3 :: C.PlutusScript C.PlutusScriptV3
 verifyEcdsaPolicyScriptV3 = C.PlutusScriptSerialised verifyEcdsaPolicyV3
 
 writeVerifyEcdsaPolicyScriptV3 :: IO ()
-writeVerifyEcdsaPolicyScriptV3 = writeSerialisedScript "verifyEcdsaPolicyScriptV3" verifyEcdsaPolicyScriptV3
+writeVerifyEcdsaPolicyScriptV3 =
+  writeCompiledScript
+    PlutusV3
+    "verifyEcdsaPolicyScriptV3"
+    verifyEcdsaPolicyCompiledV3
 
 verifyEcdsaAssetIdV3 :: C.AssetId
 verifyEcdsaAssetIdV3 = C.AssetId (policyIdV3 verifyEcdsaPolicy) ecdsaAssetName

@@ -13,6 +13,7 @@ import Helpers.ScriptUtils (IsScriptContext (mkUntypedMintingPolicy))
 import PlutusCore.Version (plcVersion110)
 import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
+import PlutusLedgerApi.Common.Versions (PlutusLedgerLanguage (PlutusV3))
 import PlutusLedgerApi.V3 qualified as PlutusV3
 import PlutusScripts.Bitwise.Complement (
   mkComplementByteStringPolicy,
@@ -61,9 +62,15 @@ import PlutusScripts.Bitwise.WriteBits (
   failingWriteBitsParams,
   succeedingWriteBitsParams
   )
-import PlutusScripts.Helpers (mintScriptWitness, plutusL3, policyIdV3, toScriptData,
-                              writeSerialisedScript)
+import PlutusScripts.Helpers (
+  mintScriptWitness,
+  plutusL3,
+  policyIdV3,
+  toScriptData,
+  writeCompiledScript,
+ )
 import PlutusTx qualified
+import PlutusTx.Code (CompiledCodeIn)
 import PlutusTx.Prelude qualified as P
 
 -- ByteString to Integer --
@@ -151,13 +158,14 @@ byteStringToIntegerAndBackMintWitnessV3 sbe redeemer =
 writeSuceedingV3Script
   :: PlutusTx.Lift DefaultUni [param]
   => String
-  -> (PlutusTx.CompiledCodeIn DefaultUni DefaultFun ([param] -> r))
+  -> (CompiledCodeIn DefaultUni DefaultFun ([param] -> r))
   -> [param]
   -> IO ()
 writeSuceedingV3Script name code params =
-  let script :: C.PlutusScript C.PlutusScriptV3
-      script = C.PlutusScriptSerialised $ serialiseCompiledCode (code `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion110 params))
-  in writeSerialisedScript name script
+  let compiledCode =
+        code
+          `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion110 params)
+   in writeCompiledScript PlutusV3 name compiledCode
 
 -- This takes a list of inputs which are expected to cause a failure.  For
 -- failing tests we have to produce a separate script for every set of inputs
@@ -167,17 +175,16 @@ writeSuceedingV3Script name code params =
 writeFailingV3Scripts
   :: PlutusTx.Lift DefaultUni [param]
   => String
-  -> (PlutusTx.CompiledCodeIn  DefaultUni DefaultFun ([param] -> r))
+  -> (CompiledCodeIn DefaultUni DefaultFun ([param] -> r))
   -> [param]
   -> IO ()
 writeFailingV3Scripts name code params =
-  let writeOneScript (n::Integer, param) =
-        let script :: C.PlutusScript C.PlutusScriptV3
-            script = C.PlutusScriptSerialised $
-              serialiseCompiledCode (code `PlutusTx.unsafeApplyCode`
-                                      (PlutusTx.liftCode plcVersion110 [param]))
-        in writeSerialisedScript (name ++ "_" ++ show n) script
-  in mapM_ writeOneScript $ zip [1..] params
+  let writeOneScript (n :: Integer, param) =
+        let compiledCode =
+              code
+                `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion110 [param])
+         in writeCompiledScript PlutusV3 (name ++ "_" ++ show n) compiledCode
+   in mapM_ writeOneScript $ zip [1 ..] params
 
 writeAndByteStringPolicyScriptsV3 :: IO ()
 writeAndByteStringPolicyScriptsV3 =
