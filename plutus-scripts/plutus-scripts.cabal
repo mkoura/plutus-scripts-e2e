@@ -12,7 +12,6 @@ maintainer:    martin.kourim@iohk.io
 license:       Apache-2.0
 license-files:
   LICENSE
-  NOTICE
 
 copyright:     2024 Intersect.
 build-type:    Simple
@@ -101,13 +100,11 @@ test-suite plutus-scripts
   -- IOG dependencies
   --------------------------
   build-depends:
-    , cardano-api        ^>=10.16.3.0
-    , data-default       >=0.8
-    , plutus-core        ^>=1.45.0.0
-    , plutus-ledger-api  ^>=1.45.0.0
-    , plutus-tx          ^>=1.45.0.0
-    , plutus-tx-plugin   ^>=1.45.0.0
-
+    , cardano-api        ^>=10.19.1.0
+    , plutus-core        ^>=1.53.1.0
+    , plutus-ledger-api  ^>=1.53.1.0
+    , plutus-tx          ^>=1.53.1.0
+    , plutus-tx-plugin   ^>=1.53.1.0
 
   ------------------------
   -- Non-IOG dependencies
@@ -117,6 +114,7 @@ test-suite plutus-scripts
     , base
     , bytestring
     , directory
+    , data-default
     , exceptions
     , filepath
     , lens
