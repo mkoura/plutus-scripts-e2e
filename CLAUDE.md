@@ -101,24 +101,31 @@ writeAlwaysSucceedPolicyScriptV3 = writeSerialisedScript "alwaysSucceedPolicyScr
 ## Dependencies
 
 Key Cardano ecosystem dependencies (from CHaP):
-- `plutus-core ^>=1.45`
-- `plutus-ledger-api ^>=1.45`
-- `plutus-tx ^>=1.45`
-- `plutus-tx-plugin ^>=1.45`
-- `cardano-api ^>=10.16`
+- `plutus-core ^>=1.53.1.0`
+- `plutus-ledger-api ^>=1.53.1.0`
+- `plutus-tx ^>=1.53.1.0`
+- `plutus-tx-plugin ^>=1.53.1.0`
+- `cardano-api ^>=10.19.1.0`
 - `data-default >=0.8`
 
 ### Recent API Changes
 
-**Plutus 1.45 Updates:**
+**Plutus 1.53 Updates:**
 - `txInfoMint` field now returns a structure with `mintValueMinted` accessor
 - Use `PV3.mintValueMinted (PV3.txInfoMint txInfo)` to access minted values
 - Some unused PlutusLedgerApi.V1 qualified imports removed for cleaner code
 
-**cardano-api 10.16 Updates:**
-- `PReferenceScript` constructor simplified from 2 arguments to 1
+**cardano-api 10.19 Updates:**
+- `Cardano.Api.Shelley` module removed - all exports now available from `Cardano.Api`
+- `AssetName` constructor changed to pattern synonym - use `deserialiseFromRawBytes AsAssetName` instead
+- `PReferenceScript` constructor simplified from 2 arguments to 1 (in 10.16+)
 - Updated from `PReferenceScript refTxIn Nothing` to `PReferenceScript refTxIn`
 - Affects all script witness construction (minting and spending)
+
+**Migration Notes:**
+- Replace `import Cardano.Api.Shelley qualified as C` with just `import Cardano.Api qualified as C`
+- Replace `C.AssetName "foo"` with `case C.deserialiseFromRawBytes C.AsAssetName "foo" of Left err -> error $ "Failed to create AssetName: " ++ show err; Right an -> an`
+- Use `emptyAssetName` helper from `PlutusScripts.Helpers` for empty asset names
 
 ## Development Practices
 
