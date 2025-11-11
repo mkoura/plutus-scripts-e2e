@@ -91,7 +91,7 @@ hashAndCheckResult f fName io =
   P.traceIfFalse ("Hash check failed for : " P.<> fName) (f (input io) P.== output io)
 
 hashingAssetName :: C.AssetName
-hashingAssetName = C.AssetName "hashing"
+hashingAssetName = case C.deserialiseFromRawBytes C.AsAssetName "hashing" of Left err -> error $ "Failed to create AssetName: " ++ show err; Right an -> an
 
 -- All test following test vectors were produced using https://github.com/RustCrypto/hashes
 

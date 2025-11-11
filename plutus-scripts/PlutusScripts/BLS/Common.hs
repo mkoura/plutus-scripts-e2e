@@ -19,7 +19,9 @@ import PlutusTx.Prelude qualified as P
 import GHC.ByteOrder (ByteOrder (LittleEndian))
 
 blsAssetName :: C.AssetName
-blsAssetName = C.AssetName "BLS"
+blsAssetName = case C.deserialiseFromRawBytes C.AsAssetName "BLS" of
+  Left err -> error $ "Failed to create AssetName: " ++ show err
+  Right an -> an
 
 -- hex value 424c535f5349475f424c53313233383147325f584d443a5348412d3235365f535357555f524f5f4e554c5f"
 blsSigBls12381G2XmdSha256SswuRoNul :: P.BuiltinByteString

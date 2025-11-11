@@ -65,7 +65,9 @@ mkVerifySchnorrPolicy :: Secp256Params -> P.BuiltinData -> P.BuiltinData -> Bool
 mkVerifySchnorrPolicy Secp256Params{..} _r _sc = BI.verifySchnorrSecp256k1Signature vkey msg sig
 
 schnorrAssetName :: C.AssetName
-schnorrAssetName = C.AssetName "Schnorr"
+schnorrAssetName = case C.deserialiseFromRawBytes C.AsAssetName "Schnorr" of
+  Left err -> error $ "Failed to create AssetName: " ++ show err
+  Right an -> an
 
 verifySchnorrParams :: Secp256Params
 verifySchnorrParams =
@@ -117,7 +119,9 @@ mkVerifyEcdsaPolicy :: Secp256Params -> P.BuiltinData -> P.BuiltinData -> Bool
 mkVerifyEcdsaPolicy Secp256Params{..} _r _sc = BI.verifyEcdsaSecp256k1Signature vkey msg sig
 
 ecdsaAssetName :: C.AssetName
-ecdsaAssetName = C.AssetName "ECDSA"
+ecdsaAssetName = case C.deserialiseFromRawBytes C.AsAssetName "ECDSA" of
+  Left err -> error $ "Failed to create AssetName: " ++ show err
+  Right an -> an
 
 verifyEcdsaParams :: Secp256Params
 verifyEcdsaParams =

@@ -64,7 +64,7 @@ mkByteStringToIntegerRoundtripPolicy bs _sc = do
   bs P.== bsBE P.&& bs P.== bsLE
 
 bitwiseAssetName :: C.AssetName
-bitwiseAssetName = C.AssetName "bitwise"
+bitwiseAssetName = case C.deserialiseFromRawBytes C.AsAssetName "bitwise" of Left err -> error $ "Failed to create AssetName: " ++ show err; Right an -> an
 
 bsToIParams :: ByteStringToIntegerParams
 bsToIParams =
