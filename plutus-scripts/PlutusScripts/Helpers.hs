@@ -83,7 +83,7 @@ mintScriptWitness era lang@(C.PlutusScriptLanguage C.PlutusScriptV2) (Right refT
   C.PlutusScriptWitness
     (maybeScriptWitness era lang $ C.scriptLanguageSupportedInEra era lang)
     C.PlutusScriptV2
-    (C.PReferenceScript refTxIn Nothing)
+    (C.PReferenceScript refTxIn)
     C.NoScriptDatumForMint
     redeemer
     defExecutionUnits
@@ -101,7 +101,7 @@ mintScriptWitness era lang@(C.PlutusScriptLanguage C.PlutusScriptV3) (Right refT
   C.PlutusScriptWitness
     (maybeScriptWitness era lang $ C.scriptLanguageSupportedInEra era lang)
     C.PlutusScriptV3
-    (C.PReferenceScript refTxIn Nothing)
+    (C.PReferenceScript refTxIn)
     C.NoScriptDatumForMint
     redeemer
     defExecutionUnits
@@ -135,7 +135,7 @@ mintScriptWitness' era lang@(C.PlutusScriptLanguage C.PlutusScriptV2) (Right ref
   C.PlutusScriptWitness
     (maybeScriptWitness era lang $ C.scriptLanguageSupportedInEra era lang)
     C.PlutusScriptV2
-    (C.PReferenceScript refTxIn Nothing)
+    (C.PReferenceScript refTxIn)
     C.NoScriptDatumForMint
     redeemer
 -- V3 script
@@ -151,7 +151,7 @@ mintScriptWitness' era lang@(C.PlutusScriptLanguage C.PlutusScriptV3) (Right ref
   C.PlutusScriptWitness
     (maybeScriptWitness era lang $ C.scriptLanguageSupportedInEra era lang)
     C.PlutusScriptV3
-    (C.PReferenceScript refTxIn Nothing)
+    (C.PReferenceScript refTxIn)
     C.NoScriptDatumForMint
     redeemer
 
@@ -185,7 +185,7 @@ spendScriptWitness era lang@(C.PlutusScriptLanguage C.PlutusScriptV2) (Right ref
   C.PlutusScriptWitness
     (maybeScriptWitness era lang $ C.scriptLanguageSupportedInEra era lang)
     C.PlutusScriptV2
-    (C.PReferenceScript refTxIn Nothing)
+    (C.PReferenceScript refTxIn)
     datumWit
     redeemer
     defExecutionUnits
@@ -203,7 +203,7 @@ spendScriptWitness era lang@(C.PlutusScriptLanguage C.PlutusScriptV3) (Right ref
   C.PlutusScriptWitness
     (maybeScriptWitness era lang $ C.scriptLanguageSupportedInEra era lang)
     C.PlutusScriptV3
-    (C.PReferenceScript refTxIn Nothing)
+    (C.PReferenceScript refTxIn)
     datumWit
     redeemer
     defExecutionUnits
