@@ -2,12 +2,9 @@
   description = "Flake for the IOG ecosystem";
 
   inputs = {
-    iogx = {
-      url = "github:input-output-hk/iogx";
+    haskell-nix = {
+      url = "github:input-output-hk/haskell.nix";
       inputs.hackage.follows = "hackage";
-      inputs.CHaP.follows = "CHaP";
-      inputs.haskell-nix.follows = "haskell-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     nixpkgs.follows = "haskell-nix/nixpkgs";
@@ -22,26 +19,17 @@
       flake = false;
     };
 
-    haskell-nix = {
-      url = "github:input-output-hk/haskell.nix";
-      inputs.hackage.follows = "hackage";
+    iohk-nix = {
+      url = "github:input-output-hk/iohk-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  # Docs for mkFlake: https://github.com/input-output-hk/iogx/blob/main/doc/api.md#mkflake
-  outputs =
-    inputs:
-    inputs.iogx.lib.mkFlake {
-      inherit inputs;
-      repoRoot = ./.;
-      outputs = import ./nix/outputs.nix;
-      systems = [
-        "x86_64-linux"
-        "x86_64-darwin"
-        "aarch64-darwin"
-        "aarch64-linux"
-      ];
-    };
+  outputs = inputs: inputs.flake-utils.lib.eachDefaultSystem (system:
+    import ./nix/outputs.nix { inherit inputs system; }
+  );
 
   nixConfig = {
     extra-substituters = [ "https://cache.iog.io" ];

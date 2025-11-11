@@ -1,45 +1,28 @@
-# Docs for this file: https://github.com/input-output-hk/iogx/blob/main/doc/api.md#mkhaskellprojectinshellargs
-# See `shellArgs` in `mkHaskellProject` in ./project.nix for more details.
+{ inputs, pkgs, lib, project }:
 
-{ repoRoot, inputs, pkgs, lib, system }:
+let
+  # Get Haskell development tools from the project
+  cabal = project.tool "cabal" "latest";
+  hls = project.tool "haskell-language-server" "latest";
 
-# Each flake variant defined in your project.nix project will yield a separate
-# shell. If no flake variants are defined, then cabalProject is the original 
-# project.
-cabalProject:
+  shell = project.shellFor {
+    name = "plutus-scripts-e2e-${project.args.compiler-nix-name}";
 
-{
-  name = "plutus-scripts-e2e";
+    buildInputs = [
+      cabal
+      hls
+      pkgs.git
+      pkgs.bash
+      pkgs.cacert
+    ];
 
-  packages = [
-  ];
+    withHoogle = false;
 
-  # scripts = {
-  #   foo = {
-  #      description = "";
-  #      group = "general";
-  #      enabled = true;
-  #      exec = ''
-  #        echo "Hello, World!"
-  #      '';
-  #    };
-  # };
-
-  # env = {
-  #   KEY = "VALUE";
-  # };
-
-  shellHook = ''
-    # Custom shellHook
-  '';
-
-  preCommit = {
-    # cabal-fmt.enable = true;
-    # stylish-haskell.enable = true;
-    # fourmolu.enable = true;
-    # hlint.enable = true;
-    # editorconfig-checker.enable = true;
-    # nixpkgs-fmt.enable = true;
+    shellHook = ''
+      export PS1="\n\[\033[1;32m\][nix-shell:\w]\$\[\033[0m\] "
+    '';
   };
-}
- 
+
+in
+
+shell
