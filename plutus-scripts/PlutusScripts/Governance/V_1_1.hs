@@ -19,7 +19,6 @@
 module PlutusScripts.Governance.V_1_1 where
 
 import Cardano.Api qualified as C
-import Cardano.Api.Shelley qualified as C
 import Helpers.ScriptUtils (mkUntypedMintingPolicy)
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusLedgerApi.V3 qualified as V3

@@ -8,7 +8,6 @@
 module PlutusScripts.Basic.V_1_1 where
 
 import Cardano.Api qualified as C
-import Cardano.Api.Shelley qualified as C
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusLedgerApi.V1 (Redeemer, ScriptPurpose (Minting))
 import PlutusLedgerApi.V2 qualified as PlutusV2 (Map)
@@ -23,6 +22,7 @@ import PlutusScripts.Basic.Common (
  )
 import PlutusScripts.Helpers (
   asRedeemer,
+  emptyAssetName,
   fromPolicyId,
   mintScriptWitness,
   mintScriptWitness',
@@ -50,7 +50,7 @@ alwaysSucceedPolicyIdV3 :: C.PolicyId
 alwaysSucceedPolicyIdV3 = policyIdV3 alwaysSucceedPolicy
 
 alwaysSucceedAssetIdV3 :: C.AssetId
-alwaysSucceedAssetIdV3 = C.AssetId (policyIdV3 alwaysSucceedPolicy) ""
+alwaysSucceedAssetIdV3 = C.AssetId (policyIdV3 alwaysSucceedPolicy) emptyAssetName
 
 alwaysSucceedPolicyTxInfoRedeemerV3 :: PlutusV2.Map ScriptPurpose Redeemer
 alwaysSucceedPolicyTxInfoRedeemerV3 =
@@ -126,7 +126,7 @@ alwaysFailsPolicyIdV3 :: C.PolicyId
 alwaysFailsPolicyIdV3 = policyIdV3 alwaysFailsPolicy
 
 alwaysFailsAssetIdV3 :: C.AssetId
-alwaysFailsAssetIdV3 = C.AssetId alwaysFailsPolicyIdV3 ""
+alwaysFailsAssetIdV3 = C.AssetId alwaysFailsPolicyIdV3 emptyAssetName
 
 alwaysFailsPolicyTxInfoRedeemerV3 :: PlutusV2.Map ScriptPurpose Redeemer
 alwaysFailsPolicyTxInfoRedeemerV3 =

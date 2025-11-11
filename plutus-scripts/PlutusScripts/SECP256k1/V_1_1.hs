@@ -10,7 +10,6 @@
 module PlutusScripts.SECP256k1.V_1_1 where
 
 import Cardano.Api qualified as C
-import Cardano.Api.Shelley qualified as C
 import PlutusCore.Version (plcVersion110)
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusLedgerApi.V3 qualified as PlutusV3 (serialiseCompiledCode)

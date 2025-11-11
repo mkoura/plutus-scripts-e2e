@@ -7,7 +7,6 @@
 module PlutusScripts.Basic.V_1_0 where
 
 import Cardano.Api qualified as C
-import Cardano.Api.Shelley qualified as C
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusLedgerApi.V1 (Redeemer, ScriptPurpose (Minting))
 import PlutusLedgerApi.V2 qualified as PlutusV2
@@ -18,6 +17,7 @@ import PlutusScripts.Basic.Common (
  )
 import PlutusScripts.Helpers (
   asRedeemer,
+  emptyAssetName,
   fromPolicyId,
   mintScriptWitness,
   mintScriptWitness',
@@ -54,10 +54,10 @@ alwaysSucceedPolicyScriptHashV2 :: C.ScriptHash
 alwaysSucceedPolicyScriptHashV2 = C.hashScript $ unPlutusScriptV2 alwaysSucceedPolicyScriptV2
 
 alwaysSucceedAssetIdV1 :: C.AssetId
-alwaysSucceedAssetIdV1 = C.AssetId (policyIdV1 alwaysSucceedPolicy) ""
+alwaysSucceedAssetIdV1 = C.AssetId (policyIdV1 alwaysSucceedPolicy) emptyAssetName
 
 alwaysSucceedAssetIdV2 :: C.AssetId
-alwaysSucceedAssetIdV2 = C.AssetId alwaysSucceedPolicyIdV2 ""
+alwaysSucceedAssetIdV2 = C.AssetId alwaysSucceedPolicyIdV2 emptyAssetName
 
 alwaysSucceedPolicyTxInfoRedeemerV2 :: PlutusV2.Map ScriptPurpose Redeemer
 alwaysSucceedPolicyTxInfoRedeemerV2 =
@@ -175,10 +175,10 @@ alwaysFailsPolicyIdV2 :: C.PolicyId
 alwaysFailsPolicyIdV2 = policyIdV2 alwaysFailsPolicy
 
 alwaysFailsAssetIdV1 :: C.AssetId
-alwaysFailsAssetIdV1 = C.AssetId (policyIdV1 alwaysFailsPolicy) ""
+alwaysFailsAssetIdV1 = C.AssetId (policyIdV1 alwaysFailsPolicy) emptyAssetName
 
 alwaysFailsAssetIdV2 :: C.AssetId
-alwaysFailsAssetIdV2 = C.AssetId alwaysFailsPolicyIdV2 ""
+alwaysFailsAssetIdV2 = C.AssetId alwaysFailsPolicyIdV2 emptyAssetName
 
 alwaysFailsPolicyTxInfoRedeemerV2 :: PlutusV2.Map ScriptPurpose Redeemer
 alwaysFailsPolicyTxInfoRedeemerV2 =

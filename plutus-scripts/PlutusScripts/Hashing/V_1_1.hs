@@ -13,7 +13,6 @@
 module PlutusScripts.Hashing.V_1_1 where
 
 import Cardano.Api qualified as C
-import Cardano.Api.Shelley qualified as C
 import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusCore.Version (plcVersion110)
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)

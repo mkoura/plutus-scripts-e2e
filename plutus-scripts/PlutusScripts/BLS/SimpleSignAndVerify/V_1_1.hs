@@ -12,7 +12,6 @@
 module PlutusScripts.BLS.SimpleSignAndVerify.V_1_1 where
 
 import Cardano.Api qualified as C
-import Cardano.Api.Shelley qualified as C
 import Helpers.ScriptUtils (IsScriptContext (mkUntypedMintingPolicy))
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusLedgerApi.V3 qualified as PlutusV3

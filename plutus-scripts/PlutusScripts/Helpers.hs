@@ -7,7 +7,6 @@
 module PlutusScripts.Helpers where
 
 import Cardano.Api qualified as C
-import Cardano.Api.Shelley qualified as C
 import Control.Monad (void)
 import Data.ByteString qualified as BS (ByteString)
 import PlutusLedgerApi.Common (SerialisedScript)
@@ -36,6 +35,12 @@ hxs = BI.toBuiltin . bytesFromHex
 -}
 defExecutionUnits :: C.ExecutionUnits
 defExecutionUnits = C.ExecutionUnits{C.executionSteps = 0, C.executionMemory = 0}
+
+-- | Empty AssetName (for use with AssetId construction)
+emptyAssetName :: C.AssetName
+emptyAssetName = case C.deserialiseFromRawBytes C.AsAssetName "" of
+  Left err -> error $ "Failed to create empty AssetName: " ++ show err
+  Right an -> an
 
 -- | Any data to ScriptData. Used for script datum and redeemer.
 toScriptData :: (PlutusTx.ToData a) => a -> C.HashableScriptData

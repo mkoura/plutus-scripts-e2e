@@ -9,7 +9,6 @@
 module PlutusScripts.Bitwise.V_1_1 where
 
 import Cardano.Api qualified as C
-import Cardano.Api.Shelley qualified as C
 import Helpers.ScriptUtils (IsScriptContext (mkUntypedMintingPolicy))
 import PlutusCore.Version (plcVersion110)
 import PlutusCore.Default (DefaultFun, DefaultUni)
