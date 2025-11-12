@@ -22,19 +22,29 @@ This project uses the IOG ecosystem tooling with Nix flakes and haskell.nix:
 # Enter development shell
 nix develop
 
-# Build the project
+# Build the project (library and executable)
 cabal build plutus-scripts
 
-# Run tests (generates serialized script files)
-cabal test plutus-scripts
+# Build only the library
+cabal build scripts
+
+# Run the envelopes executable (generates serialized script files)
+cabal run envelopes
 
 # Clean build artifacts
 cabal clean
 ```
 
-The test suite (`Spec.hs`) runs `writeScriptFiles` which serializes all Plutus scripts to `plutus-scripts/serialised-plutus-scripts/` directory (git-ignored).
+The `envelopes` executable (`app/Main.hs`) serializes all Plutus scripts to `plutus-scripts/serialised-plutus-scripts/` directory (git-ignored). This executable uses `PlutusLedgerApi.Envelope.writeCodeEnvelopeForVersion` to generate `.plutus` files compatible with cardano-node-tests.
 
 ## Architecture
+
+### Cabal Package Structure
+
+The `plutus-scripts` package contains:
+
+- **Library `scripts`**: Core Plutus script implementations and helpers
+- **Executable `envelopes`**: Serializes compiled scripts to `.plutus` files
 
 ### Project Structure
 
@@ -49,8 +59,8 @@ plutus-scripts/
 │   └── SECP256k1/          # SECP256k1 signature scripts
 ├── Helpers/                # Helper utilities
 │   └── ScriptUtils.hs     # Script context utilities (subset of plutus-script-utils)
-├── Spec/                   # Test specifications
-│   └── WriteScriptFiles.hs # Serializes all scripts to .plutus files
+├── app/                    # Executable applications
+│   └── Main.hs            # Envelopes executable - serializes all scripts to .plutus files
 └── plutus-scripts.cabal    # Cabal package definition
 ```
 
@@ -190,17 +200,26 @@ Pre-commit hooks are configured and enabled via `.pre-commit-config.yaml`. The h
 
 Scripts demonstrating PlutusV3 governance features (voting, proposals)
 
-## Testing
+## Script Generation
 
-The test suite is a single executable that serializes all scripts:
+The `envelopes` executable serializes all scripts to `.plutus` files:
 
 ```bash
-cabal test
+cabal run envelopes
 ```
 
-Output: `.plutus` files in `plutus-scripts/serialised-plutus-scripts/`
+Output: `.plutus` files in `plutus-scripts/serialised-plutus-scripts/` (git-ignored)
 
 These serialized scripts are consumed by external E2E tests (e.g., `cardano-node-tests`).
+
+### Adding New Scripts
+
+To add a new script:
+
+1. Create the validator logic in a `Common.hs` module with `INLINEABLE` pragma
+2. Add versioned modules (`V_1_0.hs`, `V_1_1.hs`) that compile and export the script
+3. Update `app/Main.hs` to include the new script in the serialization list
+4. Run `cabal run envelopes` to generate the `.plutus` file
 
 ## Nix Binary Cache
 
