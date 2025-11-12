@@ -2,7 +2,7 @@
 
 module PlutusScripts.Bitwise.Conversions where
 
-import PlutusLedgerApi.V1 qualified as PV1
+import PlutusLedgerApi.V1 qualified as V1
 import PlutusScripts.Helpers (hxs)
 
 import PlutusTx qualified
@@ -43,7 +43,7 @@ mkIntegerToByteStringPolicy IntegerToByteStringParams{..} _sc = do
 {-# INLINEABLE mkByteStringToIntegerRoundtripPolicySimple #-}
 mkByteStringToIntegerRoundtripPolicySimple :: P.BuiltinData -> P.BuiltinData -> ()
 mkByteStringToIntegerRoundtripPolicySimple r _sc = do
-  let oInt = PV1.unsafeFromBuiltinData r :: Integer
+  let oInt = V1.unsafeFromBuiltinData r :: Integer
       bs = BI.integerToByteString BigEndian 0 oInt
       intBE = BI.byteStringToInteger BigEndian bs
   if intBE P.== oInt then () else P.traceError "PT5"

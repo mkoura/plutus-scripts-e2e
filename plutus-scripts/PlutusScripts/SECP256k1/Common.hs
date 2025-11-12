@@ -1,7 +1,7 @@
 module PlutusScripts.SECP256k1.Common where
 
 import Helpers.ScriptUtils (constrArgs)
-import PlutusLedgerApi.V3 qualified as PV3
+import PlutusLedgerApi.V3 qualified as V3
 import PlutusScripts.Helpers (bytesFromHex)
 import PlutusTx qualified
 import PlutusTx.Builtins qualified as BI
@@ -38,7 +38,7 @@ mkVerifySchnorrPolicyV3 arg = if checkSignature then BI.unitval else P.traceErro
   redeemerBuiltinData = BI.head redeemerFollowedByScriptInfo
 
   redeemer :: Secp256Params
-  redeemer = PV3.unsafeFromBuiltinData redeemerBuiltinData
+  redeemer = V3.unsafeFromBuiltinData redeemerBuiltinData
 
   Secp256Params{..} = redeemer
 
@@ -84,7 +84,7 @@ mkVerifyEcdsaPolicyV3 arg = if checkSignature then BI.unitval else P.traceError 
   redeemerBuiltinData = BI.head redeemerFollowedByScriptInfo
 
   redeemer :: Secp256Params
-  redeemer = PV3.unsafeFromBuiltinData redeemerBuiltinData
+  redeemer = V3.unsafeFromBuiltinData redeemerBuiltinData
 
   Secp256Params{..} = redeemer
 

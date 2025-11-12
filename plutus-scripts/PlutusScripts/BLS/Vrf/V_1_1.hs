@@ -4,11 +4,11 @@ module PlutusScripts.BLS.Vrf.V_1_1 where
 
 import Helpers.ScriptUtils (IsScriptContext (mkUntypedMintingPolicy))
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
-import PlutusLedgerApi.V3 qualified as PlutusV3
+import PlutusLedgerApi.V3 qualified as V3
 import PlutusScripts.BLS.Vrf.Common (verifyBlsVrfScript)
 import PlutusTx qualified
 
 verifyBlsVrfPolicyV3 :: SerialisedScript
 verifyBlsVrfPolicyV3 =
   serialiseCompiledCode
-    $$(PlutusTx.compile [||mkUntypedMintingPolicy @PlutusV3.ScriptContext verifyBlsVrfScript||])
+    $$(PlutusTx.compile [||mkUntypedMintingPolicy @V3.ScriptContext verifyBlsVrfScript||])

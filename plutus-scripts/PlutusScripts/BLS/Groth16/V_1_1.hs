@@ -5,7 +5,7 @@ module PlutusScripts.BLS.Groth16.V_1_1 where
 import Helpers.ScriptUtils (IsScriptContext (mkUntypedMintingPolicy))
 import PlutusCore.Core qualified as PLC
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
-import PlutusLedgerApi.V3 qualified as PlutusV3
+import PlutusLedgerApi.V3 qualified as V3
 import PlutusScripts.BLS.Groth16.Common (
   CompressedG1Element (compressedG1),
   CompressedG2Element (compressedG2),
@@ -31,7 +31,7 @@ verifyBlsGroth16PolicyV3 =
   serialiseCompiledCode $
     $$( PlutusTx.compile
           [||
-          \a b c d e f g h i -> mkUntypedMintingPolicy @PlutusV3.ScriptContext (verifyBlsGroth16Script a b c d e f g h i)
+          \a b c d e f g h i -> mkUntypedMintingPolicy @V3.ScriptContext (verifyBlsGroth16Script a b c d e f g h i)
           ||]
       )
       `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode PLC.plcVersion110 $ compressedG1 groth16alpha)

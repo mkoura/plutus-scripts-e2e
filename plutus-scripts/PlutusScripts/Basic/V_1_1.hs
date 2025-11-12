@@ -3,7 +3,7 @@
 module PlutusScripts.Basic.V_1_1 where
 
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
-import PlutusLedgerApi.V3 qualified as PlutusV3 (serialiseCompiledCode)
+import PlutusLedgerApi.V3 qualified as V3
 import PlutusScripts.Basic.Common (
   mkAlwaysFailsPolicyV3,
   mkAlwaysSucceedPolicyV3,
@@ -42,7 +42,7 @@ mintTokenNamePolicyCompiledV3 :: PlutusTx.CompiledCode (P.BuiltinData -> P.Built
 mintTokenNamePolicyCompiledV3 = $$(PlutusTx.compile [||mkMintTokenNamePolicyV3||])
 
 mintTokenNamePolicyV3 :: SerialisedScript
-mintTokenNamePolicyV3 = PlutusV3.serialiseCompiledCode mintTokenNamePolicyCompiledV3
+mintTokenNamePolicyV3 = V3.serialiseCompiledCode mintTokenNamePolicyCompiledV3
 
 -- Time range policy --
 
@@ -50,7 +50,7 @@ timeRangePolicyCompiledV3 :: PlutusTx.CompiledCode (P.BuiltinData -> P.BuiltinUn
 timeRangePolicyCompiledV3 = $$(PlutusTx.compile [||mkTimeRangePolicyV3||])
 
 timeRangePolicyV3 :: SerialisedScript
-timeRangePolicyV3 = PlutusV3.serialiseCompiledCode timeRangePolicyCompiledV3
+timeRangePolicyV3 = V3.serialiseCompiledCode timeRangePolicyCompiledV3
 
 -- Witness redeemer policy --
 
@@ -59,4 +59,4 @@ witnessRedeemerPolicyCompiledV3
 witnessRedeemerPolicyCompiledV3 = $$(PlutusTx.compile [||mkWitnessRedeemerPolicyV3||])
 
 witnessRedeemerPolicyV3 :: SerialisedScript
-witnessRedeemerPolicyV3 = PlutusV3.serialiseCompiledCode witnessRedeemerPolicyCompiledV3
+witnessRedeemerPolicyV3 = V3.serialiseCompiledCode witnessRedeemerPolicyCompiledV3

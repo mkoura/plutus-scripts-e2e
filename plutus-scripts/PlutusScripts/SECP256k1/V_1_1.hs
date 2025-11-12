@@ -4,7 +4,7 @@ module PlutusScripts.SECP256k1.V_1_1 where
 
 import PlutusCore.Version (plcVersion110)
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
-import PlutusLedgerApi.V3 qualified as PlutusV3 (serialiseCompiledCode)
+import PlutusLedgerApi.V3 qualified as V3
 import PlutusScripts.SECP256k1.Common (
   mkVerifyEcdsaPolicy,
   mkVerifyEcdsaPolicyV3,
@@ -31,7 +31,7 @@ verifySchnorrPolicyCompiledV3 =
 
 verifySchnorrPolicyV3 :: SerialisedScript
 verifySchnorrPolicyV3 =
-  PlutusV3.serialiseCompiledCode verifySchnorrPolicyCompiledV3
+  V3.serialiseCompiledCode verifySchnorrPolicyCompiledV3
 
 -- ECDSA minting policy --
 
@@ -48,4 +48,4 @@ verifyEcdsaPolicyCompiledV3 =
 
 verifyEcdsaPolicyV3 :: SerialisedScript
 verifyEcdsaPolicyV3 =
-  PlutusV3.serialiseCompiledCode verifyEcdsaPolicyCompiledV3
+  V3.serialiseCompiledCode verifyEcdsaPolicyCompiledV3

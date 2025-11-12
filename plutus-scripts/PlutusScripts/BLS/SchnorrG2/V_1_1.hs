@@ -5,7 +5,7 @@ module PlutusScripts.BLS.SchnorrG2.V_1_1 where
 import Helpers.ScriptUtils (IsScriptContext (mkUntypedMintingPolicy))
 import PlutusCore.Core qualified as PLC
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
-import PlutusLedgerApi.V3 qualified as PlutusV3
+import PlutusLedgerApi.V3 qualified as V3
 import PlutusScripts.BLS.Common (byteString16Null)
 import PlutusScripts.BLS.SchnorrG2.Common (verifySchnorrG2Script)
 import PlutusTx qualified
@@ -13,5 +13,5 @@ import PlutusTx qualified
 verifyBlsSchnorrG2PolicyV3 :: SerialisedScript
 verifyBlsSchnorrG2PolicyV3 =
   serialiseCompiledCode $
-    $$(PlutusTx.compile [||mkUntypedMintingPolicy @PlutusV3.ScriptContext . verifySchnorrG2Script||])
+    $$(PlutusTx.compile [||mkUntypedMintingPolicy @V3.ScriptContext . verifySchnorrG2Script||])
       `PlutusTx.unsafeApplyCode` PlutusTx.liftCode PLC.plcVersion110 byteString16Null

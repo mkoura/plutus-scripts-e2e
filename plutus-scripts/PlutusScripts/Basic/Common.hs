@@ -1,8 +1,8 @@
 module PlutusScripts.Basic.Common where
 
 import Helpers.ScriptUtils (check, constrArgs)
-import PlutusLedgerApi.V1 qualified as P
-import PlutusLedgerApi.V3 qualified as PV3
+import PlutusLedgerApi.V1 qualified as V1
+import PlutusLedgerApi.V3 qualified as V3
 import PlutusTx.Builtins.Internal qualified as BI (
   BuiltinList,
   head,
@@ -44,8 +44,8 @@ mkAlwaysFailsPolicyV3 _sc = P.check $ P.error ()
 mkMintTokenNamePolicyV3 :: P.BuiltinData -> P.BuiltinUnit
 mkMintTokenNamePolicyV3 arg = if checkTokenName then BI.unitval else P.traceError "wrong token name"
  where
-  -- ctx@(PV3.ScriptContext info (PV3.Redeemer redeemer) _scriptInfo) =
-  --     PV3.unsafeFromBuiltinData arg
+  -- ctx@(V3.ScriptContext info (V3.Redeemer redeemer) _scriptInfo) =
+  --     V3.unsafeFromBuiltinData arg
 
   context :: BI.BuiltinList P.BuiltinData
   context = constrArgs arg
@@ -53,8 +53,8 @@ mkMintTokenNamePolicyV3 arg = if checkTokenName then BI.unitval else P.traceErro
   txInfoBuiltinData :: P.BuiltinData
   txInfoBuiltinData = BI.head context
 
-  txInfo :: PV3.TxInfo
-  txInfo = PV3.unsafeFromBuiltinData txInfoBuiltinData
+  txInfo :: V3.TxInfo
+  txInfo = V3.unsafeFromBuiltinData txInfoBuiltinData
 
   redeemerFollowedByScriptInfo :: BI.BuiltinList P.BuiltinData
   redeemerFollowedByScriptInfo = BI.tail context
@@ -62,24 +62,24 @@ mkMintTokenNamePolicyV3 arg = if checkTokenName then BI.unitval else P.traceErro
   redeemerBuiltinData :: P.BuiltinData
   redeemerBuiltinData = BI.head redeemerFollowedByScriptInfo
 
-  redeemer :: P.TokenName
-  redeemer = PV3.unsafeFromBuiltinData redeemerBuiltinData
+  redeemer :: V1.TokenName
+  redeemer = V3.unsafeFromBuiltinData redeemerBuiltinData
 
   scriptInfoData :: P.BuiltinData
   scriptInfoData = BI.head (BI.tail redeemerFollowedByScriptInfo)
 
-  scriptInfo :: PV3.ScriptInfo
-  scriptInfo = PV3.unsafeFromBuiltinData scriptInfoData
+  scriptInfo :: V3.ScriptInfo
+  scriptInfo = V3.unsafeFromBuiltinData scriptInfoData
 
   -- TODO: Use builtin when available in PV3
-  ownCurrencySymbol :: PV3.ScriptInfo -> PV3.CurrencySymbol
+  ownCurrencySymbol :: V3.ScriptInfo -> V3.CurrencySymbol
   ownCurrencySymbol = \case
-    PV3.MintingScript cs -> cs
+    V3.MintingScript cs -> cs
     _ -> P.traceError "Lh"
 
   checkTokenName :: Bool
   checkTokenName =
-    P.valueOf (PV3.mintValueMinted (PV3.txInfoMint txInfo)) (ownCurrencySymbol scriptInfo) redeemer
+    V1.valueOf (V3.mintValueMinted (V3.txInfoMint txInfo)) (ownCurrencySymbol scriptInfo) redeemer
       P.> 0
 
 -- Time range policy --
@@ -94,8 +94,8 @@ mkTimeRangePolicyV3 arg = if checkRange then BI.unitval else P.traceError "not i
   txInfoBuiltinData :: P.BuiltinData
   txInfoBuiltinData = BI.head context
 
-  txInfo :: PV3.TxInfo
-  txInfo = PV3.unsafeFromBuiltinData txInfoBuiltinData
+  txInfo :: V3.TxInfo
+  txInfo = V3.unsafeFromBuiltinData txInfoBuiltinData
 
   redeemerFollowedByScriptInfo :: BI.BuiltinList P.BuiltinData
   redeemerFollowedByScriptInfo = BI.tail context
@@ -103,14 +103,14 @@ mkTimeRangePolicyV3 arg = if checkRange then BI.unitval else P.traceError "not i
   redeemerBuiltinData :: P.BuiltinData
   redeemerBuiltinData = BI.head redeemerFollowedByScriptInfo
 
-  redeemer :: P.POSIXTime
-  redeemer = PV3.unsafeFromBuiltinData redeemerBuiltinData
+  redeemer :: V1.POSIXTime
+  redeemer = V3.unsafeFromBuiltinData redeemerBuiltinData
 
-  range :: P.POSIXTimeRange
-  range = PV3.txInfoValidRange txInfo
+  range :: V1.POSIXTimeRange
+  range = V3.txInfoValidRange txInfo
 
   checkRange :: Bool
-  checkRange = P.to redeemer `P.contains` range
+  checkRange = V1.to redeemer `V1.contains` range
 
 -- Witness redeemer policy --
 
@@ -125,8 +125,8 @@ mkWitnessRedeemerPolicyV3 arg =
   txInfoBuiltinData :: P.BuiltinData
   txInfoBuiltinData = BI.head context
 
-  txInfo :: PV3.TxInfo
-  txInfo = PV3.unsafeFromBuiltinData txInfoBuiltinData
+  txInfo :: V3.TxInfo
+  txInfo = V3.unsafeFromBuiltinData txInfoBuiltinData
 
   redeemerFollowedByScriptInfo :: BI.BuiltinList P.BuiltinData
   redeemerFollowedByScriptInfo = BI.tail context
@@ -134,12 +134,12 @@ mkWitnessRedeemerPolicyV3 arg =
   redeemerBuiltinData :: P.BuiltinData
   redeemerBuiltinData = BI.head redeemerFollowedByScriptInfo
 
-  redeemer :: PV3.PubKeyHash
-  redeemer = PV3.unsafeFromBuiltinData redeemerBuiltinData
+  redeemer :: V3.PubKeyHash
+  redeemer = V3.unsafeFromBuiltinData redeemerBuiltinData
 
   -- TODO: Use builtin when available in PV3
-  txSignedBy :: PV3.TxInfo -> PV3.PubKeyHash -> Bool
-  txSignedBy PV3.TxInfo{PV3.txInfoSignatories} k =
+  txSignedBy :: V3.TxInfo -> V3.PubKeyHash -> Bool
+  txSignedBy V3.TxInfo{V3.txInfoSignatories} k =
     case List.find (k P.==) txInfoSignatories of
       P.Just _ -> P.True
       P.Nothing -> P.False

@@ -6,7 +6,7 @@ import Helpers.ScriptUtils (IsScriptContext (mkUntypedMintingPolicy))
 import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusCore.Version (plcVersion110)
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
-import PlutusLedgerApi.V3 qualified as PlutusV3
+import PlutusLedgerApi.V3 qualified as V3
 import PlutusScripts.Bitwise.Complement (
   mkComplementByteStringPolicy,
   succeedingComplementByteStringParams,
@@ -59,7 +59,7 @@ byteStringToIntegerPolicyV3 =
   serialiseCompiledCode
     $$(PlutusTx.compile [||wrap||])
  where
-  wrap = mkUntypedMintingPolicy @PlutusV3.ScriptContext mkByteStringToIntegerPolicy
+  wrap = mkUntypedMintingPolicy @V3.ScriptContext mkByteStringToIntegerPolicy
 
 -- Integer to ByteString --
 
@@ -68,7 +68,7 @@ integerToByteStringPolicyV3 =
   serialiseCompiledCode
     $$(PlutusTx.compile [||wrap||])
  where
-  wrap = mkUntypedMintingPolicy @PlutusV3.ScriptContext mkIntegerToByteStringPolicy
+  wrap = mkUntypedMintingPolicy @V3.ScriptContext mkIntegerToByteStringPolicy
 
 -- ByteString to Integer and Integer to ByteString Roundtrip --
 
@@ -77,9 +77,9 @@ byteStringToIntegerRoundtripPolicyV3 =
   serialiseCompiledCode
     $$(PlutusTx.compile [||wrap||])
  where
-  wrap = mkUntypedMintingPolicy @PlutusV3.ScriptContext mkByteStringToIntegerRoundtripPolicy
+  wrap = mkUntypedMintingPolicy @V3.ScriptContext mkByteStringToIntegerRoundtripPolicy
 
-{- Simple end-to-end tests for bitwise builtins in PlutusV3.  All of these are
+{- Simple end-to-end tests for bitwise builtins in V3.  All of these are
    self-contained: the inputs are compiled into the script rather than being
    obtained from a redeemer or similar. -}
 
