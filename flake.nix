@@ -27,9 +27,11 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = inputs: inputs.flake-utils.lib.eachDefaultSystem (system:
-    import ./nix/outputs.nix { inherit inputs system; }
-  );
+  outputs =
+    inputs:
+    inputs.flake-utils.lib.eachDefaultSystem (
+      system: import ./nix/outputs.nix { inherit inputs system; }
+    );
 
   nixConfig = {
     extra-substituters = [ "https://cache.iog.io" ];

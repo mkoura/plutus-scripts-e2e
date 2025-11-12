@@ -5,10 +5,10 @@ module PlutusScripts.SECP256k1.V_1_0 where
 import PlutusCore.Version (plcVersion100)
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusScripts.SECP256k1.Common (
-  mkVerifyEcdsaPolicy,
-  mkVerifySchnorrPolicy,
-  verifyEcdsaParams,
-  verifySchnorrParams,
+    mkVerifyEcdsaPolicy,
+    mkVerifySchnorrPolicy,
+    verifyEcdsaParams,
+    verifySchnorrParams,
  )
 import PlutusTx qualified
 
@@ -16,14 +16,14 @@ import PlutusTx qualified
 
 verifySchnorrPolicy :: SerialisedScript
 verifySchnorrPolicy =
-  serialiseCompiledCode $
-    $$(PlutusTx.compile [||mkVerifySchnorrPolicy||])
-      `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion100 verifySchnorrParams)
+    serialiseCompiledCode $
+        $$(PlutusTx.compile [||mkVerifySchnorrPolicy||])
+            `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion100 verifySchnorrParams)
 
 -- ECDSA minting policy --
 
 verifyEcdsaPolicy :: SerialisedScript
 verifyEcdsaPolicy =
-  serialiseCompiledCode $
-    $$(PlutusTx.compile [||mkVerifyEcdsaPolicy||])
-      `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion100 verifyEcdsaParams)
+    serialiseCompiledCode $
+        $$(PlutusTx.compile [||mkVerifyEcdsaPolicy||])
+            `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion100 verifyEcdsaParams)

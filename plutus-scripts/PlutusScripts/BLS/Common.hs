@@ -1,9 +1,3 @@
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
--- Not using all CardanoEra
-{-# OPTIONS_GHC -fno-warn-incomplete-patterns #-}
-
-{-# HLINT ignore "Use underscore" #-}
-
 module PlutusScripts.BLS.Common where
 
 import Data.ByteString.Char8 qualified as C8

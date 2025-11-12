@@ -12,6 +12,6 @@ import PlutusTx qualified
 
 verifyAggregateSigSingleKeyG1PolicyV3 :: SerialisedScript
 verifyAggregateSigSingleKeyG1PolicyV3 =
-  serialiseCompiledCode $
-    $$(PlutusTx.compile [||mkUntypedMintingPolicy @PlutusV3.ScriptContext . aggregateSigSingleKeyG1||])
-      `PlutusTx.unsafeApplyCode` PlutusTx.liftCode PLC.plcVersion110 blsSigBls12381G2XmdSha256SswuRoNul
+    serialiseCompiledCode $
+        $$(PlutusTx.compile [||mkUntypedMintingPolicy @PlutusV3.ScriptContext . aggregateSigSingleKeyG1||])
+            `PlutusTx.unsafeApplyCode` PlutusTx.liftCode PLC.plcVersion110 blsSigBls12381G2XmdSha256SswuRoNul

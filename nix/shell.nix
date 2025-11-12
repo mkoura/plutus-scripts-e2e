@@ -1,4 +1,9 @@
-{ inputs, pkgs, lib, project }:
+{
+  inputs,
+  pkgs,
+  lib,
+  project,
+}:
 
 let
   # Get Haskell development tools from the project
@@ -9,11 +14,21 @@ let
     name = "plutus-scripts-e2e-${project.args.compiler-nix-name}";
 
     buildInputs = [
+      # Haskell development tools
       cabal
       hls
+      pkgs.fourmolu
+      pkgs.haskellPackages.cabal-fmt
+
+      # Core development tools
       pkgs.git
       pkgs.bash
       pkgs.cacert
+
+      # Formatting tools
+      pkgs.treefmt
+      pkgs.nodePackages.prettier
+      pkgs.nixfmt-rfc-style
     ];
 
     withHoogle = false;
