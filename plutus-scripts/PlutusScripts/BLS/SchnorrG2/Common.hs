@@ -74,5 +74,5 @@ verifySchnorrG2Script bs16Null BlsParams{..} _sc = do
     -- additional check using negation is for testing the function
     -- it can be removed to improve performance
     && (rDeser `P.bls12_381_G2_scalarMul` uncompressedG2)
-      `P.bls12_381_G2_add` (P.bls12_381_G2_neg aDeser)
+      `P.bls12_381_G2_add` P.bls12_381_G2_neg aDeser
       `P.bls12_381_G2_equals` (c `P.bls12_381_G2_scalarMul` pkDeser)

@@ -19,6 +19,7 @@ let
       hls
       pkgs.fourmolu
       pkgs.haskellPackages.cabal-fmt
+      pkgs.haskellPackages.hlint
 
       # Core development tools
       pkgs.git

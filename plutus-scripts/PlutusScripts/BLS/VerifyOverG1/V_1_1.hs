@@ -3,15 +3,14 @@
 module PlutusScripts.BLS.VerifyOverG1.V_1_1 where
 
 import Helpers.ScriptUtils (IsScriptContext (mkUntypedMintingPolicy))
-import PlutusCore.Core qualified as PLC
-import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
+import PlutusCore.Version (plcVersion110)
 import PlutusLedgerApi.V3 qualified as V3
 import PlutusScripts.BLS.Common (blsSigBls12381G2XmdSha256SswuRoNul)
 import PlutusScripts.BLS.VerifyOverG1.Common (verifySigG1Script)
-import PlutusTx qualified
+import PlutusTx (compile, liftCode, unsafeApplyCode)
 
-verifyBlsSigG1PolicyV3 :: SerialisedScript
+verifyBlsSigG1PolicyV3 :: V3.SerialisedScript
 verifyBlsSigG1PolicyV3 =
-  serialiseCompiledCode $
-    $$(PlutusTx.compile [||mkUntypedMintingPolicy @V3.ScriptContext . verifySigG1Script||])
-      `PlutusTx.unsafeApplyCode` PlutusTx.liftCode PLC.plcVersion110 blsSigBls12381G2XmdSha256SswuRoNul
+  V3.serialiseCompiledCode $
+    $$(compile [||mkUntypedMintingPolicy @V3.ScriptContext . verifySigG1Script||])
+      `unsafeApplyCode` liftCode plcVersion110 blsSigBls12381G2XmdSha256SswuRoNul

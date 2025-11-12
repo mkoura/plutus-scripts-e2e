@@ -3,12 +3,11 @@
 module PlutusScripts.BLS.SimpleSignAndVerify.V_1_1 where
 
 import Helpers.ScriptUtils (IsScriptContext (mkUntypedMintingPolicy))
-import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusLedgerApi.V3 qualified as V3
 import PlutusScripts.BLS.SimpleSignAndVerify.Common (verifyBlsSimpleScript)
-import PlutusTx qualified
+import PlutusTx (compile)
 
-verifyBlsSimplePolicyV3 :: SerialisedScript
+verifyBlsSimplePolicyV3 :: V3.SerialisedScript
 verifyBlsSimplePolicyV3 =
-  serialiseCompiledCode
-    $$(PlutusTx.compile [||mkUntypedMintingPolicy @V3.ScriptContext verifyBlsSimpleScript||])
+  V3.serialiseCompiledCode
+    $$(compile [||mkUntypedMintingPolicy @V3.ScriptContext verifyBlsSimpleScript||])

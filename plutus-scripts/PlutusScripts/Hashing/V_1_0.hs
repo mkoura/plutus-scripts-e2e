@@ -14,4 +14,4 @@ checkHashingPolicy :: SerialisedScript
 checkHashingPolicy =
   serialiseCompiledCode $
     $$(PlutusTx.compile [||mkHashingPolicyV1V2||])
-      `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion100 hashingParamsV1V2)
+      `PlutusTx.unsafeApplyCode` PlutusTx.liftCode plcVersion100 hashingParamsV1V2

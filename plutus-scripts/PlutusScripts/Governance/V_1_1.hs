@@ -11,7 +11,7 @@
 module PlutusScripts.Governance.V_1_1 where
 
 import Helpers.ScriptUtils (mkUntypedMintingPolicy)
-import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
+import PlutusLedgerApi.V3 qualified as V3
 import PlutusScripts.Governance.Common (
   mkVerifyCurrentTreasuryAmount,
   mkVerifyProposalProcedures,
@@ -20,46 +20,46 @@ import PlutusScripts.Governance.Common (
   mkVerifyTxCerts,
   mkVerifyVotes,
  )
-import PlutusTx qualified
+import PlutusTx (compile)
 
 -- ScriptInfo --
 
-verifyScriptInfoPolicy :: SerialisedScript
+verifyScriptInfoPolicy :: V3.SerialisedScript
 verifyScriptInfoPolicy =
-  serialiseCompiledCode
-    $$(PlutusTx.compile [||mkUntypedMintingPolicy mkVerifyScriptInfo||])
+  V3.serialiseCompiledCode
+    $$(compile [||mkUntypedMintingPolicy mkVerifyScriptInfo||])
 
 -- TxCert --
 
-verifyTxCertsPolicy :: SerialisedScript
-verifyTxCertsPolicy = serialiseCompiledCode $$(PlutusTx.compile [||wrap||])
+verifyTxCertsPolicy :: V3.SerialisedScript
+verifyTxCertsPolicy = V3.serialiseCompiledCode $$(compile [||wrap||])
  where
   wrap = mkUntypedMintingPolicy mkVerifyTxCerts
 
 -- txInfoVotingProcedures --
 
-verifyVotesPolicy :: SerialisedScript
-verifyVotesPolicy = serialiseCompiledCode $$(PlutusTx.compile [||wrap||])
+verifyVotesPolicy :: V3.SerialisedScript
+verifyVotesPolicy = V3.serialiseCompiledCode $$(compile [||wrap||])
  where
   wrap = mkUntypedMintingPolicy mkVerifyVotes
 
 -- txInfoProposalProcedures --
 
-verifyProposalProceduresPolicy :: SerialisedScript
-verifyProposalProceduresPolicy = serialiseCompiledCode $$(PlutusTx.compile [||wrap||])
+verifyProposalProceduresPolicy :: V3.SerialisedScript
+verifyProposalProceduresPolicy = V3.serialiseCompiledCode $$(compile [||wrap||])
  where
   wrap = mkUntypedMintingPolicy mkVerifyProposalProcedures
 
 -- txInfoCurrentTreasuryAmount --
 
-verifyCurrentTreasuryAmountPolicy :: SerialisedScript
-verifyCurrentTreasuryAmountPolicy = serialiseCompiledCode $$(PlutusTx.compile [||wrap||])
+verifyCurrentTreasuryAmountPolicy :: V3.SerialisedScript
+verifyCurrentTreasuryAmountPolicy = V3.serialiseCompiledCode $$(compile [||wrap||])
  where
   wrap = mkUntypedMintingPolicy mkVerifyCurrentTreasuryAmount
 
 -- txInfoTreasuryDonation --
 
-verifyTreasuryDonationPolicy :: SerialisedScript
-verifyTreasuryDonationPolicy = serialiseCompiledCode $$(PlutusTx.compile [||wrap||])
+verifyTreasuryDonationPolicy :: V3.SerialisedScript
+verifyTreasuryDonationPolicy = V3.serialiseCompiledCode $$(compile [||wrap||])
  where
   wrap = mkUntypedMintingPolicy mkVerifyTreasuryDonation

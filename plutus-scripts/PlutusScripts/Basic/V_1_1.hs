@@ -2,7 +2,6 @@
 
 module PlutusScripts.Basic.V_1_1 where
 
-import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusLedgerApi.V3 qualified as V3
 import PlutusScripts.Basic.Common (
   mkAlwaysFailsPolicyV3,
@@ -12,51 +11,51 @@ import PlutusScripts.Basic.Common (
   mkTimeRangePolicyV3,
   mkWitnessRedeemerPolicyV3,
  )
-import PlutusTx qualified
+import PlutusTx (CompiledCode, compile)
 import PlutusTx.Prelude qualified as P
 
 -- AlwaysSucceeds minting policy --
 
-alwaysSucceedPolicyCompiled :: PlutusTx.CompiledCode (P.BuiltinData -> P.BuiltinUnit)
-alwaysSucceedPolicyCompiled = $$(PlutusTx.compile [||mkAlwaysSucceedPolicyV3||])
+alwaysSucceedPolicyCompiled :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
+alwaysSucceedPolicyCompiled = $$(compile [||mkAlwaysSucceedPolicyV3||])
 
-alwaysSucceedPolicy :: SerialisedScript
-alwaysSucceedPolicy = serialiseCompiledCode alwaysSucceedPolicyCompiled
+alwaysSucceedPolicy :: V3.SerialisedScript
+alwaysSucceedPolicy = V3.serialiseCompiledCode alwaysSucceedPolicyCompiled
 
 -- AlwaysSucceeds validator --
 
-alwaysSucceedSpend :: SerialisedScript
-alwaysSucceedSpend = serialiseCompiledCode $$(PlutusTx.compile [||mkAlwaysSucceedSpend||])
+alwaysSucceedSpend :: V3.SerialisedScript
+alwaysSucceedSpend = V3.serialiseCompiledCode $$(compile [||mkAlwaysSucceedSpend||])
 
 -- AlwaysFails minting policy --
 
-alwaysFailsPolicyCompiled :: PlutusTx.CompiledCode (P.BuiltinData -> P.BuiltinUnit)
-alwaysFailsPolicyCompiled = $$(PlutusTx.compile [||mkAlwaysFailsPolicyV3||])
+alwaysFailsPolicyCompiled :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
+alwaysFailsPolicyCompiled = $$(compile [||mkAlwaysFailsPolicyV3||])
 
-alwaysFailsPolicy :: SerialisedScript
-alwaysFailsPolicy = serialiseCompiledCode alwaysFailsPolicyCompiled
+alwaysFailsPolicy :: V3.SerialisedScript
+alwaysFailsPolicy = V3.serialiseCompiledCode alwaysFailsPolicyCompiled
 
 -- Mint token name policy --
 
-mintTokenNamePolicyCompiledV3 :: PlutusTx.CompiledCode (P.BuiltinData -> P.BuiltinUnit)
-mintTokenNamePolicyCompiledV3 = $$(PlutusTx.compile [||mkMintTokenNamePolicyV3||])
+mintTokenNamePolicyCompiledV3 :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
+mintTokenNamePolicyCompiledV3 = $$(compile [||mkMintTokenNamePolicyV3||])
 
-mintTokenNamePolicyV3 :: SerialisedScript
+mintTokenNamePolicyV3 :: V3.SerialisedScript
 mintTokenNamePolicyV3 = V3.serialiseCompiledCode mintTokenNamePolicyCompiledV3
 
 -- Time range policy --
 
-timeRangePolicyCompiledV3 :: PlutusTx.CompiledCode (P.BuiltinData -> P.BuiltinUnit)
-timeRangePolicyCompiledV3 = $$(PlutusTx.compile [||mkTimeRangePolicyV3||])
+timeRangePolicyCompiledV3 :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
+timeRangePolicyCompiledV3 = $$(compile [||mkTimeRangePolicyV3||])
 
-timeRangePolicyV3 :: SerialisedScript
+timeRangePolicyV3 :: V3.SerialisedScript
 timeRangePolicyV3 = V3.serialiseCompiledCode timeRangePolicyCompiledV3
 
 -- Witness redeemer policy --
 
 witnessRedeemerPolicyCompiledV3
-  :: PlutusTx.CompiledCode (P.BuiltinData -> P.BuiltinUnit)
-witnessRedeemerPolicyCompiledV3 = $$(PlutusTx.compile [||mkWitnessRedeemerPolicyV3||])
+  :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
+witnessRedeemerPolicyCompiledV3 = $$(compile [||mkWitnessRedeemerPolicyV3||])
 
-witnessRedeemerPolicyV3 :: SerialisedScript
+witnessRedeemerPolicyV3 :: V3.SerialisedScript
 witnessRedeemerPolicyV3 = V3.serialiseCompiledCode witnessRedeemerPolicyCompiledV3

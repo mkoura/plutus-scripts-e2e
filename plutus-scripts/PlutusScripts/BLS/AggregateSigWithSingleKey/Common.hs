@@ -60,7 +60,7 @@ aggregateSigSingleKeyG1
   -> Bool
 aggregateSigSingleKeyG1 dst BlsParams{..} _sc = do
   let
-    hashedMsgs = List.map (\x -> P.bls12_381_G2_hashToGroup x dst) messages
+    hashedMsgs = List.map (`P.bls12_381_G2_hashToGroup` dst) messages
     pkDeser = P.bls12_381_G1_uncompress pubKey
     aggrSigDeser = P.bls12_381_G2_uncompress aggregateSignature
     aggrMsg = foldl1' P.bls12_381_G2_add hashedMsgs

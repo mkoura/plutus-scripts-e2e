@@ -128,7 +128,7 @@ generateVrfProofWithOutput privKey message = do
 
     -- define the third and last element of a proof of correct VRF
     s =
-      (k - (BI.byteStringToInteger BigEndian c) * privKey)
+      (k - BI.byteStringToInteger BigEndian c * privKey)
         `P.modulo` 52435875175126190479447740508185965837690552500527637822603658699938581184513
 
     -- cofactor of G2

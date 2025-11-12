@@ -3,7 +3,6 @@
 module PlutusScripts.SECP256k1.V_1_1 where
 
 import PlutusCore.Version (plcVersion110)
-import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusLedgerApi.V3 qualified as V3
 import PlutusScripts.SECP256k1.Common (
   mkVerifyEcdsaPolicy,
@@ -13,39 +12,39 @@ import PlutusScripts.SECP256k1.Common (
   verifyEcdsaParams,
   verifySchnorrParams,
  )
-import PlutusTx qualified
+import PlutusTx (CompiledCode, compile, liftCode, unsafeApplyCode)
 import PlutusTx.Prelude qualified as P
 
 -- Schnorr minting policy --
 
-verifySchnorrPolicy :: SerialisedScript
+verifySchnorrPolicy :: V3.SerialisedScript
 verifySchnorrPolicy =
-  serialiseCompiledCode $
-    $$(PlutusTx.compile [||mkVerifySchnorrPolicy||])
-      `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion110 verifySchnorrParams)
+  V3.serialiseCompiledCode $
+    $$(compile [||mkVerifySchnorrPolicy||])
+      `unsafeApplyCode` liftCode plcVersion110 verifySchnorrParams
 
 verifySchnorrPolicyCompiledV3
-  :: PlutusTx.CompiledCode (P.BuiltinData -> P.BuiltinUnit)
+  :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
 verifySchnorrPolicyCompiledV3 =
-  $$(PlutusTx.compile [||mkVerifySchnorrPolicyV3||])
+  $$(compile [||mkVerifySchnorrPolicyV3||])
 
-verifySchnorrPolicyV3 :: SerialisedScript
+verifySchnorrPolicyV3 :: V3.SerialisedScript
 verifySchnorrPolicyV3 =
   V3.serialiseCompiledCode verifySchnorrPolicyCompiledV3
 
 -- ECDSA minting policy --
 
-verifyEcdsaPolicy :: SerialisedScript
+verifyEcdsaPolicy :: V3.SerialisedScript
 verifyEcdsaPolicy =
-  serialiseCompiledCode $
-    $$(PlutusTx.compile [||mkVerifyEcdsaPolicy||])
-      `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion110 verifyEcdsaParams)
+  V3.serialiseCompiledCode $
+    $$(compile [||mkVerifyEcdsaPolicy||])
+      `unsafeApplyCode` liftCode plcVersion110 verifyEcdsaParams
 
 verifyEcdsaPolicyCompiledV3
-  :: PlutusTx.CompiledCode (P.BuiltinData -> P.BuiltinUnit)
+  :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
 verifyEcdsaPolicyCompiledV3 =
-  $$(PlutusTx.compile [||mkVerifyEcdsaPolicyV3||])
+  $$(compile [||mkVerifyEcdsaPolicyV3||])
 
-verifyEcdsaPolicyV3 :: SerialisedScript
+verifyEcdsaPolicyV3 :: V3.SerialisedScript
 verifyEcdsaPolicyV3 =
   V3.serialiseCompiledCode verifyEcdsaPolicyCompiledV3

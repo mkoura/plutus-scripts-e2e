@@ -3,15 +3,14 @@
 module PlutusScripts.BLS.AggregateSigWithSingleKey.V_1_1 where
 
 import Helpers.ScriptUtils (IsScriptContext (mkUntypedMintingPolicy))
-import PlutusCore.Core qualified as PLC
-import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
+import PlutusCore.Version (plcVersion110)
 import PlutusLedgerApi.V3 qualified as V3
 import PlutusScripts.BLS.AggregateSigWithSingleKey.Common (aggregateSigSingleKeyG1)
 import PlutusScripts.BLS.Common (blsSigBls12381G2XmdSha256SswuRoNul)
-import PlutusTx qualified
+import PlutusTx (compile, liftCode, unsafeApplyCode)
 
-verifyAggregateSigSingleKeyG1PolicyV3 :: SerialisedScript
+verifyAggregateSigSingleKeyG1PolicyV3 :: V3.SerialisedScript
 verifyAggregateSigSingleKeyG1PolicyV3 =
-  serialiseCompiledCode $
-    $$(PlutusTx.compile [||mkUntypedMintingPolicy @V3.ScriptContext . aggregateSigSingleKeyG1||])
-      `PlutusTx.unsafeApplyCode` PlutusTx.liftCode PLC.plcVersion110 blsSigBls12381G2XmdSha256SswuRoNul
+  V3.serialiseCompiledCode $
+    $$(compile [||mkUntypedMintingPolicy @V3.ScriptContext . aggregateSigSingleKeyG1||])
+      `unsafeApplyCode` liftCode plcVersion110 blsSigBls12381G2XmdSha256SswuRoNul

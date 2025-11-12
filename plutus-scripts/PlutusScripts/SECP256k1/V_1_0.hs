@@ -18,7 +18,7 @@ verifySchnorrPolicy :: SerialisedScript
 verifySchnorrPolicy =
   serialiseCompiledCode $
     $$(PlutusTx.compile [||mkVerifySchnorrPolicy||])
-      `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion100 verifySchnorrParams)
+      `PlutusTx.unsafeApplyCode` PlutusTx.liftCode plcVersion100 verifySchnorrParams
 
 -- ECDSA minting policy --
 
@@ -26,4 +26,4 @@ verifyEcdsaPolicy :: SerialisedScript
 verifyEcdsaPolicy =
   serialiseCompiledCode $
     $$(PlutusTx.compile [||mkVerifyEcdsaPolicy||])
-      `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion100 verifyEcdsaParams)
+      `PlutusTx.unsafeApplyCode` PlutusTx.liftCode plcVersion100 verifyEcdsaParams
