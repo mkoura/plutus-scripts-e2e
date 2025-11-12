@@ -15,106 +15,56 @@ import System.Directory (createDirectoryIfMissing)
 main :: IO ()
 main = withUtf8 do
   -- Bitwise V1.0 script (PlutusV2)
-  writeEnvelope
-    PlutusV2
+  writeEnvelopeV2
     "byteStringToIntegerRoundtripPolicyV2"
     BitwiseV0.byteStringToIntegerRoundtripPolicyCompiledV2
 
   -- Basic scripts (PlutusV3)
-  writeEnvelope
-    PlutusV3
-    "alwaysSucceedPolicyScriptV3"
-    Basic.alwaysSucceedPolicyCompiled
-
-  writeEnvelope
-    PlutusV3
-    "alwaysFailsPolicyScriptV3"
-    Basic.alwaysFailsPolicyCompiled
-
-  writeEnvelope
-    PlutusV3
-    "mintTokenNamePolicyScriptV3"
-    Basic.mintTokenNamePolicyCompiledV3
-
-  writeEnvelope
-    PlutusV3
-    "timeRangePolicyScriptV3"
-    Basic.timeRangePolicyCompiledV3
-
-  writeEnvelope
-    PlutusV3
-    "witnessRedeemerPolicyScriptV3"
-    Basic.witnessRedeemerPolicyCompiledV3
+  writeEnvelopeV3 "alwaysSucceedPolicyScriptV3" Basic.alwaysSucceedPolicyCompiled
+  writeEnvelopeV3 "alwaysFailsPolicyScriptV3" Basic.alwaysFailsPolicyCompiled
+  writeEnvelopeV3 "mintTokenNamePolicyScriptV3" Basic.mintTokenNamePolicyCompiledV3
+  writeEnvelopeV3 "timeRangePolicyScriptV3" Basic.timeRangePolicyCompiledV3
+  writeEnvelopeV3 "witnessRedeemerPolicyScriptV3" Basic.witnessRedeemerPolicyCompiledV3
 
   -- SECP256k1 scripts (PlutusV3)
-  writeEnvelope
-    PlutusV3
-    "verifySchnorrPolicyScriptV3"
-    SECP.verifySchnorrPolicyCompiledV3
-  writeEnvelope
-    PlutusV3
-    "verifyEcdsaPolicyScriptV3"
-    SECP.verifyEcdsaPolicyCompiledV3
+  writeEnvelopeV3 "verifySchnorrPolicyScriptV3" SECP.verifySchnorrPolicyCompiledV3
+  writeEnvelopeV3 "verifyEcdsaPolicyScriptV3" SECP.verifyEcdsaPolicyCompiledV3
 
   -- Hashing scripts (PlutusV3)
-  writeEnvelope
-    PlutusV3
-    "succeedingRipemd_160Policy"
-    Hashing.succeedingRipemd_160PolicyCompiled
+  writeEnvelopeV3 "succeedingRipemd_160Policy" Hashing.succeedingRipemd_160PolicyCompiled
 
   -- Bitwise V1.1 scripts (PlutusV3)
-  writeEnvelope
-    PlutusV3
+  writeEnvelopeV3
     "succeedingAndByteStringPolicyScriptV3"
     BitwiseV1.succeedingAndByteStringPolicyCompiledV3
-
-  writeEnvelope
-    PlutusV3
+  writeEnvelopeV3
     "succeedingOrByteStringPolicyScriptV3"
     BitwiseV1.succeedingOrByteStringPolicyCompiledV3
-
-  writeEnvelope
-    PlutusV3
+  writeEnvelopeV3
     "succeedingXorByteStringPolicyScriptV3"
     BitwiseV1.succeedingXorByteStringPolicyCompiledV3
-
-  writeEnvelope
-    PlutusV3
+  writeEnvelopeV3
     "succeedingComplementByteStringPolicyScriptV3"
     BitwiseV1.succeedingComplementByteStringPolicyCompiledV3
-
-  writeEnvelope
-    PlutusV3
+  writeEnvelopeV3
     "succeedingShiftByteStringPolicyScriptV3"
     BitwiseV1.succeedingShiftByteStringPolicyCompiledV3
-
-  writeEnvelope
-    PlutusV3
+  writeEnvelopeV3
     "succeedingRotateByteStringPolicyScriptV3"
     BitwiseV1.succeedingRotateByteStringPolicyCompiledV3
-
-  writeEnvelope
-    PlutusV3
+  writeEnvelopeV3
     "succeedingCountSetBitsPolicyScriptV3"
     BitwiseV1.succeedingCountSetBitsPolicyCompiledV3
-
-  writeEnvelope
-    PlutusV3
+  writeEnvelopeV3
     "succeedingFindFirstSetBitPolicyScriptV3"
     BitwiseV1.succeedingFindFirstSetBitPolicyCompiledV3
-
-  writeEnvelope
-    PlutusV3
+  writeEnvelopeV3
     "succeedingReadBitPolicyScriptV3"
     BitwiseV1.succeedingReadBitPolicyCompiledV3
-
-  writeEnvelope
-    PlutusV3
+  writeEnvelopeV3
     "succeedingWriteBitsPolicyScriptV3"
     BitwiseV1.succeedingWriteBitsPolicyCompiledV3
-
-  writeEnvelope
-    PlutusV3
+  writeEnvelopeV3
     "succeedingReplicateBytePolicyScriptV3"
     BitwiseV1.succeedingReplicateBytePolicyCompiledV3
 
@@ -129,3 +79,11 @@ writeEnvelope lang filename compiledCode = do
   let description = T.pack filename
   createDirectoryIfMissing True dir
   Envelope.writeCodeEnvelopeForVersion lang description compiledCode filePath
+
+-- | Write PlutusV2 script
+writeEnvelopeV2 :: FilePath -> CompiledCode a -> IO ()
+writeEnvelopeV2 = writeEnvelope PlutusV2
+
+-- | Write PlutusV3 script
+writeEnvelopeV3 :: FilePath -> CompiledCode a -> IO ()
+writeEnvelopeV3 = writeEnvelope PlutusV3
