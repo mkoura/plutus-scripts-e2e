@@ -4,17 +4,17 @@ module PlutusScripts.Bitwise.V_1_0 where
 
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusScripts.Bitwise.Conversions (
-    mkByteStringToIntegerRoundtripPolicySimple,
+  mkByteStringToIntegerRoundtripPolicySimple,
  )
 import PlutusTx qualified
 
 -- integerToByteString and byteStringToInteger added to PlutusV2 --
 
-byteStringToIntegerRoundtripPolicyCompiledV2 ::
-    PlutusTx.CompiledCode (PlutusTx.BuiltinData -> PlutusTx.BuiltinData -> ())
+byteStringToIntegerRoundtripPolicyCompiledV2
+  :: PlutusTx.CompiledCode (PlutusTx.BuiltinData -> PlutusTx.BuiltinData -> ())
 byteStringToIntegerRoundtripPolicyCompiledV2 =
-    $$(PlutusTx.compile [||mkByteStringToIntegerRoundtripPolicySimple||])
+  $$(PlutusTx.compile [||mkByteStringToIntegerRoundtripPolicySimple||])
 
 byteStringToIntegerRoundtripPolicyV2 :: SerialisedScript
 byteStringToIntegerRoundtripPolicyV2 =
-    serialiseCompiledCode byteStringToIntegerRoundtripPolicyCompiledV2
+  serialiseCompiledCode byteStringToIntegerRoundtripPolicyCompiledV2

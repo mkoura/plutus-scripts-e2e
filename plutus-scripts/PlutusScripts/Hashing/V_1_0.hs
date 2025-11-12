@@ -5,13 +5,13 @@ module PlutusScripts.Hashing.V_1_0 where
 import PlutusCore.Version (plcVersion100)
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusScripts.Hashing.Common (
-    hashingParamsV1V2,
-    mkHashingPolicyV1V2,
+  hashingParamsV1V2,
+  mkHashingPolicyV1V2,
  )
 import PlutusTx qualified
 
 checkHashingPolicy :: SerialisedScript
 checkHashingPolicy =
-    serialiseCompiledCode $
-        $$(PlutusTx.compile [||mkHashingPolicyV1V2||])
-            `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion100 hashingParamsV1V2)
+  serialiseCompiledCode $
+    $$(PlutusTx.compile [||mkHashingPolicyV1V2||])
+      `PlutusTx.unsafeApplyCode` (PlutusTx.liftCode plcVersion100 hashingParamsV1V2)

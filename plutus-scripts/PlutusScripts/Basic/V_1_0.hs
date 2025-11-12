@@ -4,9 +4,9 @@ module PlutusScripts.Basic.V_1_0 where
 
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusScripts.Basic.Common (
-    mkAlwaysFailsPolicy,
-    mkAlwaysSucceedPolicy,
-    mkAlwaysSucceedSpend,
+  mkAlwaysFailsPolicy,
+  mkAlwaysSucceedPolicy,
+  mkAlwaysSucceedSpend,
  )
 import PlutusTx qualified
 

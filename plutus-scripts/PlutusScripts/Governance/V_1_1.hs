@@ -13,12 +13,12 @@ module PlutusScripts.Governance.V_1_1 where
 import Helpers.ScriptUtils (mkUntypedMintingPolicy)
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusScripts.Governance.Common (
-    mkVerifyCurrentTreasuryAmount,
-    mkVerifyProposalProcedures,
-    mkVerifyScriptInfo,
-    mkVerifyTreasuryDonation,
-    mkVerifyTxCerts,
-    mkVerifyVotes,
+  mkVerifyCurrentTreasuryAmount,
+  mkVerifyProposalProcedures,
+  mkVerifyScriptInfo,
+  mkVerifyTreasuryDonation,
+  mkVerifyTxCerts,
+  mkVerifyVotes,
  )
 import PlutusTx qualified
 
@@ -26,40 +26,40 @@ import PlutusTx qualified
 
 verifyScriptInfoPolicy :: SerialisedScript
 verifyScriptInfoPolicy =
-    serialiseCompiledCode
-        $$(PlutusTx.compile [||mkUntypedMintingPolicy mkVerifyScriptInfo||])
+  serialiseCompiledCode
+    $$(PlutusTx.compile [||mkUntypedMintingPolicy mkVerifyScriptInfo||])
 
 -- TxCert --
 
 verifyTxCertsPolicy :: SerialisedScript
 verifyTxCertsPolicy = serialiseCompiledCode $$(PlutusTx.compile [||wrap||])
-  where
-    wrap = mkUntypedMintingPolicy mkVerifyTxCerts
+ where
+  wrap = mkUntypedMintingPolicy mkVerifyTxCerts
 
 -- txInfoVotingProcedures --
 
 verifyVotesPolicy :: SerialisedScript
 verifyVotesPolicy = serialiseCompiledCode $$(PlutusTx.compile [||wrap||])
-  where
-    wrap = mkUntypedMintingPolicy mkVerifyVotes
+ where
+  wrap = mkUntypedMintingPolicy mkVerifyVotes
 
 -- txInfoProposalProcedures --
 
 verifyProposalProceduresPolicy :: SerialisedScript
 verifyProposalProceduresPolicy = serialiseCompiledCode $$(PlutusTx.compile [||wrap||])
-  where
-    wrap = mkUntypedMintingPolicy mkVerifyProposalProcedures
+ where
+  wrap = mkUntypedMintingPolicy mkVerifyProposalProcedures
 
 -- txInfoCurrentTreasuryAmount --
 
 verifyCurrentTreasuryAmountPolicy :: SerialisedScript
 verifyCurrentTreasuryAmountPolicy = serialiseCompiledCode $$(PlutusTx.compile [||wrap||])
-  where
-    wrap = mkUntypedMintingPolicy mkVerifyCurrentTreasuryAmount
+ where
+  wrap = mkUntypedMintingPolicy mkVerifyCurrentTreasuryAmount
 
 -- txInfoTreasuryDonation --
 
 verifyTreasuryDonationPolicy :: SerialisedScript
 verifyTreasuryDonationPolicy = serialiseCompiledCode $$(PlutusTx.compile [||wrap||])
-  where
-    wrap = mkUntypedMintingPolicy mkVerifyTreasuryDonation
+ where
+  wrap = mkUntypedMintingPolicy mkVerifyTreasuryDonation

@@ -5,12 +5,12 @@ module PlutusScripts.Basic.V_1_1 where
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusLedgerApi.V3 qualified as PlutusV3 (serialiseCompiledCode)
 import PlutusScripts.Basic.Common (
-    mkAlwaysFailsPolicyV3,
-    mkAlwaysSucceedPolicyV3,
-    mkAlwaysSucceedSpend,
-    mkMintTokenNamePolicyV3,
-    mkTimeRangePolicyV3,
-    mkWitnessRedeemerPolicyV3,
+  mkAlwaysFailsPolicyV3,
+  mkAlwaysSucceedPolicyV3,
+  mkAlwaysSucceedSpend,
+  mkMintTokenNamePolicyV3,
+  mkTimeRangePolicyV3,
+  mkWitnessRedeemerPolicyV3,
  )
 import PlutusTx qualified
 import PlutusTx.Prelude qualified as P
@@ -54,8 +54,8 @@ timeRangePolicyV3 = PlutusV3.serialiseCompiledCode timeRangePolicyCompiledV3
 
 -- Witness redeemer policy --
 
-witnessRedeemerPolicyCompiledV3 ::
-    PlutusTx.CompiledCode (P.BuiltinData -> P.BuiltinUnit)
+witnessRedeemerPolicyCompiledV3
+  :: PlutusTx.CompiledCode (P.BuiltinData -> P.BuiltinUnit)
 witnessRedeemerPolicyCompiledV3 = $$(PlutusTx.compile [||mkWitnessRedeemerPolicyV3||])
 
 witnessRedeemerPolicyV3 :: SerialisedScript

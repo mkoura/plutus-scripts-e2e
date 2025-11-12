@@ -10,5 +10,5 @@ import PlutusTx qualified
 
 verifyBlsSimplePolicyV3 :: SerialisedScript
 verifyBlsSimplePolicyV3 =
-    serialiseCompiledCode
-        $$(PlutusTx.compile [||mkUntypedMintingPolicy @PlutusV3.ScriptContext verifyBlsSimpleScript||])
+  serialiseCompiledCode
+    $$(PlutusTx.compile [||mkUntypedMintingPolicy @PlutusV3.ScriptContext verifyBlsSimpleScript||])
