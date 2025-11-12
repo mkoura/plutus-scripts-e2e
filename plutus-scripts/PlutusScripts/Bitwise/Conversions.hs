@@ -1,14 +1,8 @@
 -- editorconfig-checker-disable-file
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE RecordWildCards     #-}
-{-# LANGUAGE TemplateHaskell     #-}
-{-# LANGUAGE TypeApplications    #-}
-{-# LANGUAGE ViewPatterns        #-}
 
 module PlutusScripts.Bitwise.Conversions where
 
-import Cardano.Api qualified as C
-import PlutusLedgerApi.V1 qualified as PV1
+import PlutusLedgerApi.V1 qualified as V1
 import PlutusScripts.Helpers (hxs)
 
 import PlutusTx qualified
@@ -19,15 +13,15 @@ import GHC.ByteOrder (ByteOrder (BigEndian, LittleEndian))
 
 data ByteStringToIntegerParams = ByteStringToIntegerParams
   { bsByteOrder :: Bool
-  , byteString  :: P.BuiltinByteString
-  , expInteger  :: Integer
+  , byteString :: P.BuiltinByteString
+  , expInteger :: Integer
   }
 PlutusTx.unstableMakeIsData ''ByteStringToIntegerParams
 
 data IntegerToByteStringParams = IntegerToByteStringParams
-  { intByteOrder  :: Bool
+  { intByteOrder :: Bool
   , outputMinSize :: Integer
-  , integer       :: Integer
+  , integer :: Integer
   , expByteString :: P.BuiltinByteString
   }
 PlutusTx.unstableMakeIsData ''IntegerToByteStringParams
@@ -49,7 +43,7 @@ mkIntegerToByteStringPolicy IntegerToByteStringParams{..} _sc = do
 {-# INLINEABLE mkByteStringToIntegerRoundtripPolicySimple #-}
 mkByteStringToIntegerRoundtripPolicySimple :: P.BuiltinData -> P.BuiltinData -> ()
 mkByteStringToIntegerRoundtripPolicySimple r _sc = do
-  let oInt = PV1.unsafeFromBuiltinData r :: Integer
+  let oInt = V1.unsafeFromBuiltinData r :: Integer
       bs = BI.integerToByteString BigEndian 0 oInt
       intBE = BI.byteStringToInteger BigEndian bs
   if intBE P.== oInt then () else P.traceError "PT5"
@@ -62,9 +56,6 @@ mkByteStringToIntegerRoundtripPolicy bs _sc = do
       intLE = BI.byteStringToInteger LittleEndian bs
       bsLE = BI.integerToByteString LittleEndian 0 intLE
   bs P.== bsBE P.&& bs P.== bsLE
-
-bitwiseAssetName :: C.AssetName
-bitwiseAssetName = case C.deserialiseFromRawBytes C.AsAssetName "bitwise" of Left err -> error $ "Failed to create AssetName: " ++ show err; Right an -> an
 
 bsToIParams :: ByteStringToIntegerParams
 bsToIParams =
@@ -82,4 +73,3 @@ iToBsParams =
     , outputMinSize = 0
     , expByteString = hxs "deadbeef"
     }
-

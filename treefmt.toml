@@ -1,0 +1,52 @@
+# treefmt configuration
+# https://treefmt.com/
+
+[formatter.prettier]
+command = "prettier"
+options = ["--write", "--prose-wrap", "never"]
+includes = [
+  "*.md", "*.markdown",   # Markdown files
+  "*.yml", "*.yaml",      # YAML files
+  "*.json",               # JSON files
+]
+
+[formatter.fourmolu]
+command = "fourmolu"
+options = ["--mode", "inplace"]
+includes = ["*.hs", "*.lhs"]
+
+[formatter.cabal-fmt]
+command = "cabal-fmt"
+options = ["--inplace"]
+includes = ["*.cabal"]
+
+[formatter.nixfmt]
+command = "nixfmt"
+options = []
+includes = ["*.nix"]
+
+# Global settings
+[global]
+excludes = [
+  # Exclude nix-specific directories and files
+  "result",
+  "result-*",
+  ".direnv/**",
+
+  # Exclude temporary and build directories
+  "node_modules/**",
+  "dist/**",
+  "build/**",
+  ".git/**",
+  "dist-newstyle/**",
+
+  # Exclude specific files that shouldn't be formatted
+  "flake.lock",
+
+  # Exclude any auto-generated files
+  "**/*.generated.*",
+
+  # Exclude serialized Plutus scripts
+  "serialised-plutus-scripts/**",
+  "plutus-scripts/serialised-plutus-scripts/**",
+]

@@ -1,4 +1,8 @@
-{ inputs, pkgs, lib }:
+{
+  inputs,
+  pkgs,
+  lib,
+}:
 
 let
   cabalProject = pkgs.haskell-nix.cabalProject' (
@@ -10,13 +14,17 @@ let
 
       src = lib.cleanSource ../.;
 
-      inputMap = { "https://chap.intersectmbo.org/" = inputs.CHaP; };
+      inputMap = {
+        "https://chap.intersectmbo.org/" = inputs.CHaP;
+      };
 
       shell.withHoogle = false;
 
-      modules = [{
-        packages = {};
-      }];
+      modules = [
+        {
+          packages = { };
+        }
+      ];
     }
   );
 

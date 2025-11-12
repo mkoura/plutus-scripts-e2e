@@ -1,13 +1,3 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# HLINT ignore "Use underscore" #-}
-{-# LANGUAGE ViewPatterns #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
--- Not using all CardanoEra
-{-# OPTIONS_GHC -fno-warn-incomplete-patterns #-}
-
 module PlutusScripts.BLS.Groth16.Common where
 
 import Data.ByteString qualified as BS

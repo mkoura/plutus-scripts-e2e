@@ -1,5 +1,4 @@
-Plutus Scripts
-==============
+# Plutus Scripts
 
 Collection of Plutus scripts used by the E2E tests.
 
