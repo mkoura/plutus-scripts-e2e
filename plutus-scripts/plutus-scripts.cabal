@@ -50,7 +50,6 @@ common ghc-options
     TemplateHaskell
     TypeApplications
     TypeFamilies
-    UndecidableInstances
     ViewPatterns
 
 -- These options are required for Plinth builds
