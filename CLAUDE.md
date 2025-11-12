@@ -77,20 +77,23 @@ Example:
 mkAlwaysSucceedPolicyV3 :: P.BuiltinData -> P.BuiltinUnit
 
 -- PlutusScripts/Basic/V_1_1.hs
+alwaysSucceedPolicyCompiled :: PlutusTx.CompiledCode (P.BuiltinData -> P.BuiltinUnit)
+alwaysSucceedPolicyCompiled = $$(PlutusTx.compile [||mkAlwaysSucceedPolicyV3||])
+
 alwaysSucceedPolicy :: SerialisedScript
-alwaysSucceedPolicy = serialiseCompiledCode $$(PlutusTx.compile [||mkAlwaysSucceedPolicyV3||])
+alwaysSucceedPolicy = serialiseCompiledCode alwaysSucceedPolicyCompiled
 
 writeAlwaysSucceedPolicyScriptV3 :: IO ()
-writeAlwaysSucceedPolicyScriptV3 = writeSerialisedScript "alwaysSucceedPolicyScriptV3" alwaysSucceedPolicyScriptV3
+writeAlwaysSucceedPolicyScriptV3 =
+  writeCompiledScript PlutusV3 "alwaysSucceedPolicyScriptV3" alwaysSucceedPolicyCompiled
 ```
 
 ### Helper Utilities
 
 **`PlutusScripts.Helpers`** provides:
-- Script witness construction for V1/V2/V3 (minting and spending)
-- `toScriptData`, `asRedeemer`, `asDatum` conversions
-- `policyIdV1/V2/V3` for computing policy IDs
-- `writeSerialisedScript` for serializing scripts to files
+- `writeCompiledScript` - Direct serialization from `CompiledCode` to JSON envelope using `PlutusLedgerApi.Envelope`
+- `bytesFromHex`, `hxs` - Hex string conversion utilities
+- `asRedeemer`, `asDatum` - Plutus data conversions
 
 **`Helpers.ScriptUtils`** provides:
 - Untyped validator/policy/stake validator types
@@ -100,13 +103,14 @@ writeAlwaysSucceedPolicyScriptV3 = writeSerialisedScript "alwaysSucceedPolicyScr
 
 ## Dependencies
 
-Key Cardano ecosystem dependencies (from CHaP):
+Key Plutus ecosystem dependencies (from CHaP):
 - `plutus-core ^>=1.53.1.0`
 - `plutus-ledger-api ^>=1.53.1.0`
 - `plutus-tx ^>=1.53.1.0`
 - `plutus-tx-plugin ^>=1.53.1.0`
-- `cardano-api ^>=10.19.1.0`
 - `data-default >=0.8`
+
+**Note**: cardano-api dependency was completely removed in November 2025. Scripts now serialize using native `PlutusLedgerApi.Envelope` tooling.
 
 ### Recent API Changes
 
@@ -115,17 +119,11 @@ Key Cardano ecosystem dependencies (from CHaP):
 - Use `PV3.mintValueMinted (PV3.txInfoMint txInfo)` to access minted values
 - Some unused PlutusLedgerApi.V1 qualified imports removed for cleaner code
 
-**cardano-api 10.19 Updates:**
-- `Cardano.Api.Shelley` module removed - all exports now available from `Cardano.Api`
-- `AssetName` constructor changed to pattern synonym - use `deserialiseFromRawBytes AsAssetName` instead
-- `PReferenceScript` constructor simplified from 2 arguments to 1 (in 10.16+)
-- Updated from `PReferenceScript refTxIn Nothing` to `PReferenceScript refTxIn`
-- Affects all script witness construction (minting and spending)
-
-**Migration Notes:**
-- Replace `import Cardano.Api.Shelley qualified as C` with just `import Cardano.Api qualified as C`
-- Replace `C.AssetName "foo"` with `case C.deserialiseFromRawBytes C.AsAssetName "foo" of Left err -> error $ "Failed to create AssetName: " ++ show err; Right an -> an`
-- Use `emptyAssetName` helper from `PlutusScripts.Helpers` for empty asset names
+**November 2025 - cardano-api Removal:**
+- Completely removed cardano-api dependency
+- All witness construction code removed (was unused legacy from Antaeus)
+- Scripts now serialize using `PlutusLedgerApi.Envelope.writeCodeEnvelopeForVersion`
+- Output format remains identical for cardano-node-tests compatibility
 
 ## Development Practices
 
