@@ -19,6 +19,7 @@ build-type:    Simple
 common project-config
   default-language:   Haskell2010
   default-extensions:
+    DataKinds
     DeriveAnyClass
     DeriveFoldable
     DeriveFunctor
@@ -26,14 +27,23 @@ common project-config
     DeriveLift
     DeriveTraversable
     ExplicitForAll
+    FlexibleContexts
     FlexibleInstances
     GeneralizedNewtypeDeriving
     ImportQualifiedPost
     InstanceSigs
+    LambdaCase
     MultiParamTypeClasses
+    NumericUnderscores
+    OverloadedStrings
+    RecordWildCards
     ScopedTypeVariables
     StandaloneDeriving
+    TemplateHaskell
+    TypeApplications
     TypeFamilies
+    UndecidableInstances
+    ViewPatterns
 
   ghc-options:
     -Wall -Widentities -Wincomplete-record-updates
@@ -58,12 +68,12 @@ test-suite plutus-scripts
     PlutusScripts.Bitwise.Conversions
     PlutusScripts.Bitwise.CountFindFirstSet
     PlutusScripts.Bitwise.Logical
-    PlutusScripts.Bitwise.ShiftRotate
-    PlutusScripts.Bitwise.ReplicateByte
     PlutusScripts.Bitwise.ReadBit
-    PlutusScripts.Bitwise.WriteBits
+    PlutusScripts.Bitwise.ReplicateByte
+    PlutusScripts.Bitwise.ShiftRotate
     PlutusScripts.Bitwise.V_1_0
     PlutusScripts.Bitwise.V_1_1
+    PlutusScripts.Bitwise.WriteBits
     PlutusScripts.BLS
     PlutusScripts.BLS.AggregateSigWithMultipleKeys.Common
     PlutusScripts.BLS.AggregateSigWithMultipleKeys.V_1_1
@@ -97,10 +107,9 @@ test-suite plutus-scripts
     Spec.WriteScriptFiles
 
   --------------------------
-  -- IOG dependencies
+  -- Plutus dependencies
   --------------------------
   build-depends:
-    , cardano-api        ^>=10.19.1.0
     , plutus-core        ^>=1.53.1.0
     , plutus-ledger-api  ^>=1.53.1.0
     , plutus-tx          ^>=1.53.1.0
@@ -113,8 +122,8 @@ test-suite plutus-scripts
     , aeson
     , base
     , bytestring
-    , directory
     , data-default
+    , directory
     , exceptions
     , filepath
     , lens
