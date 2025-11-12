@@ -1,22 +1,10 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE NumericUnderscores #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE ViewPatterns #-}
 {-# OPTIONS_GHC -Wno-missing-fields #-}
 -- Not using all CardanoEra
 {-# OPTIONS_GHC -fno-warn-incomplete-patterns #-}
 
 module PlutusScripts.Hashing.Common where
 
-import Cardano.Api qualified as C
-import PlutusScripts.Helpers (
-  bytesFromHex,
-  toScriptData,
- )
+import PlutusScripts.Helpers (bytesFromHex)
 import PlutusTx qualified
 import PlutusTx.Builtins qualified as BI
 import PlutusTx.List qualified as List
@@ -90,8 +78,6 @@ hashAndCheckResult
 hashAndCheckResult f fName io =
   P.traceIfFalse ("Hash check failed for : " P.<> fName) (f (input io) P.== output io)
 
-hashingAssetName :: C.AssetName
-hashingAssetName = case C.deserialiseFromRawBytes C.AsAssetName "hashing" of Left err -> error $ "Failed to create AssetName: " ++ show err; Right an -> an
 
 -- All test following test vectors were produced using https://github.com/RustCrypto/hashes
 
@@ -258,10 +244,3 @@ hashingParamsV3 =
     , ripemd_160Long = ripemd160LongIO
     }
 
--- Test inputs and outputs for PlutusV1 and PlutusV2 hashing functions
-hashingParamsV1AndV2Redeemer :: C.HashableScriptData
-hashingParamsV1AndV2Redeemer = toScriptData hashingParamsV1V2
-
--- Test inputs and outputs for PlutusV1, PlutusV2 and PlutusV3 hashing functions
-hashingParamsV3Redeemer :: C.HashableScriptData
-hashingParamsV3Redeemer = toScriptData hashingParamsV3

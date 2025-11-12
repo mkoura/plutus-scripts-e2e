@@ -1,23 +1,11 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE NumericUnderscores #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE ViewPatterns #-}
 -- Not using all CardanoEra
 {-# OPTIONS_GHC -fno-warn-incomplete-patterns #-}
 
 module PlutusScripts.SECP256k1.Common where
 
-import Cardano.Api qualified as C
 import Helpers.ScriptUtils (constrArgs)
 import PlutusLedgerApi.V3 qualified as PV3
-import PlutusScripts.Helpers (
-  bytesFromHex,
-  toScriptData,
- )
+import PlutusScripts.Helpers (bytesFromHex)
 import PlutusTx qualified
 import PlutusTx.Builtins qualified as BI
 import PlutusTx.Builtins.Internal qualified as BI (
@@ -64,11 +52,6 @@ mkVerifySchnorrPolicyV3 arg = if checkSignature then BI.unitval else P.traceErro
 mkVerifySchnorrPolicy :: Secp256Params -> P.BuiltinData -> P.BuiltinData -> Bool
 mkVerifySchnorrPolicy Secp256Params{..} _r _sc = BI.verifySchnorrSecp256k1Signature vkey msg sig
 
-schnorrAssetName :: C.AssetName
-schnorrAssetName = case C.deserialiseFromRawBytes C.AsAssetName "Schnorr" of
-  Left err -> error $ "Failed to create AssetName: " ++ show err
-  Right an -> an
-
 verifySchnorrParams :: Secp256Params
 verifySchnorrParams =
   Secp256Params
@@ -87,9 +70,6 @@ verifySchnorrParams =
                 <> "613454a60f6703819a39fdac2a410a094442afd1fc083354443e8d8bb4461a9b"
             )
     }
-
-verifySchnorrRedeemer :: C.HashableScriptData
-verifySchnorrRedeemer = toScriptData verifySchnorrParams
 
 -- ECDSA minting policy --
 
@@ -118,11 +98,6 @@ mkVerifyEcdsaPolicyV3 arg = if checkSignature then BI.unitval else P.traceError 
 mkVerifyEcdsaPolicy :: Secp256Params -> P.BuiltinData -> P.BuiltinData -> Bool
 mkVerifyEcdsaPolicy Secp256Params{..} _r _sc = BI.verifyEcdsaSecp256k1Signature vkey msg sig
 
-ecdsaAssetName :: C.AssetName
-ecdsaAssetName = case C.deserialiseFromRawBytes C.AsAssetName "ECDSA" of
-  Left err -> error $ "Failed to create AssetName: " ++ show err
-  Right an -> an
-
 verifyEcdsaParams :: Secp256Params
 verifyEcdsaParams =
   Secp256Params
@@ -138,5 +113,3 @@ verifyEcdsaParams =
             )
     }
 
-verifyEcdsaRedeemer :: C.HashableScriptData
-verifyEcdsaRedeemer = toScriptData verifyEcdsaParams

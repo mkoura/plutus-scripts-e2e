@@ -2,10 +2,6 @@
 `shiftByteString` builtins.  These are adapted from the `plutus-conformance`
 tests. -}
 
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE RecordWildCards     #-}
-{-# LANGUAGE TemplateHaskell     #-}
-{-# LANGUAGE ViewPatterns        #-}
 
 module PlutusScripts.Bitwise.ShiftRotate (
   mkRotateByteStringPolicy,

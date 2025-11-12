@@ -1,7 +1,3 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE Strict #-}
 {-# OPTIONS_GHC -fno-full-laziness #-}
 {-# OPTIONS_GHC -fno-ignore-interface-pragmas #-}
 {-# OPTIONS_GHC -fno-omit-interface-pragmas #-}
@@ -14,11 +10,7 @@
 
 module PlutusScripts.Governance.Common where
 
-import Cardano.Api qualified as C
 import PlutusLedgerApi.V3 qualified as V3
-import PlutusScripts.Helpers (
-  toScriptData,
- )
 import PlutusTx.AssocMap qualified as AM
 import PlutusTx.List qualified as List
 import PlutusTx.Prelude qualified as P
@@ -43,23 +35,11 @@ listEq rs cs =
 mkVerifyScriptInfo :: V3.ScriptInfo -> V3.ScriptContext -> Bool
 mkVerifyScriptInfo _r _sc = False
 
-scriptInfoAssetName :: C.AssetName
-scriptInfoAssetName = case C.deserialiseFromRawBytes C.AsAssetName "ScriptInfo" of Left err -> error $ "Failed to create AssetName: " ++ show err; Right an -> an
-
-verifyScriptInfoRedeemer :: V3.ScriptInfo -> C.HashableScriptData
-verifyScriptInfoRedeemer = toScriptData
-
 -- TxCert --
 
 {-# INLINEABLE mkVerifyTxCerts #-}
 mkVerifyTxCerts :: [V3.TxCert] -> V3.ScriptContext -> Bool
 mkVerifyTxCerts r sc = r P.== V3.txInfoTxCerts (V3.scriptContextTxInfo sc)
-
-txCertsAssetName :: C.AssetName
-txCertsAssetName = case C.deserialiseFromRawBytes C.AsAssetName "TxCerts" of Left err -> error $ "Failed to create AssetName: " ++ show err; Right an -> an
-
-verifyTxCertsRedeemer :: [V3.TxCert] -> C.HashableScriptData
-verifyTxCertsRedeemer = toScriptData
 
 -- txInfoVotes --
 
@@ -84,13 +64,6 @@ mkVerifyVotes r sc = do
       -- lengthEq rs cs -- alternate implementation
       P.&& List.all (P.== True) (List.zipWith listEq rs cs)
 
-votesAssetName :: C.AssetName
-votesAssetName = case C.deserialiseFromRawBytes C.AsAssetName "Votes" of Left err -> error $ "Failed to create AssetName: " ++ show err; Right an -> an
-
-verifyVotesRedeemer ::
-  V3.Map V3.Voter (V3.Map V3.GovernanceActionId V3.Vote) -> C.HashableScriptData
-verifyVotesRedeemer = toScriptData
-
 -- txInfoProposalProcedures --
 
 {-# INLINEABLE mkVerifyProposalProcedures #-}
@@ -99,24 +72,12 @@ mkVerifyProposalProcedures _r _sc =
   -- r P.== V3.txInfoProposalProcedures (V3.scriptContextTxInfo sc)
   False
 
-proposalProceduresAssetName :: C.AssetName
-proposalProceduresAssetName = case C.deserialiseFromRawBytes C.AsAssetName "ProposalProcedures" of Left err -> error $ "Failed to create AssetName: " ++ show err; Right an -> an
-
-verifyProposalProceduresRedeemer :: [V3.ProposalProcedure] -> C.HashableScriptData
-verifyProposalProceduresRedeemer = toScriptData
-
 -- txInfoCurrentTreasuryAmount --
 
 {-# INLINEABLE mkVerifyCurrentTreasuryAmount #-}
 mkVerifyCurrentTreasuryAmount :: P.Maybe V3.Lovelace -> V3.ScriptContext -> Bool
 mkVerifyCurrentTreasuryAmount r sc =
   r P.== V3.txInfoCurrentTreasuryAmount (V3.scriptContextTxInfo sc)
-
-currentTreasuryAmountAssetName :: C.AssetName
-currentTreasuryAmountAssetName = case C.deserialiseFromRawBytes C.AsAssetName "CurrentTreasuryAmount" of Left err -> error $ "Failed to create AssetName: " ++ show err; Right an -> an
-
-currentTreasuryAmountRedeemer :: P.Maybe V3.Value -> C.HashableScriptData
-currentTreasuryAmountRedeemer = toScriptData
 
 -- txInfoTreasuryDonation --
 
@@ -125,8 +86,3 @@ mkVerifyTreasuryDonation :: P.Maybe V3.Lovelace -> V3.ScriptContext -> Bool
 mkVerifyTreasuryDonation r sc =
   r P.== V3.txInfoTreasuryDonation (V3.scriptContextTxInfo sc)
 
-treasuryDonationAssetName :: C.AssetName
-treasuryDonationAssetName = case C.deserialiseFromRawBytes C.AsAssetName "TreasuryDonationAssetName" of Left err -> error $ "Failed to create AssetName: " ++ show err; Right an -> an
-
-treasuryDonationRedeemer :: P.Maybe V3.Value -> C.HashableScriptData
-treasuryDonationRedeemer = toScriptData

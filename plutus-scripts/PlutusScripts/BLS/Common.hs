@@ -1,7 +1,3 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 -- Not using all CardanoEra
 {-# OPTIONS_GHC -fno-warn-incomplete-patterns #-}
@@ -10,18 +6,11 @@
 
 module PlutusScripts.BLS.Common where
 
-import Cardano.Api qualified as C
 import Data.ByteString.Char8 qualified as C8
-import PlutusScripts.Helpers qualified as H
+import GHC.ByteOrder (ByteOrder (LittleEndian))
+import PlutusScripts.Helpers (bytesFromHex)
 import PlutusTx.Builtins qualified as BI
 import PlutusTx.Prelude qualified as P
-
-import GHC.ByteOrder (ByteOrder (LittleEndian))
-
-blsAssetName :: C.AssetName
-blsAssetName = case C.deserialiseFromRawBytes C.AsAssetName "BLS" of
-  Left err -> error $ "Failed to create AssetName: " ++ show err
-  Right an -> an
 
 -- hex value 424c535f5349475f424c53313233383147325f584d443a5348412d3235365f535357555f524f5f4e554c5f"
 blsSigBls12381G2XmdSha256SswuRoNul :: P.BuiltinByteString
@@ -30,7 +19,7 @@ blsSigBls12381G2XmdSha256SswuRoNul = BI.toBuiltin $ C8.pack "BLS_SIG_BLS12381G2_
 -- all zero bytestring 16 byte in length used to append to truncated bytestring onchain
 {-# INLINEABLE byteString16Null #-}
 byteString16Null :: P.BuiltinByteString
-byteString16Null = P.toBuiltin $ H.bytesFromHex "00000000000000000000000000000000"
+byteString16Null = P.toBuiltin $ bytesFromHex "00000000000000000000000000000000"
 
 -- Little-endian bytestring to integer conversion #-}
 {-# INLINEABLE byteStringToIntegerLE #-}

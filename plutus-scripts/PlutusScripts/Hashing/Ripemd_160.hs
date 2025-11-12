@@ -1,10 +1,6 @@
 {-| Simple end-to-end tests for the Plutus Core `ripemd_160` builtin.
 These are adapted from the `plutus-conformance` tests. -}
 
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE ViewPatterns    #-}
 
 module PlutusScripts.Hashing.Ripemd_160 (mkRipemd_160Policy, succeedingRipemd_160Params)
 where

@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
 
 -- subset of utilities from plutus-script-utils
 module Helpers.ScriptUtils where

@@ -1,10 +1,6 @@
 {-| Simple end-to-end tests for the Plutus Core `readBit`builtin.  These are
 adapted from the `plutus-conformance` tests. -}
 
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE RecordWildCards     #-}
-{-# LANGUAGE TemplateHaskell     #-}
-{-# LANGUAGE ViewPatterns        #-}
 
 module PlutusScripts.Bitwise.ReadBit where
 

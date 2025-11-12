@@ -1,10 +1,6 @@
 {-| Simple end-to-end tests for the Plutus Core `complementByteString` builtin.
 These are adapted from the `plutus-conformance` tests. -}
 
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE RecordWildCards     #-}
-{-# LANGUAGE TemplateHaskell     #-}
-{-# LANGUAGE ViewPatterns        #-}
 
 module PlutusScripts.Bitwise.Complement (mkComplementByteStringPolicy, succeedingComplementByteStringParams)
 where

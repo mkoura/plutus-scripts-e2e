@@ -1,13 +1,7 @@
 -- editorconfig-checker-disable-file
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE RecordWildCards     #-}
-{-# LANGUAGE TemplateHaskell     #-}
-{-# LANGUAGE TypeApplications    #-}
-{-# LANGUAGE ViewPatterns        #-}
 
 module PlutusScripts.Bitwise.Conversions where
 
-import Cardano.Api qualified as C
 import PlutusLedgerApi.V1 qualified as PV1
 import PlutusScripts.Helpers (hxs)
 
@@ -62,9 +56,6 @@ mkByteStringToIntegerRoundtripPolicy bs _sc = do
       intLE = BI.byteStringToInteger LittleEndian bs
       bsLE = BI.integerToByteString LittleEndian 0 intLE
   bs P.== bsBE P.&& bs P.== bsLE
-
-bitwiseAssetName :: C.AssetName
-bitwiseAssetName = case C.deserialiseFromRawBytes C.AsAssetName "bitwise" of Left err -> error $ "Failed to create AssetName: " ++ show err; Right an -> an
 
 bsToIParams :: ByteStringToIntegerParams
 bsToIParams =
