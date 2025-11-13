@@ -7,13 +7,35 @@ let
 
   project = import ./project.nix { inherit inputs pkgs lib; };
 
-  devShells.default = import ./shell.nix { inherit inputs pkgs lib project; };
+  devShells.default = import ./shell.nix {
+    inherit
+      inputs
+      pkgs
+      lib
+      project
+      ;
+  };
 
-  projectFlake = project.flake {};
+  projectFlake = project.flake { };
 
-  packages = projectFlake.packages or {};
+  packages = projectFlake.packages or { };
 
-  checks = projectFlake.checks or {};
+  checks = projectFlake.checks or { };
+
+  # Configure nix fmt to use treefmt
+  formatter = pkgs.writeShellApplication {
+    name = "treefmt";
+    runtimeInputs = with pkgs; [
+      treefmt
+      fourmolu
+      haskellPackages.cabal-fmt
+      nixfmt-rfc-style
+      nodePackages.prettier
+    ];
+    text = ''
+      exec treefmt "$@"
+    '';
+  };
 
 in
 
@@ -21,4 +43,5 @@ in
   inherit packages;
   inherit devShells;
   inherit checks;
+  inherit formatter;
 }

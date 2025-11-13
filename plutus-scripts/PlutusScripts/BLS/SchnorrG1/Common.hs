@@ -1,17 +1,3 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE NumericUnderscores #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
-{-# HLINT ignore "Use underscore" #-}
-{-# LANGUAGE ViewPatterns #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
--- Not using all CardanoEra
-{-# OPTIONS_GHC -fno-warn-incomplete-patterns #-}
-
 module PlutusScripts.BLS.SchnorrG1.Common where
 
 import PlutusScripts.Helpers (
@@ -85,5 +71,5 @@ verifySchnorrG1Script bs16Null BlsParams{..} _sc = do
     -- additional check using negation is for testing the function
     -- it can be removed to improve performance
     && (rDeser `P.bls12_381_G1_scalarMul` P.bls12_381_G1_uncompress P.bls12_381_G1_compressed_generator)
-      `P.bls12_381_G1_add` (P.bls12_381_G1_neg aDeser)
+      `P.bls12_381_G1_add` P.bls12_381_G1_neg aDeser
       P.== (c `P.bls12_381_G1_scalarMul` pkDeser)

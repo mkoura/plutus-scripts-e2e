@@ -1,17 +1,3 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE NumericUnderscores #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
-{-# HLINT ignore "Use underscore" #-}
-{-# LANGUAGE ViewPatterns #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
--- Not using all CardanoEra
-{-# OPTIONS_GHC -fno-warn-incomplete-patterns #-}
-
 module PlutusScripts.BLS.AggregateSigWithMultipleKeys.Common where
 
 import PlutusScripts.Helpers (
@@ -136,46 +122,46 @@ aggregateMultiKeyG2Script bs16Null dst BlsParams{..} _sc = do
     (P.bls12_381_millerLoop hashedMsg aggrPk)
     ( P.bls12_381_millerLoop aggrSigDeser (P.bls12_381_G2_uncompress P.bls12_381_G2_compressed_generator)
     )
-  where
-    -- PlutusTx.Foldable has no foldl1
-    foldl1' :: (a -> a -> a) -> [a] -> a
-    foldl1' _ [] = P.traceError "foldr1: empty list"
-    foldl1' _ [_] = P.traceError "foldr1: only one element in list"
-    foldl1' f (x : xs) = List.foldl f x xs
+ where
+  -- PlutusTx.Foldable has no foldl1
+  foldl1' :: (a -> a -> a) -> [a] -> a
+  foldl1' _ [] = P.traceError "foldr1: empty list"
+  foldl1' _ [_] = P.traceError "foldr1: only one element in list"
+  foldl1' f (x : xs) = List.foldl f x xs
 
-    calcAggregatedPubkeys :: Integer -> [P.BuiltinBLS12_381_G2_Element] -> P.BuiltinBLS12_381_G2_Element
-    calcAggregatedPubkeys dsScalar' pksDeser' = do
-      let dsScalars = calcDsScalars pksDeser' [dsScalar']
-      go
-        1
-        (List.drop 1 pksDeser')
-        (List.drop 1 dsScalars)
-        (calcAggregatedPubkey (List.head pksDeser') (List.head dsScalars))
-
-    calcDsScalars :: [P.BuiltinBLS12_381_G2_Element] -> [Integer] -> [Integer]
-    calcDsScalars [] acc = acc
-    calcDsScalars (_ : xs) [x'] = calcDsScalars xs [x', x' P.* x']
-    calcDsScalars (_ : xs) acc@(x' : xs') = calcDsScalars xs (acc List.++ [last' xs' P.* x'])
-    calcDsScalars _ _ = P.traceError "calcDsScalars: unexpected"
-
+  calcAggregatedPubkeys :: Integer -> [P.BuiltinBLS12_381_G2_Element] -> P.BuiltinBLS12_381_G2_Element
+  calcAggregatedPubkeys dsScalar' pksDeser' = do
+    let dsScalars = calcDsScalars pksDeser' [dsScalar']
     go
-      :: Integer
-      -> [P.BuiltinBLS12_381_G2_Element]
-      -> [Integer]
-      -> P.BuiltinBLS12_381_G2_Element
-      -> P.BuiltinBLS12_381_G2_Element
-    go _ [] _ acc = acc
-    go i (x : xs) (x' : xs') acc = go (i P.+ 1) xs xs' (acc `P.bls12_381_G2_add` calcAggregatedPubkey x x')
-    go _ _ _ _ = P.traceError "go: unexpected"
+      1
+      (List.drop 1 pksDeser')
+      (List.drop 1 dsScalars)
+      (calcAggregatedPubkey (List.head pksDeser') (List.head dsScalars))
 
-    calcAggregatedPubkey :: P.BuiltinBLS12_381_G2_Element -> Integer -> P.BuiltinBLS12_381_G2_Element
-    calcAggregatedPubkey pk ds = ds `P.bls12_381_G2_scalarMul` pk
+  calcDsScalars :: [P.BuiltinBLS12_381_G2_Element] -> [Integer] -> [Integer]
+  calcDsScalars [] acc = acc
+  calcDsScalars (_ : xs) [x'] = calcDsScalars xs [x', x' P.* x']
+  calcDsScalars (_ : xs) acc@(x' : xs') = calcDsScalars xs (acc List.++ [last' xs' P.* x'])
+  calcDsScalars _ _ = P.traceError "calcDsScalars: unexpected"
 
-    -- PlutusTx.Prelude has no last
-    last' :: [a] -> a
-    last' [] = P.traceError "last: needs at least two elements"
-    last' [x] = x
-    last' (_ : xs) = last' xs
+  go
+    :: Integer
+    -> [P.BuiltinBLS12_381_G2_Element]
+    -> [Integer]
+    -> P.BuiltinBLS12_381_G2_Element
+    -> P.BuiltinBLS12_381_G2_Element
+  go _ [] _ acc = acc
+  go i (x : xs) (x' : xs') acc = go (i P.+ 1) xs xs' (acc `P.bls12_381_G2_add` calcAggregatedPubkey x x')
+  go _ _ _ _ = P.traceError "go: unexpected"
+
+  calcAggregatedPubkey :: P.BuiltinBLS12_381_G2_Element -> Integer -> P.BuiltinBLS12_381_G2_Element
+  calcAggregatedPubkey pk ds = ds `P.bls12_381_G2_scalarMul` pk
+
+  -- PlutusTx.Prelude has no last
+  last' :: [a] -> a
+  last' [] = P.traceError "last: needs at least two elements"
+  last' [x] = x
+  last' (_ : xs) = last' xs
 
 {- An alternative implementation of calcAggregatedPubkeys which uses a different
 -- means of scalar exponentiation. It results in a slightly smaller script using less CPU but

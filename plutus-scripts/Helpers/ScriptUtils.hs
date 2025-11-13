@@ -1,11 +1,9 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 -- subset of utilities from plutus-script-utils
 module Helpers.ScriptUtils where
 
-import PlutusLedgerApi.V1 qualified as PV1
-import PlutusLedgerApi.V2 qualified as PV2
-import PlutusLedgerApi.V3 qualified as PV3
+import PlutusLedgerApi.V1 qualified as V1
+import PlutusLedgerApi.V2 qualified as V2
+import PlutusLedgerApi.V3 qualified as V3
 import PlutusTx (UnsafeFromData)
 import PlutusTx.Builtins.Internal qualified as BI (
   BuiltinList,
@@ -14,20 +12,20 @@ import PlutusTx.Builtins.Internal qualified as BI (
  )
 import PlutusTx.Prelude qualified as P
 
-type UntypedValidator = PV1.BuiltinData -> PV1.BuiltinData -> PV1.BuiltinData -> ()
-type UntypedMintingPolicy = PV1.BuiltinData -> PV1.BuiltinData -> ()
-type UntypedStakeValidator = PV1.BuiltinData -> PV1.BuiltinData -> ()
+type UntypedValidator = V1.BuiltinData -> V1.BuiltinData -> V1.BuiltinData -> ()
+type UntypedMintingPolicy = V1.BuiltinData -> V1.BuiltinData -> ()
+type UntypedStakeValidator = V1.BuiltinData -> V1.BuiltinData -> ()
 
 {-# INLINEABLE tracedUnsafeFrom #-}
-tracedUnsafeFrom :: forall a. (UnsafeFromData a) => P.BuiltinString -> PV1.BuiltinData -> a
-tracedUnsafeFrom label d = P.trace label $ PV1.unsafeFromBuiltinData d
+tracedUnsafeFrom :: forall a. (UnsafeFromData a) => P.BuiltinString -> V1.BuiltinData -> a
+tracedUnsafeFrom label d = P.trace label $ V1.unsafeFromBuiltinData d
 
-class (PV1.UnsafeFromData sc) => IsScriptContext sc where
+class (V1.UnsafeFromData sc) => IsScriptContext sc where
   {-# INLINEABLE mkUntypedValidator #-}
-  mkUntypedValidator ::
-    (PV1.UnsafeFromData d, PV1.UnsafeFromData r) =>
-    (d -> r -> sc -> Bool) ->
-    UntypedValidator
+  mkUntypedValidator
+    :: (V1.UnsafeFromData d, V1.UnsafeFromData r)
+    => (d -> r -> sc -> Bool)
+    -> UntypedValidator
   -- We can use unsafeFromBuiltinData here as we would fail immediately anyway if parsing failed
   mkUntypedValidator f d r p =
     check $
@@ -37,10 +35,10 @@ class (PV1.UnsafeFromData sc) => IsScriptContext sc where
         (tracedUnsafeFrom "Script context decoded successfully" p)
 
   {-# INLINEABLE mkUntypedStakeValidator #-}
-  mkUntypedStakeValidator ::
-    (PV1.UnsafeFromData r) =>
-    (r -> sc -> Bool) ->
-    UntypedStakeValidator
+  mkUntypedStakeValidator
+    :: (V1.UnsafeFromData r)
+    => (r -> sc -> Bool)
+    -> UntypedStakeValidator
   mkUntypedStakeValidator f r p =
     check $
       f
@@ -48,25 +46,25 @@ class (PV1.UnsafeFromData sc) => IsScriptContext sc where
         (tracedUnsafeFrom "Script context decoded successfully" p)
 
   {-# INLINEABLE mkUntypedMintingPolicy #-}
-  mkUntypedMintingPolicy ::
-    (UnsafeFromData r) =>
-    (r -> sc -> Bool) ->
-    PV3.BuiltinData ->
-    PV3.BuiltinData ->
-    P.BuiltinUnit
+  mkUntypedMintingPolicy
+    :: (UnsafeFromData r)
+    => (r -> sc -> Bool)
+    -> V3.BuiltinData
+    -> V3.BuiltinData
+    -> P.BuiltinUnit
   mkUntypedMintingPolicy f r p =
     P.check $
       f
         (tracedUnsafeFrom "Redeemer decoded successfully" r)
         (tracedUnsafeFrom "Script context decoded successfully" p)
 
-type ScriptContextV1 = PV1.ScriptContext
-type ScriptContextV2 = PV2.ScriptContext
-type ScriptContextV3 = PV3.ScriptContext
+type ScriptContextV1 = V1.ScriptContext
+type ScriptContextV2 = V2.ScriptContext
+type ScriptContextV3 = V3.ScriptContext
 
-instance IsScriptContext PV1.ScriptContext
-instance IsScriptContext PV2.ScriptContext
-instance IsScriptContext PV3.ScriptContext
+instance IsScriptContext V1.ScriptContext
+instance IsScriptContext V2.ScriptContext
+instance IsScriptContext V3.ScriptContext
 
 {-# INLINEABLE check #-}
 

@@ -1,16 +1,4 @@
 -- editorconfig-checker-disable-file
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE NamedFieldPuns #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE ViewPatterns #-}
-{-# OPTIONS_GHC -O0 #-}
-{-# OPTIONS_GHC -fno-ignore-interface-pragmas #-}
-{-# OPTIONS_GHC -fno-omit-interface-pragmas #-}
 
 module PlutusScripts.BLS.Vrf.Common where
 
@@ -140,7 +128,7 @@ generateVrfProofWithOutput privKey message = do
 
     -- define the third and last element of a proof of correct VRF
     s =
-      (k - (BI.byteStringToInteger BigEndian c) * privKey)
+      (k - BI.byteStringToInteger BigEndian c * privKey)
         `P.modulo` 52435875175126190479447740508185965837690552500527637822603658699938581184513
 
     -- cofactor of G2

@@ -22,19 +22,29 @@ This project uses the IOG ecosystem tooling with Nix flakes and haskell.nix:
 # Enter development shell
 nix develop
 
-# Build the project
+# Build the project (library and executable)
 cabal build plutus-scripts
 
-# Run tests (generates serialized script files)
-cabal test plutus-scripts
+# Build only the library
+cabal build scripts
+
+# Run the envelopes executable (generates serialized script files)
+cabal run envelopes
 
 # Clean build artifacts
 cabal clean
 ```
 
-The test suite (`Spec.hs`) runs `writeScriptFiles` which serializes all Plutus scripts to `plutus-scripts/serialised-plutus-scripts/` directory (git-ignored).
+The `envelopes` executable (`app/Main.hs`) serializes all Plutus scripts to `plutus-scripts/serialised-plutus-scripts/` directory (git-ignored). This executable uses `PlutusLedgerApi.Envelope.writeCodeEnvelopeForVersion` to generate `.plutus` files compatible with cardano-node-tests.
 
 ## Architecture
+
+### Cabal Package Structure
+
+The `plutus-scripts` package contains:
+
+- **Library `scripts`**: Core Plutus script implementations and helpers
+- **Executable `envelopes`**: Serializes compiled scripts to `.plutus` files
 
 ### Project Structure
 
@@ -49,8 +59,8 @@ plutus-scripts/
 │   └── SECP256k1/          # SECP256k1 signature scripts
 ├── Helpers/                # Helper utilities
 │   └── ScriptUtils.hs     # Script context utilities (subset of plutus-script-utils)
-├── Spec/                   # Test specifications
-│   └── WriteScriptFiles.hs # Serializes all scripts to .plutus files
+├── app/                    # Executable applications
+│   └── Main.hs            # Envelopes executable - serializes all scripts to .plutus files
 └── plutus-scripts.cabal    # Cabal package definition
 ```
 
@@ -71,28 +81,34 @@ Each script category follows a consistent pattern:
 3. **Write functions**: Export `write*` functions that serialize to `.plutus` files
 
 Example:
+
 ```haskell
 -- PlutusScripts/Basic/Common.hs
 {-# INLINEABLE mkAlwaysSucceedPolicyV3 #-}
 mkAlwaysSucceedPolicyV3 :: P.BuiltinData -> P.BuiltinUnit
 
 -- PlutusScripts/Basic/V_1_1.hs
+alwaysSucceedPolicyCompiled :: PlutusTx.CompiledCode (P.BuiltinData -> P.BuiltinUnit)
+alwaysSucceedPolicyCompiled = $$(PlutusTx.compile [||mkAlwaysSucceedPolicyV3||])
+
 alwaysSucceedPolicy :: SerialisedScript
-alwaysSucceedPolicy = serialiseCompiledCode $$(PlutusTx.compile [||mkAlwaysSucceedPolicyV3||])
+alwaysSucceedPolicy = serialiseCompiledCode alwaysSucceedPolicyCompiled
 
 writeAlwaysSucceedPolicyScriptV3 :: IO ()
-writeAlwaysSucceedPolicyScriptV3 = writeSerialisedScript "alwaysSucceedPolicyScriptV3" alwaysSucceedPolicyScriptV3
+writeAlwaysSucceedPolicyScriptV3 =
+  writeCompiledScript PlutusV3 "alwaysSucceedPolicyScriptV3" alwaysSucceedPolicyCompiled
 ```
 
 ### Helper Utilities
 
 **`PlutusScripts.Helpers`** provides:
-- Script witness construction for V1/V2/V3 (minting and spending)
-- `toScriptData`, `asRedeemer`, `asDatum` conversions
-- `policyIdV1/V2/V3` for computing policy IDs
-- `writeSerialisedScript` for serializing scripts to files
+
+- `writeCompiledScript` - Direct serialization from `CompiledCode` to JSON envelope using `PlutusLedgerApi.Envelope`
+- `bytesFromHex`, `hxs` - Hex string conversion utilities
+- `asRedeemer`, `asDatum` - Plutus data conversions
 
 **`Helpers.ScriptUtils`** provides:
+
 - Untyped validator/policy/stake validator types
 - `IsScriptContext` typeclass for version-agnostic script construction
 - `check` utility for validation
@@ -100,32 +116,30 @@ writeAlwaysSucceedPolicyScriptV3 = writeSerialisedScript "alwaysSucceedPolicyScr
 
 ## Dependencies
 
-Key Cardano ecosystem dependencies (from CHaP):
+Key Plutus ecosystem dependencies (from CHaP):
+
 - `plutus-core ^>=1.53.1.0`
 - `plutus-ledger-api ^>=1.53.1.0`
 - `plutus-tx ^>=1.53.1.0`
 - `plutus-tx-plugin ^>=1.53.1.0`
-- `cardano-api ^>=10.19.1.0`
 - `data-default >=0.8`
+
+**Note**: cardano-api dependency was completely removed in November 2025. Scripts now serialize using native `PlutusLedgerApi.Envelope` tooling.
 
 ### Recent API Changes
 
 **Plutus 1.53 Updates:**
+
 - `txInfoMint` field now returns a structure with `mintValueMinted` accessor
 - Use `PV3.mintValueMinted (PV3.txInfoMint txInfo)` to access minted values
 - Some unused PlutusLedgerApi.V1 qualified imports removed for cleaner code
 
-**cardano-api 10.19 Updates:**
-- `Cardano.Api.Shelley` module removed - all exports now available from `Cardano.Api`
-- `AssetName` constructor changed to pattern synonym - use `deserialiseFromRawBytes AsAssetName` instead
-- `PReferenceScript` constructor simplified from 2 arguments to 1 (in 10.16+)
-- Updated from `PReferenceScript refTxIn Nothing` to `PReferenceScript refTxIn`
-- Affects all script witness construction (minting and spending)
+**November 2025 - cardano-api Removal:**
 
-**Migration Notes:**
-- Replace `import Cardano.Api.Shelley qualified as C` with just `import Cardano.Api qualified as C`
-- Replace `C.AssetName "foo"` with `case C.deserialiseFromRawBytes C.AsAssetName "foo" of Left err -> error $ "Failed to create AssetName: " ++ show err; Right an -> an`
-- Use `emptyAssetName` helper from `PlutusScripts.Helpers` for empty asset names
+- Completely removed cardano-api dependency
+- All witness construction code removed (was unused legacy from Antaeus)
+- Scripts now serialize using `PlutusLedgerApi.Envelope.writeCodeEnvelopeForVersion`
+- Output format remains identical for cardano-node-tests compatibility
 
 ## Development Practices
 
@@ -138,12 +152,14 @@ Key Cardano ecosystem dependencies (from CHaP):
 ### GHC Pragmas
 
 Scripts consistently use:
+
 ```haskell
 {-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:conservative-optimisation #-}
 {-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.1.0 #-}
 ```
 
 Common language extensions (defined in `cabal.project`):
+
 - `ImportQualifiedPost`
 - `OverloadedStrings`
 - `TemplateHaskell` (for PlutusTx compilation)
@@ -152,6 +168,7 @@ Common language extensions (defined in `cabal.project`):
 ### Pre-commit Hooks
 
 Pre-commit hooks are configured and enabled via `.pre-commit-config.yaml`. The hooks automatically stash unstaged files during commits to ensure clean staging. Available hooks:
+
 - `fourmolu` (Haskell formatting)
 - `hlint` (Haskell linting)
 - `cabal-fmt` (Cabal file formatting)
@@ -160,40 +177,54 @@ Pre-commit hooks are configured and enabled via `.pre-commit-config.yaml`. The h
 ## Script Categories
 
 ### Basic Scripts
+
 - Always succeed/fail validators and policies
 - Token name validation
 - Time range validation
 - Witness redeemer policies
 
 ### Bitwise Operations
+
 - Bitwise complement, logical operations (AND, OR, XOR)
 - Shift and rotate operations
 - Byte conversions and replication
 - Bit reading/writing
 
 ### Cryptographic Scripts
+
 - **BLS**: BLS12-381 signatures, Groth16 proofs, Schnorr signatures, VRF
 - **SECP256k1**: ECDSA and Schnorr signature verification
 - **Hashing**: RIPEMD-160, SHA2-256, SHA3-256, BLAKE2b-224/256
 
 ### Governance
+
 Scripts demonstrating PlutusV3 governance features (voting, proposals)
 
-## Testing
+## Script Generation
 
-The test suite is a single executable that serializes all scripts:
+The `envelopes` executable serializes all scripts to `.plutus` files:
 
 ```bash
-cabal test
+cabal run envelopes
 ```
 
-Output: `.plutus` files in `plutus-scripts/serialised-plutus-scripts/`
+Output: `.plutus` files in `plutus-scripts/serialised-plutus-scripts/` (git-ignored)
 
 These serialized scripts are consumed by external E2E tests (e.g., `cardano-node-tests`).
+
+### Adding New Scripts
+
+To add a new script:
+
+1. Create the validator logic in a `Common.hs` module with `INLINEABLE` pragma
+2. Add versioned modules (`V_1_0.hs`, `V_1_1.hs`) that compile and export the script
+3. Update `app/Main.hs` to include the new script in the serialization list
+4. Run `cabal run envelopes` to generate the `.plutus` file
 
 ## Nix Binary Cache
 
 The project is configured to use IOG's Hydra cache:
+
 ```
 extra-substituters = https://cache.iog.io
 extra-trusted-public-keys = hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ=

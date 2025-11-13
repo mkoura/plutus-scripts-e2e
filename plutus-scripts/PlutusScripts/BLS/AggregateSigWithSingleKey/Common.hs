@@ -1,17 +1,3 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE NumericUnderscores #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeApplications #-}
-{-# HLINT ignore "Use underscore" #-}
-{-# LANGUAGE ViewPatterns #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
--- Not using all CardanoEra
-{-# OPTIONS_GHC -fno-warn-incomplete-patterns #-}
-
 module PlutusScripts.BLS.AggregateSigWithSingleKey.Common where
 
 import PlutusScripts.Helpers (
@@ -74,7 +60,7 @@ aggregateSigSingleKeyG1
   -> Bool
 aggregateSigSingleKeyG1 dst BlsParams{..} _sc = do
   let
-    hashedMsgs = List.map (\x -> P.bls12_381_G2_hashToGroup x dst) messages
+    hashedMsgs = List.map (`P.bls12_381_G2_hashToGroup` dst) messages
     pkDeser = P.bls12_381_G1_uncompress pubKey
     aggrSigDeser = P.bls12_381_G2_uncompress aggregateSignature
     aggrMsg = foldl1' P.bls12_381_G2_add hashedMsgs
@@ -83,9 +69,9 @@ aggregateSigSingleKeyG1 dst BlsParams{..} _sc = do
     (P.bls12_381_millerLoop pkDeser aggrMsg)
     ( P.bls12_381_millerLoop (P.bls12_381_G1_uncompress P.bls12_381_G1_compressed_generator) aggrSigDeser
     )
-  where
-    -- PlutusTx.Foldable has no foldl1
-    foldl1' :: (a -> a -> a) -> [a] -> a
-    foldl1' _ [] = P.traceError "foldr1: empty list"
-    foldl1' _ [_] = P.traceError "foldr1: only one element in list"
-    foldl1' f (x : xs) = List.foldl f x xs
+ where
+  -- PlutusTx.Foldable has no foldl1
+  foldl1' :: (a -> a -> a) -> [a] -> a
+  foldl1' _ [] = P.traceError "foldr1: empty list"
+  foldl1' _ [_] = P.traceError "foldr1: only one element in list"
+  foldl1' f (x : xs) = List.foldl f x xs
