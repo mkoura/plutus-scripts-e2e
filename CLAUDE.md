@@ -105,7 +105,7 @@ For scripts with multiple parameter combinations (e.g., failing tests):
 ```haskell
 -- PlutusScripts/Bitwise/ReadBit.hs (Common module)
 data Params = Params { s :: BuiltinByteString, i :: Integer, output :: Bool }
-failingReadBitParams :: [Params]  -- 14 test cases
+failingReadBitParams :: [Params]  -- Test cases for edge conditions
 
 -- PlutusScripts/Bitwise/V_1_1.hs
 failingBitwiseScriptGroupsV3 :: [ScriptGroup DefaultUni DefaultFun (BuiltinData -> BuiltinUnit)]
@@ -239,15 +239,15 @@ The `envelopes` executable serializes all scripts to `.plutus` files:
 cabal run envelopes
 ```
 
-Output: **59 `.plutus` files** in `serialised-plutus-scripts/` (git-ignored)
+Output: Multiple `.plutus` files in `serialised-plutus-scripts/` (git-ignored)
 
 **Generated Scripts**:
-- 1 PlutusV2 script (bytestring/integer conversions)
-- 5 Basic PlutusV3 scripts (always succeed/fail, token names, time ranges, redeemers)
-- 2 SECP256k1 scripts (Schnorr, ECDSA signature verification)
-- 1 Hashing script (RIPEMD-160)
-- 11 Bitwise succeeding tests (AND, OR, XOR, complement, shift, rotate, bit operations)
-- 39 Bitwise failing tests (14 ReadBit + 19 WriteBits + 6 ReplicateByte edge cases)
+- PlutusV2 scripts (bytestring/integer conversions)
+- Basic PlutusV3 scripts (always succeed/fail, token names, time ranges, redeemers)
+- SECP256k1 scripts (Schnorr and ECDSA signature verification)
+- Hashing scripts (RIPEMD-160)
+- Bitwise succeeding tests (AND, OR, XOR, complement, shift, rotate, bit operations)
+- Bitwise failing tests (ReadBit, WriteBits, ReplicateByte edge case validation)
 
 These serialized scripts are consumed by external E2E tests (e.g., `cardano-node-tests`).
 

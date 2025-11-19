@@ -84,7 +84,7 @@ main = withUtf8 do
     "succeedingReplicateBytePolicyScriptV3"
     BitwiseV1.succeedingReplicateBytePolicyCompiledV3
 
-  -- Failing Bitwise Tests (39 scripts: 14 ReadBit + 19 WriteBits + 6 ReplicateByte)
+  -- Failing Bitwise Tests (ReadBit, WriteBits, ReplicateByte variants)
   mapM_ writeScriptGroup BitwiseV1.failingBitwiseScriptGroupsV3
 
 --------------------------------------------------------------------------------

@@ -39,13 +39,13 @@ cabal run envelopes
 
 The generated `.plutus` files are JSON envelopes containing the serialized Plutus scripts, ready for use in cardano-node-tests.
 
-**Generated Scripts (59 total)**:
-- 1 PlutusV2 script
-- 5 Basic PlutusV3 scripts
-- 2 SECP256k1 scripts
-- 1 Hashing script
-- 11 Bitwise succeeding tests
-- 39 Bitwise failing tests (14 ReadBit + 19 WriteBits + 6 ReplicateByte)
+**Generated Scripts**:
+- PlutusV2 scripts (bytestring/integer conversions)
+- Basic PlutusV3 scripts (always succeed/fail, token names, time ranges, redeemers)
+- SECP256k1 scripts (Schnorr and ECDSA signature verification)
+- Hashing scripts (RIPEMD-160)
+- Bitwise succeeding tests (AND, OR, XOR, complement, shift, rotate, bit operations)
+- Bitwise failing tests (ReadBit, WriteBits, ReplicateByte edge case variants)
 
 ## Project Structure
 
@@ -86,16 +86,16 @@ Core testing scripts for fundamental blockchain operations:
 
 Scripts demonstrating Plutus bitwise primitives (Plutus Core 1.1.0+):
 
-**Succeeding Tests (11 scripts)**:
+**Succeeding Tests**:
 - Logical operations: `andByteString`, `orByteString`, `xorByteString`, `complementByteString`
 - Shifts and rotates: `shiftByteString`, `rotateByteString`
 - Bit manipulation: `readBit`, `writeBits`, `countSetBits`, `findFirstSetBit`
 - Byte operations: `replicateByte`, conversions between integers and bytestrings
 
-**Failing Tests (39 scripts)**:
-- ReadBit edge cases: empty bytestring, negative indices, out of bounds, Int64 limits (14 variants)
-- WriteBits edge cases: empty bytestring, negative indices, out of bounds (19 variants)
-- ReplicateByte edge cases: negative count, invalid byte values, size limits (6 variants)
+**Failing Tests**:
+- ReadBit edge cases: empty bytestring, negative indices, out of bounds, Int64 limits
+- WriteBits edge cases: empty bytestring, negative indices, out of bounds
+- ReplicateByte edge cases: negative count, invalid byte values, size limits
 
 These failing tests validate proper error handling for invalid inputs adapted from `plutus-conformance` tests.
 

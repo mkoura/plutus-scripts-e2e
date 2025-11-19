@@ -159,17 +159,17 @@ succeedingReplicateBytePolicyCompiledV3 =
 -- Each group generates numbered scripts (e.g., failingReadBit_1.plutus, failingReadBit_2.plutus)
 failingBitwiseScriptGroupsV3 :: [ScriptGroup DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)]
 failingBitwiseScriptGroupsV3 =
-  [ -- ReadBit failing tests (14 variants)
+  [ -- ReadBit failing tests
     ScriptGroup
       { sgBaseName = "failingReadBitPolicyScriptV3"
       , sgScripts = map compileReadBit failingReadBitParams
       }
-  , -- WriteBits failing tests (19 variants)
+  , -- WriteBits failing tests
     ScriptGroup
       { sgBaseName = "failingWriteBitsPolicyScriptV3"
       , sgScripts = map compileWriteBits failingWriteBitsParams
       }
-  , -- ReplicateByte failing tests (6 variants)
+  , -- ReplicateByte failing tests
     ScriptGroup
       { sgBaseName = "failingReplicateBytePolicyScriptV3"
       , sgScripts = map compileReplicateByte failingReplicateByteParams
