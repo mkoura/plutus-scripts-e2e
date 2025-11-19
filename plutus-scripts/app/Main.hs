@@ -4,6 +4,7 @@ import Data.Text qualified as T
 import Main.Utf8 (withUtf8)
 import PlutusLedgerApi.Common.Versions (PlutusLedgerLanguage (PlutusV2, PlutusV3))
 import PlutusLedgerApi.Envelope qualified as Envelope
+import PlutusScripts.Array.V_1_1 qualified as Array
 import PlutusScripts.Basic.V_1_1 qualified as Basic
 import Control.Monad (zipWithM_)
 import Helpers.ScriptUtils (ScriptGroup (ScriptGroup, sgBaseName, sgScripts))
@@ -15,15 +16,6 @@ import PlutusScripts.SECP256k1.V_1_1 qualified as SECP
 import PlutusTx.Code (CompiledCode)
 import System.Directory (createDirectoryIfMissing)
 
---------------------------------------------------------------------------------
--- Script Group Helpers --------------------------------------------------------
-
--- | Write a group of numbered scripts (e.g., script_1.plutus, script_2.plutus, ...)
-writeScriptGroup :: ScriptGroup DefaultUni DefaultFun a -> IO ()
-writeScriptGroup ScriptGroup{..} =
-  zipWithM_ writeNumbered [1 :: Integer ..] sgScripts
- where
-  writeNumbered n code = writeEnvelopeV3 (sgBaseName ++ "_" ++ show n) code
 
 --------------------------------------------------------------------------------
 -- Main ------------------------------------------------------------------------
@@ -48,6 +40,17 @@ main = withUtf8 do
 
   -- Hashing scripts (PlutusV3)
   writeEnvelopeV3 "succeedingRipemd_160Policy" Hashing.succeedingRipemd_160PolicyCompiled
+
+  -- Array builtin scripts (PlutusV3)
+  writeEnvelopeV3
+    "succeedingIndexArrayPolicyScriptV3"
+    Array.succeedingIndexArrayPolicyCompiledV3
+  writeEnvelopeV3
+    "succeedingLengthOfArrayPolicyScriptV3"
+    Array.succeedingLengthOfArrayPolicyCompiledV3
+  writeEnvelopeV3
+    "succeedingListToArrayPolicyScriptV3"
+    Array.succeedingListToArrayPolicyCompiledV3
 
   -- Bitwise V1.1 scripts (PlutusV3)
   writeEnvelopeV3
@@ -106,3 +109,10 @@ writeEnvelopeV2 = writeEnvelope PlutusV2
 -- | Write PlutusV3 script
 writeEnvelopeV3 :: FilePath -> CompiledCode a -> IO ()
 writeEnvelopeV3 = writeEnvelope PlutusV3
+
+-- | Write a group of numbered scripts (e.g., script_1.plutus, script_2.plutus, ...)
+writeScriptGroup :: ScriptGroup DefaultUni DefaultFun a -> IO ()
+writeScriptGroup ScriptGroup{..} =
+  zipWithM_ writeNumbered [1 :: Integer ..] sgScripts
+ where
+  writeNumbered n = writeEnvelopeV3 (sgBaseName ++ "_" ++ show n)
