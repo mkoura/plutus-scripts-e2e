@@ -76,11 +76,14 @@ All scripts target **Plutus Core 1.1.0** and use **PlutusV3** ledger API:
 
 Each script category follows a consistent pattern:
 
-1. **Common module** (`Common.hs`): Contains `INLINEABLE` validator logic
-2. **Versioned modules** (`V_1_0.hs`, `V_1_1.hs`): Compile and serialize scripts
-3. **Write functions**: Export `write*` functions that serialize to `.plutus` files
+1. **Common module** (`Common.hs`): Contains `INLINEABLE` validator logic and test parameters
+2. **Versioned modules** (`V_1_0.hs`, `V_1_1.hs`): Compile scripts with Plutus Core target versions
+3. **Library exports**: Pure `CompiledCode` values (no IO operations)
+4. **Executable serialization**: `app/Main.hs` handles all file writing
 
-Example:
+#### Single Script Pattern
+
+For simple scripts without test variants:
 
 ```haskell
 -- PlutusScripts/Basic/Common.hs
@@ -88,16 +91,43 @@ Example:
 mkAlwaysSucceedPolicyV3 :: P.BuiltinData -> P.BuiltinUnit
 
 -- PlutusScripts/Basic/V_1_1.hs
-alwaysSucceedPolicyCompiled :: PlutusTx.CompiledCode (P.BuiltinData -> P.BuiltinUnit)
-alwaysSucceedPolicyCompiled = $$(PlutusTx.compile [||mkAlwaysSucceedPolicyV3||])
+alwaysSucceedPolicyCompiled :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
+alwaysSucceedPolicyCompiled = $$(compile [||mkAlwaysSucceedPolicyV3||])
 
-alwaysSucceedPolicy :: SerialisedScript
-alwaysSucceedPolicy = serialiseCompiledCode alwaysSucceedPolicyCompiled
-
-writeAlwaysSucceedPolicyScriptV3 :: IO ()
-writeAlwaysSucceedPolicyScriptV3 =
-  writeCompiledScript PlutusV3 "alwaysSucceedPolicyScriptV3" alwaysSucceedPolicyCompiled
+-- app/Main.hs
+writeEnvelopeV3 "alwaysSucceedPolicyScriptV3" Basic.alwaysSucceedPolicyCompiled
 ```
+
+#### Script Group Pattern (For Test Variants)
+
+For scripts with multiple parameter combinations (e.g., failing tests):
+
+```haskell
+-- PlutusScripts/Bitwise/ReadBit.hs (Common module)
+data Params = Params { s :: BuiltinByteString, i :: Integer, output :: Bool }
+failingReadBitParams :: [Params]  -- 14 test cases
+
+-- PlutusScripts/Bitwise/V_1_1.hs
+failingBitwiseScriptGroupsV3 :: [ScriptGroup DefaultUni DefaultFun (BuiltinData -> BuiltinUnit)]
+failingBitwiseScriptGroupsV3 =
+  [ ScriptGroup
+      { sgBaseName = "failingReadBitPolicyScriptV3"
+      , sgScripts = map compileReadBit failingReadBitParams  -- Iteration in library
+      }
+  ]
+  where
+    compileReadBit param = $$(compile [||mkReadBitPolicy||]) `unsafeApplyCode` liftCode plcVersion110 [param]
+
+-- app/Main.hs
+mapM_ writeScriptGroup BitwiseV1.failingBitwiseScriptGroupsV3
+-- Generates: failingReadBitPolicyScriptV3_1.plutus, _2.plutus, ..., _14.plutus
+```
+
+This pattern:
+- ✅ Encapsulates parameter iteration in the library
+- ✅ Keeps executable unaware of Params types
+- ✅ Generates numbered script files automatically
+- ✅ Reusable for any parameterized test variants
 
 ### Helper Utilities
 
@@ -111,6 +141,7 @@ writeAlwaysSucceedPolicyScriptV3 =
 
 - Untyped validator/policy/stake validator types
 - `IsScriptContext` typeclass for version-agnostic script construction
+- `ScriptGroup` type for organizing parameterized test variants
 - `check` utility for validation
 - `constrArgs` for deconstructing BuiltinData constructors
 
@@ -208,18 +239,50 @@ The `envelopes` executable serializes all scripts to `.plutus` files:
 cabal run envelopes
 ```
 
-Output: `.plutus` files in `plutus-scripts/serialised-plutus-scripts/` (git-ignored)
+Output: **59 `.plutus` files** in `serialised-plutus-scripts/` (git-ignored)
+
+**Generated Scripts**:
+- 1 PlutusV2 script (bytestring/integer conversions)
+- 5 Basic PlutusV3 scripts (always succeed/fail, token names, time ranges, redeemers)
+- 2 SECP256k1 scripts (Schnorr, ECDSA signature verification)
+- 1 Hashing script (RIPEMD-160)
+- 11 Bitwise succeeding tests (AND, OR, XOR, complement, shift, rotate, bit operations)
+- 39 Bitwise failing tests (14 ReadBit + 19 WriteBits + 6 ReplicateByte edge cases)
 
 These serialized scripts are consumed by external E2E tests (e.g., `cardano-node-tests`).
 
 ### Adding New Scripts
 
-To add a new script:
+#### Single Script
+
+To add a simple script:
 
 1. Create the validator logic in a `Common.hs` module with `INLINEABLE` pragma
-2. Add versioned modules (`V_1_0.hs`, `V_1_1.hs`) that compile and export the script
-3. Update `app/Main.hs` to include the new script in the serialization list
+2. Add versioned modules (`V_1_0.hs`, `V_1_1.hs`) that compile and export the script as `CompiledCode`
+3. Update `app/Main.hs` to add a `writeEnvelopeV3` call
 4. Run `cabal run envelopes` to generate the `.plutus` file
+
+#### Multiple Test Variants (Script Group Pattern)
+
+For parameterized tests (e.g., failing tests with multiple edge cases):
+
+1. Define test parameters in the `Common` module:
+   ```haskell
+   data Params = Params { input :: ByteString, expected :: Bool }
+   testParams :: [Params]
+   ```
+
+2. Create a `ScriptGroup` in the versioned module:
+   ```haskell
+   myScriptGroup :: [ScriptGroup DefaultUni DefaultFun (BuiltinData -> BuiltinUnit)]
+   myScriptGroup = [ScriptGroup
+     { sgBaseName = "myTestScript"
+     , sgScripts = map compile testParams
+     }]
+   ```
+
+3. Use `mapM_ writeScriptGroup` in `app/Main.hs`
+4. Run `cabal run envelopes` - generates numbered files (myTestScript_1.plutus, _2.plutus, ...)
 
 ## Nix Binary Cache
 
