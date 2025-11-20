@@ -12,7 +12,6 @@ import PlutusScripts.Bitwise.V_1_0 qualified as BitwiseV0
 import PlutusScripts.Bitwise.V_1_1 qualified as BitwiseV1
 import PlutusScripts.Hashing.V_1_1 qualified as Hashing
 import PlutusScripts.SECP256k1.V_1_1 qualified as SECP
--- import PlutusScripts.Batch6.V_1_0 qualified as Batch6_1_0
 import PlutusScripts.Batch6.V_1_1 qualified as Batch6_1_1
 import PlutusTx.Code (CompiledCode)
 import System.Directory (createDirectoryIfMissing)
