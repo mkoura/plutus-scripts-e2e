@@ -18,7 +18,7 @@ import Helpers.ScriptUtils (ScriptGroup (ScriptGroup, sgBaseName, sgScripts))
 -- Compiled code values with parameters already applied for succeeding tests
 succeedingDropListPolicyCompiledV2
   :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
-succeedingDropListPolicyCompiledV2 = 
+succeedingDropListPolicyCompiledV2 =
   $$(compile [|| DropList.mkDropListPolicy ||])
     `unsafeApplyCode` liftCode plcVersion100 DropList.succeedingDropListParams
 

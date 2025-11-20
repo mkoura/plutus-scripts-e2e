@@ -33,11 +33,11 @@ data Params = Params
   }
 PlutusTx.unstableMakeIsData ''Params
 PlutusTx.makeLift ''Params
-  
+
 {-# INLINEABLE bilEq #-}
 bilEq :: P.BuiltinList Integer -> P.BuiltinList Integer -> Bool
 bilEq as bs =
-  if BI.null as && BI.null bs 
+  if BI.null as && BI.null bs
   then True
   else (BI.head as P.== BI.head bs) && bilEq (BI.tail as) (BI.tail bs)
 
@@ -156,4 +156,3 @@ failingDropListParams =
     , output = []
     }
   ]
-
