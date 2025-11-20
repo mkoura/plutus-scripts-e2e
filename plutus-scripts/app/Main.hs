@@ -2,9 +2,14 @@ module Main (main) where
 
 import Data.Text qualified as T
 import Main.Utf8 (withUtf8)
-import PlutusLedgerApi.Common.Versions (PlutusLedgerLanguage (PlutusV2, PlutusV3))
+import PlutusLedgerApi.Common.Versions (PlutusLedgerLanguage (PlutusV1, PlutusV2, PlutusV3))
 import PlutusLedgerApi.Envelope qualified as Envelope
-import PlutusScripts.Array.V_1_1 qualified as Array
+import PlutusScripts.Array.V1_1_0_0 qualified as ArrayV1_1_0_0
+import PlutusScripts.Array.V1_1_1_0 qualified as ArrayV1_1_1_0
+import PlutusScripts.Array.V2_1_0_0 qualified as ArrayV2_1_0_0
+import PlutusScripts.Array.V2_1_1_0 qualified as ArrayV2_1_1_0
+import PlutusScripts.Array.V3_1_0_0 qualified as ArrayV3_1_0_0
+import PlutusScripts.Array.V3_1_1_0 qualified as ArrayV3_1_1_0
 import PlutusScripts.Basic.V_1_1 qualified as Basic
 import Control.Monad (zipWithM_)
 import Helpers.ScriptUtils (ScriptGroup (ScriptGroup, sgBaseName, sgScripts))
@@ -41,16 +46,53 @@ main = withUtf8 do
   -- Hashing scripts (PlutusV3)
   writeEnvelopeV3 "succeedingRipemd_160Policy" Hashing.succeedingRipemd_160PolicyCompiled
 
-  -- Array builtin scripts (PlutusV3)
-  writeEnvelopeV3
-    "succeedingIndexArrayPolicyScriptV3"
-    Array.succeedingIndexArrayPolicyCompiledV3
-  writeEnvelopeV3
-    "succeedingLengthOfArrayPolicyScriptV3"
-    Array.succeedingLengthOfArrayPolicyCompiledV3
-  writeEnvelopeV3
-    "succeedingListToArrayPolicyScriptV3"
-    Array.succeedingListToArrayPolicyCompiledV3
+  -- Array builtin scripts (V1/1.0.0)
+  writeEnvelopeV1 "succeedingIndexArrayPolicyScriptV1_1_0_0"
+    ArrayV1_1_0_0.succeedingIndexArrayPolicyCompiledV1_1_0_0
+  writeEnvelopeV1 "succeedingLengthOfArrayPolicyScriptV1_1_0_0"
+    ArrayV1_1_0_0.succeedingLengthOfArrayPolicyCompiledV1_1_0_0
+  writeEnvelopeV1 "succeedingListToArrayPolicyScriptV1_1_0_0"
+    ArrayV1_1_0_0.succeedingListToArrayPolicyCompiledV1_1_0_0
+
+  -- Array builtin scripts (V1/1.1.0)
+  writeEnvelopeV1 "succeedingIndexArrayPolicyScriptV1_1_1_0"
+    ArrayV1_1_1_0.succeedingIndexArrayPolicyCompiledV1_1_1_0
+  writeEnvelopeV1 "succeedingLengthOfArrayPolicyScriptV1_1_1_0"
+    ArrayV1_1_1_0.succeedingLengthOfArrayPolicyCompiledV1_1_1_0
+  writeEnvelopeV1 "succeedingListToArrayPolicyScriptV1_1_1_0"
+    ArrayV1_1_1_0.succeedingListToArrayPolicyCompiledV1_1_1_0
+
+  -- Array builtin scripts (V2/1.0.0)
+  writeEnvelopeV2 "succeedingIndexArrayPolicyScriptV2_1_0_0"
+    ArrayV2_1_0_0.succeedingIndexArrayPolicyCompiledV2_1_0_0
+  writeEnvelopeV2 "succeedingLengthOfArrayPolicyScriptV2_1_0_0"
+    ArrayV2_1_0_0.succeedingLengthOfArrayPolicyCompiledV2_1_0_0
+  writeEnvelopeV2 "succeedingListToArrayPolicyScriptV2_1_0_0"
+    ArrayV2_1_0_0.succeedingListToArrayPolicyCompiledV2_1_0_0
+
+  -- Array builtin scripts (V2/1.1.0)
+  writeEnvelopeV2 "succeedingIndexArrayPolicyScriptV2_1_1_0"
+    ArrayV2_1_1_0.succeedingIndexArrayPolicyCompiledV2_1_1_0
+  writeEnvelopeV2 "succeedingLengthOfArrayPolicyScriptV2_1_1_0"
+    ArrayV2_1_1_0.succeedingLengthOfArrayPolicyCompiledV2_1_1_0
+  writeEnvelopeV2 "succeedingListToArrayPolicyScriptV2_1_1_0"
+    ArrayV2_1_1_0.succeedingListToArrayPolicyCompiledV2_1_1_0
+
+  -- Array builtin scripts (V3/1.0.0)
+  writeEnvelopeV3 "succeedingIndexArrayPolicyScriptV3_1_0_0"
+    ArrayV3_1_0_0.succeedingIndexArrayPolicyCompiledV3_1_0_0
+  writeEnvelopeV3 "succeedingLengthOfArrayPolicyScriptV3_1_0_0"
+    ArrayV3_1_0_0.succeedingLengthOfArrayPolicyCompiledV3_1_0_0
+  writeEnvelopeV3 "succeedingListToArrayPolicyScriptV3_1_0_0"
+    ArrayV3_1_0_0.succeedingListToArrayPolicyCompiledV3_1_0_0
+
+  -- Array builtin scripts (V3/1.1.0)
+  writeEnvelopeV3 "succeedingIndexArrayPolicyScriptV3_1_1_0"
+    ArrayV3_1_1_0.succeedingIndexArrayPolicyCompiledV3_1_1_0
+  writeEnvelopeV3 "succeedingLengthOfArrayPolicyScriptV3_1_1_0"
+    ArrayV3_1_1_0.succeedingLengthOfArrayPolicyCompiledV3_1_1_0
+  writeEnvelopeV3 "succeedingListToArrayPolicyScriptV3_1_1_0"
+    ArrayV3_1_1_0.succeedingListToArrayPolicyCompiledV3_1_1_0
 
   -- Bitwise V1.1 scripts (PlutusV3)
   writeEnvelopeV3
@@ -101,6 +143,10 @@ writeEnvelope lang filename compiledCode = do
   let description = T.pack filename
   createDirectoryIfMissing True dir
   Envelope.writeCodeEnvelopeForVersion lang description compiledCode filePath
+
+-- | Write PlutusV1 script
+writeEnvelopeV1 :: FilePath -> CompiledCode a -> IO ()
+writeEnvelopeV1 = writeEnvelope PlutusV1
 
 -- | Write PlutusV2 script
 writeEnvelopeV2 :: FilePath -> CompiledCode a -> IO ()
