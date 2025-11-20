@@ -118,6 +118,9 @@ library scripts
     PlutusScripts.SECP256k1.Common
     PlutusScripts.SECP256k1.V_1_0
     PlutusScripts.SECP256k1.V_1_1
+    PlutusScripts.Batch6.DropList
+    PlutusScripts.Batch6.V_1_0
+    PlutusScripts.Batch6.V_1_1
 
 executable envelopes
   import:         ghc-options

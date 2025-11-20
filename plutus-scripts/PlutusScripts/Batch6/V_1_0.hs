@@ -1,0 +1,32 @@
+{-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.0.0 #-}
+
+module PlutusScripts.Batch6.V_1_0 where
+
+import PlutusCore.Default (DefaultFun, DefaultUni)
+import PlutusCore.Version (plcVersion100)
+import PlutusScripts.Batch6.DropList qualified as DropList
+import PlutusTx (compile, liftCode, unsafeApplyCode)
+import PlutusTx.Code (CompiledCodeIn)
+import PlutusTx.Prelude qualified as P
+import Helpers.ScriptUtils (ScriptGroup (ScriptGroup, sgBaseName, sgScripts))
+
+-- Tests for `dropList` with PlutusV2 and Plutus 1.0.0
+
+-- FIXME: these are currently unused until we work out how to deal with the fact
+-- that SoPs and all builtins will be enabled in PlutusV1 and PlutusV2 at PV11.
+
+-- Compiled code values with parameters already applied for succeeding tests
+succeedingDropListPolicyCompiledV2
+  :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+succeedingDropListPolicyCompiledV2 =
+  $$(compile [|| DropList.mkDropListPolicy ||])
+    `unsafeApplyCode` liftCode plcVersion100 DropList.succeedingDropListParams
+
+failingDropListScriptGroupV2 :: ScriptGroup DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+failingDropListScriptGroupV2 =  ScriptGroup
+      { sgBaseName = "failingDropListPolicyScriptV2"
+      , sgScripts = map compileDropList DropList.failingDropListParams
+      }
+  where compileDropList param =
+          $$(compile [|| DropList.mkDropListPolicy ||])
+          `unsafeApplyCode` liftCode plcVersion100 [param]
