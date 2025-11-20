@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.0.0 #-}
 
-module PlutusScripts.Batch6.V_1_0 where
+module PlutusScripts.Batch6.V3_100 where
 
 import Helpers.ScriptUtils (ScriptGroup (ScriptGroup, sgBaseName, sgScripts))
 import PlutusCore.Default (DefaultFun, DefaultUni)
@@ -16,17 +16,17 @@ import PlutusTx.Prelude qualified as P
 -- that SoPs and all builtins will be enabled in PlutusV1 and PlutusV2 at PV11.
 
 -- Compiled code values with parameters already applied for succeeding tests
-succeedingDropListPolicyCompiledV2
+succeedingDropListPolicyCompiled_V2_100
   :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
-succeedingDropListPolicyCompiledV2 =
+succeedingDropListPolicyCompiled_V2_100 =
   $$(compile [||DropList.mkDropListPolicy||])
     `unsafeApplyCode` liftCode plcVersion100 DropList.succeedingDropListParams
 
 -- These should fail due to exceeding the budget.
-expensiveDropListScriptGroupV2 :: ScriptGroup DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
-expensiveDropListScriptGroupV2 =
+expensiveDropListScriptGroup_V2_100 :: ScriptGroup DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+expensiveDropListScriptGroup_V2_100 =
   ScriptGroup
-    { sgBaseName = "expensiveDropListPolicyScriptV2"
+    { sgBaseName = "expensiveDropListPolicyScript_V2_100"
     , sgScripts = map compileDropList DropList.expensiveDropListParams
     }
  where

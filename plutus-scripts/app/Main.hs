@@ -8,7 +8,7 @@ import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusLedgerApi.Common.Versions (PlutusLedgerLanguage (PlutusV2, PlutusV3))
 import PlutusLedgerApi.Envelope qualified as Envelope
 import PlutusScripts.Basic.V_1_1 qualified as Basic
-import PlutusScripts.Batch6.V_1_1 qualified as Batch6_1_1
+import PlutusScripts.Batch6.V3_110 qualified as Batch6_V3_110
 import PlutusScripts.Bitwise.V_1_0 qualified as BitwiseV0
 import PlutusScripts.Bitwise.V_1_1 qualified as BitwiseV1
 import PlutusScripts.Hashing.V_1_1 qualified as Hashing
@@ -90,10 +90,10 @@ main = withUtf8 do
 
   -- \** Batch 6 (protocol version 11) **
   writeEnvelopeV3
-    "succeedingDropListPolicyScriptV3"
-    Batch6_1_1.succeedingDropListPolicyCompiledV3
+    "succeedingDropListPolicyScript_V3_110"
+    Batch6_V3_110.succeedingDropListPolicyCompiled_V3_110
 
-  writeScriptGroup Batch6_1_1.expensiveDropListScriptGroupV3
+  writeScriptGroup Batch6_V3_110.expensiveDropListScriptGroup_V3_110
 
 --------------------------------------------------------------------------------
 -- IO helpers ------------------------------------------------------------------
