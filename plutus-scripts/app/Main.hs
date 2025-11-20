@@ -5,6 +5,9 @@ import Main.Utf8 (withUtf8)
 import PlutusLedgerApi.Common.Versions (PlutusLedgerLanguage (PlutusV2, PlutusV3))
 import PlutusLedgerApi.Envelope qualified as Envelope
 import PlutusScripts.Basic.V_1_1 qualified as Basic
+import Control.Monad (zipWithM_)
+import Helpers.ScriptUtils (ScriptGroup (ScriptGroup, sgBaseName, sgScripts))
+import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusScripts.Bitwise.V_1_0 qualified as BitwiseV0
 import PlutusScripts.Bitwise.V_1_1 qualified as BitwiseV1
 import PlutusScripts.Hashing.V_1_1 qualified as Hashing
@@ -13,6 +16,19 @@ import PlutusScripts.SECP256k1.V_1_1 qualified as SECP
 import PlutusScripts.Batch6.V_1_1 qualified as Batch6_1_1
 import PlutusTx.Code (CompiledCode)
 import System.Directory (createDirectoryIfMissing)
+
+--------------------------------------------------------------------------------
+-- Script Group Helpers --------------------------------------------------------
+
+-- | Write a group of numbered scripts (e.g., script_1.plutus, script_2.plutus, ...)
+writeScriptGroup :: ScriptGroup DefaultUni DefaultFun a -> IO ()
+writeScriptGroup ScriptGroup{..} =
+  zipWithM_ writeNumbered [1 :: Integer ..] sgScripts
+ where
+  writeNumbered n code = writeEnvelopeV3 (sgBaseName ++ "_" ++ show n) code
+
+--------------------------------------------------------------------------------
+-- Main ------------------------------------------------------------------------
 
 main :: IO ()
 main = withUtf8 do
@@ -72,6 +88,9 @@ main = withUtf8 do
   writeEnvelopeV3
     "succeedingDropListPolicyScriptV3"
     Batch6_1_1.succeedingDropListPolicyCompiledV3
+
+  -- Failing Bitwise Tests (ReadBit, WriteBits, ReplicateByte variants)
+  mapM_ writeScriptGroup BitwiseV1.failingBitwiseScriptGroupsV3
 
 --------------------------------------------------------------------------------
 -- IO helpers ------------------------------------------------------------------

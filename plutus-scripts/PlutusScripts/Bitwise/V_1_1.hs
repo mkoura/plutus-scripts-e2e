@@ -2,7 +2,7 @@
 
 module PlutusScripts.Bitwise.V_1_1 where
 
-import Helpers.ScriptUtils (IsScriptContext (mkUntypedMintingPolicy))
+import Helpers.ScriptUtils (IsScriptContext (mkUntypedMintingPolicy), ScriptGroup (ScriptGroup, sgBaseName, sgScripts))
 import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusCore.Version (plcVersion110)
 import PlutusLedgerApi.V3 qualified as V3
@@ -30,10 +30,12 @@ import PlutusScripts.Bitwise.Logical (
   succeedingXorByteStringParams,
  )
 import PlutusScripts.Bitwise.ReadBit (
+  failingReadBitParams,
   mkReadBitPolicy,
   succeedingReadBitParams,
  )
 import PlutusScripts.Bitwise.ReplicateByte (
+  failingReplicateByteParams,
   mkReplicateBytePolicy,
   succeedingReplicateByteParams,
  )
@@ -44,6 +46,7 @@ import PlutusScripts.Bitwise.ShiftRotate (
   succeedingShiftByteStringParams,
  )
 import PlutusScripts.Bitwise.WriteBits (
+  failingWriteBitsParams,
   mkWriteBitsPolicy,
   succeedingWriteBitsParams,
  )
@@ -149,6 +152,38 @@ succeedingReplicateBytePolicyCompiledV3 =
   $$(compile [||mkReplicateBytePolicy||])
     `unsafeApplyCode` liftCode plcVersion110 succeedingReplicateByteParams
 
--- Note: Failing test scripts are not currently generated.
--- They require applying individual failing params which would need the Params types to be exported.
--- For now, only succeeding tests are supported.
+--------------------------------------------------------------------------------
+-- Failing Tests ---------------------------------------------------------------
+
+-- | All failing bitwise test script groups
+-- Each group generates numbered scripts (e.g., failingReadBit_1.plutus, failingReadBit_2.plutus)
+failingBitwiseScriptGroupsV3 :: [ScriptGroup DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)]
+failingBitwiseScriptGroupsV3 =
+  [ -- ReadBit failing tests
+    ScriptGroup
+      { sgBaseName = "failingReadBitPolicyScriptV3"
+      , sgScripts = map compileReadBit failingReadBitParams
+      }
+  , -- WriteBits failing tests
+    ScriptGroup
+      { sgBaseName = "failingWriteBitsPolicyScriptV3"
+      , sgScripts = map compileWriteBits failingWriteBitsParams
+      }
+  , -- ReplicateByte failing tests
+    ScriptGroup
+      { sgBaseName = "failingReplicateBytePolicyScriptV3"
+      , sgScripts = map compileReplicateByte failingReplicateByteParams
+      }
+  ]
+ where
+  compileReadBit param =
+    $$(compile [||mkReadBitPolicy||])
+      `unsafeApplyCode` liftCode plcVersion110 [param]
+
+  compileWriteBits param =
+    $$(compile [||mkWriteBitsPolicy||])
+      `unsafeApplyCode` liftCode plcVersion110 [param]
+
+  compileReplicateByte param =
+    $$(compile [||mkReplicateBytePolicy||])
+      `unsafeApplyCode` liftCode plcVersion110 [param]
