@@ -6,25 +6,13 @@ adapted from the `plutus-conformance` tests. -}
 {-# LANGUAGE TemplateHaskell     #-}
 {-# LANGUAGE ViewPatterns        #-}
 
-module PlutusScripts.Batch6.DropList
-  {-
-  (
-  mkCountSetBitsPolicy,
-  mkFindFirstSetBitPolicy,
-  succeedingCountSetBitsParams,
-  succeedingFindFirstSetBitParams
-  )
--}
+module PlutusScripts.Batch6.DropList ( mkDropListPolicy, succeedingDropListParams,  expensiveDropListParams)
 where
 
 import PlutusTx.Prelude qualified as P
 import PlutusTx qualified
-import PlutusTx (Data (B,I))
 import PlutusTx.Builtins qualified as BI
-import PlutusTx.Builtins.HasOpaque ()
-import PlutusTx.Builtins.Internal qualified as BI (unitval, BuiltinInteger)
-
-import PlutusScripts.Helpers (hxs)
+import PlutusTx.Builtins.Internal qualified as BI (unitval)
 
 data Params = Params
   { count :: Integer
@@ -34,21 +22,21 @@ data Params = Params
 PlutusTx.unstableMakeIsData ''Params
 PlutusTx.makeLift ''Params
 
-{-# INLINEABLE bilEq #-}
-bilEq :: P.BuiltinList Integer -> P.BuiltinList Integer -> Bool
-bilEq as bs =
+{-# INLINEABLE eqIntList #-}
+eqIntList :: P.BuiltinList Integer -> P.BuiltinList Integer -> Bool
+eqIntList as bs =
   if BI.null as && BI.null bs
   then True
-  else (BI.head as P.== BI.head bs) && bilEq (BI.tail as) (BI.tail bs)
+  else (BI.head as P.== BI.head bs) && eqIntList (BI.tail as) (BI.tail bs)
 
 {-# INLINEABLE mkDropListPolicy #-}
 mkDropListPolicy :: [Params] -> P.BuiltinData -> P.BuiltinUnit
 mkDropListPolicy l _ctx = go l
   where go [] = BI.unitval
         go (Params{..}:rest) =
-          if BI.drop count (P.toOpaque input) `bilEq` (P.toOpaque output)
+          if BI.drop count (P.toOpaque input) `eqIntList` (P.toOpaque output)
           then go rest
-          else P.traceError "mkCountSetBitsPolicyI"
+          else P.traceError "mkCountSetBitsPolicy"
 
 -- Succeeding inputs for lists of UPLC integers; `dropList` can only fail for cost reasons.
 succeedingDropListParams :: [Params]
@@ -101,8 +89,8 @@ succeedingDropListParams =
 -- will (probably, depending on the cost model) attempt to consume the maxmimum
 -- budget and fail because the cost depends on the absolute value of the `count`
 -- argument, irrespective of the size of the list.
-failingDropListParams :: [Params]
-failingDropListParams =
+expensiveDropListParams :: [Params]
+expensiveDropListParams =
   [ Params
     { count = 10000000000000000000
     , input = [11,22,33,44,55,66,77,88,99]

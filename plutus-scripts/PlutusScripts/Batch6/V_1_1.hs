@@ -17,10 +17,11 @@ succeedingDropListPolicyCompiledV3 =
   $$(compile [|| DropList.mkDropListPolicy ||])
     `unsafeApplyCode` liftCode plcVersion110 DropList.succeedingDropListParams
 
-failingDropListScriptGroupV3 :: ScriptGroup DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
-failingDropListScriptGroupV3 =  ScriptGroup
-      { sgBaseName = "failingDropListPolicyScriptV3"
-      , sgScripts = map compileDropList DropList.failingDropListParams
+-- These should fail due to exceeding the budget.
+expensiveDropListScriptGroupV3 :: ScriptGroup DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+expensiveDropListScriptGroupV3 =  ScriptGroup
+      { sgBaseName = "expensiveDropListPolicyScriptV3"
+      , sgScripts = map compileDropList DropList.expensiveDropListParams
       }
   where compileDropList param =
           $$(compile [|| DropList.mkDropListPolicy ||])

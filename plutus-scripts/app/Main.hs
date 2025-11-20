@@ -89,12 +89,12 @@ main = withUtf8 do
   -- Failing Bitwise Tests (ReadBit, WriteBits, ReplicateByte variants)
   mapM_ writeScriptGroup BitwiseV1.failingBitwiseScriptGroupsV3
 
-  -- Batch 6 (protocol version 11)
+  -- ** Batch 6 (protocol version 11) **
   writeEnvelopeV3
     "succeedingDropListPolicyScriptV3"
     Batch6_1_1.succeedingDropListPolicyCompiledV3
 
-  writeScriptGroup Batch6_1_1.failingDropListScriptGroupV3
+  writeScriptGroup Batch6_1_1.expensiveDropListScriptGroupV3
 
 --------------------------------------------------------------------------------
 -- IO helpers ------------------------------------------------------------------
