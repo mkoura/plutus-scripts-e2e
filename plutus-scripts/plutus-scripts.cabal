@@ -126,6 +126,7 @@ executable envelopes
   build-depends:
     , base               >=4.14      && <5
     , directory
+    , plutus-core        ^>=1.53.1.0
     , plutus-ledger-api  ^>=1.53.1.0
     , plutus-tx          ^>=1.53.1.0
     , scripts
