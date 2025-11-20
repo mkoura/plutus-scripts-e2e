@@ -85,12 +85,16 @@ main = withUtf8 do
   writeEnvelopeV3
     "succeedingReplicateBytePolicyScriptV3"
     BitwiseV1.succeedingReplicateBytePolicyCompiledV3
+
+  -- Failing Bitwise Tests (ReadBit, WriteBits, ReplicateByte variants)
+  mapM_ writeScriptGroup BitwiseV1.failingBitwiseScriptGroupsV3
+
+  -- Batch 6 (protocol version 11)
   writeEnvelopeV3
     "succeedingDropListPolicyScriptV3"
     Batch6_1_1.succeedingDropListPolicyCompiledV3
 
-  -- Failing Bitwise Tests (ReadBit, WriteBits, ReplicateByte variants)
-  mapM_ writeScriptGroup BitwiseV1.failingBitwiseScriptGroupsV3
+  writeScriptGroup Batch6_1_1.failingDropListScriptGroupV3
 
 --------------------------------------------------------------------------------
 -- IO helpers ------------------------------------------------------------------
