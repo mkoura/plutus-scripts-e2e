@@ -91,9 +91,9 @@ main = withUtf8 do
   -- \** Batch 6 (protocol version 11) **
   writeEnvelopeV3
     "succeedingDropListPolicyScript_V3_110"
-    DropList_V3_110.succeedingDropListPolicyCompiled_V3_110
+    DropList_V3_110.succeedingDropListPolicy
 
-  writeScriptGroup DropList_V3_110.expensiveDropListScriptGroup_V3_110
+  writeScriptGroup DropList_V3_110.expensiveDropListScriptGroup
 
 --------------------------------------------------------------------------------
 -- IO helpers ------------------------------------------------------------------
