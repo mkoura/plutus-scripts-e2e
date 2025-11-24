@@ -105,8 +105,8 @@ expensiveDropListPolicyScript_V3_110_1.plutus
 **Qualified Import Aliases:** `{Category}_V{LedgerVersion}_{CoreCompact}`
 
 ```haskell
-import PlutusScripts.Array.V3_110 qualified as Array_V3_110
-import PlutusScripts.Batch6.V3_100 qualified as Batch6_V3_100
+import PlutusScripts.Batch6.Array.V3_110 qualified as Array_V3_110
+import PlutusScripts.Batch6.DropList.V3_110 qualified as DropList_V3_110
 ```
 
 **Rationale:**
@@ -174,7 +174,6 @@ mapM_ writeScriptGroup Bitwise_V3_110.failingBitwiseScriptGroups_V3_110
 ```
 
 This pattern:
-
 - ✅ Encapsulates parameter iteration in the library
 - ✅ Keeps executable unaware of Params types
 - ✅ Generates numbered script files automatically
@@ -293,7 +292,6 @@ cabal run envelopes
 Output: Multiple `.plutus` files in `serialised-plutus-scripts/` (git-ignored)
 
 **Generated Scripts**:
-
 - PlutusV2 scripts (bytestring/integer conversions)
 - Basic PlutusV3 scripts (always succeed/fail, token names, time ranges, redeemers)
 - SECP256k1 scripts (Schnorr and ECDSA signature verification)
@@ -319,14 +317,12 @@ To add a simple script:
 For parameterized tests (e.g., failing tests with multiple edge cases):
 
 1. Define test parameters in the `Common` module:
-
    ```haskell
    data Params = Params { input :: ByteString, expected :: Bool }
    testParams :: [Params]
    ```
 
 2. Create a `ScriptGroup` in the versioned module:
-
    ```haskell
    myScriptGroup :: [ScriptGroup DefaultUni DefaultFun (BuiltinData -> BuiltinUnit)]
    myScriptGroup = [ScriptGroup
@@ -336,7 +332,7 @@ For parameterized tests (e.g., failing tests with multiple edge cases):
    ```
 
 3. Use `mapM_ writeScriptGroup` in `app/Main.hs`
-4. Run `cabal run envelopes` - generates numbered files (myTestScript_1.plutus, \_2.plutus, ...)
+4. Run `cabal run envelopes` - generates numbered files (myTestScript_1.plutus, _2.plutus, ...)
 
 ## Nix Binary Cache
 
