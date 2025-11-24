@@ -1,11 +1,11 @@
 {-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.1.0 #-}
 
-module PlutusScripts.Batch6.V3_110 where
+module PlutusScripts.Batch6.DropList.V3_110 where
 
 import Helpers.ScriptUtils (ScriptGroup (ScriptGroup, sgBaseName, sgScripts))
 import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusCore.Version (plcVersion110)
-import PlutusScripts.Batch6.DropList qualified as DropList
+import PlutusScripts.Batch6.DropList.Common qualified as DropList
 import PlutusTx (compile, liftCode, unsafeApplyCode)
 import PlutusTx.Code (CompiledCodeIn)
 import PlutusTx.Prelude qualified as P

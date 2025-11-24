@@ -6,7 +6,7 @@
 {- | Simple end-to-end tests for the Plutus Core `dropList` builtin.  These are
 adapted from the `plutus-conformance` tests.
 -}
-module PlutusScripts.Batch6.DropList (mkDropListPolicy, succeedingDropListParams, expensiveDropListParams)
+module PlutusScripts.Batch6.DropList.Common (mkDropListPolicy, succeedingDropListParams, expensiveDropListParams)
 where
 
 import PlutusTx qualified
