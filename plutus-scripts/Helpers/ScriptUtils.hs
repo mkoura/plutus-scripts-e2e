@@ -38,9 +38,9 @@ The executable can iterate over 'sgScripts' and generate files named
 -}
 data ScriptGroup uni fun a = ScriptGroup
   { sgBaseName :: String
-    -- ^ Base name for the script group (e.g., "failingReadBitPolicyScriptV3")
+  -- ^ Base name for the script group (e.g., "failingReadBitPolicyScriptV3")
   , sgScripts :: [CompiledCodeIn uni fun a]
-    -- ^ List of compiled scripts, will be numbered from 1
+  -- ^ List of compiled scripts, will be numbered from 1
   }
 
 {-# INLINEABLE tracedUnsafeFrom #-}

@@ -1,17 +1,18 @@
 module Main (main) where
 
+import Control.Monad (zipWithM_)
 import Data.Text qualified as T
+import Helpers.ScriptUtils (ScriptGroup (ScriptGroup, sgBaseName, sgScripts))
 import Main.Utf8 (withUtf8)
+import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusLedgerApi.Common.Versions (PlutusLedgerLanguage (PlutusV2, PlutusV3))
 import PlutusLedgerApi.Envelope qualified as Envelope
 import PlutusScripts.Basic.V_1_1 qualified as Basic
-import Control.Monad (zipWithM_)
-import Helpers.ScriptUtils (ScriptGroup (ScriptGroup, sgBaseName, sgScripts))
-import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusScripts.Bitwise.V_1_0 qualified as BitwiseV0
 import PlutusScripts.Bitwise.V_1_1 qualified as BitwiseV1
 import PlutusScripts.Hashing.V_1_1 qualified as Hashing
 import PlutusScripts.SECP256k1.V_1_1 qualified as SECP
+
 -- import PlutusScripts.Batch6.V_1_0 qualified as Batch6_1_0
 import PlutusScripts.Batch6.V_1_1 qualified as Batch6_1_1
 import PlutusTx.Code (CompiledCode)
@@ -38,15 +39,15 @@ main = withUtf8 do
     BitwiseV0.byteStringToIntegerRoundtripPolicyCompiledV2
 
   -- Basic scripts (PlutusV3)
-  writeEnvelopeV3 "alwaysSucceedPolicyScriptV3"   Basic.alwaysSucceedPolicyCompiled
-  writeEnvelopeV3 "alwaysFailsPolicyScriptV3"     Basic.alwaysFailsPolicyCompiled
-  writeEnvelopeV3 "mintTokenNamePolicyScriptV3"   Basic.mintTokenNamePolicyCompiledV3
-  writeEnvelopeV3 "timeRangePolicyScriptV3"       Basic.timeRangePolicyCompiledV3
+  writeEnvelopeV3 "alwaysSucceedPolicyScriptV3" Basic.alwaysSucceedPolicyCompiled
+  writeEnvelopeV3 "alwaysFailsPolicyScriptV3" Basic.alwaysFailsPolicyCompiled
+  writeEnvelopeV3 "mintTokenNamePolicyScriptV3" Basic.mintTokenNamePolicyCompiledV3
+  writeEnvelopeV3 "timeRangePolicyScriptV3" Basic.timeRangePolicyCompiledV3
   writeEnvelopeV3 "witnessRedeemerPolicyScriptV3" Basic.witnessRedeemerPolicyCompiledV3
 
   -- SECP256k1 scripts (PlutusV3)
   writeEnvelopeV3 "verifySchnorrPolicyScriptV3" SECP.verifySchnorrPolicyCompiledV3
-  writeEnvelopeV3 "verifyEcdsaPolicyScriptV3"   SECP.verifyEcdsaPolicyCompiledV3
+  writeEnvelopeV3 "verifyEcdsaPolicyScriptV3" SECP.verifyEcdsaPolicyCompiledV3
 
   -- Hashing scripts (PlutusV3)
   writeEnvelopeV3 "succeedingRipemd_160Policy" Hashing.succeedingRipemd_160PolicyCompiled

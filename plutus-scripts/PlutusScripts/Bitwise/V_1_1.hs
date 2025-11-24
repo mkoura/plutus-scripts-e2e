@@ -2,7 +2,10 @@
 
 module PlutusScripts.Bitwise.V_1_1 where
 
-import Helpers.ScriptUtils (IsScriptContext (mkUntypedMintingPolicy), ScriptGroup (ScriptGroup, sgBaseName, sgScripts))
+import Helpers.ScriptUtils (
+  IsScriptContext (mkUntypedMintingPolicy),
+  ScriptGroup (ScriptGroup, sgBaseName, sgScripts),
+ )
 import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusCore.Version (plcVersion110)
 import PlutusLedgerApi.V3 qualified as V3
@@ -155,8 +158,9 @@ succeedingReplicateBytePolicyCompiledV3 =
 --------------------------------------------------------------------------------
 -- Failing Tests ---------------------------------------------------------------
 
--- | All failing bitwise test script groups
--- Each group generates numbered scripts (e.g., failingReadBit_1.plutus, failingReadBit_2.plutus)
+{- | All failing bitwise test script groups
+Each group generates numbered scripts (e.g., failingReadBit_1.plutus, failingReadBit_2.plutus)
+-}
 failingBitwiseScriptGroupsV3 :: [ScriptGroup DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)]
 failingBitwiseScriptGroupsV3 =
   [ -- ReadBit failing tests
