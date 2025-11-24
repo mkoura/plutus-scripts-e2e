@@ -72,9 +72,12 @@ library scripts
     , plutus-ledger-api  ^>=1.53.1.0
     , plutus-tx          ^>=1.53.1.0
     , plutus-tx-plugin   ^>=1.53.1.0
+    , text
 
   exposed-modules:
+    Helpers.Envelopes
     Helpers.ScriptUtils
+    PlutusScripts.Batch6.Array
     PlutusScripts.Batch6.Array.Common
     PlutusScripts.Batch6.Array.V1_100
     PlutusScripts.Batch6.Array.V1_110

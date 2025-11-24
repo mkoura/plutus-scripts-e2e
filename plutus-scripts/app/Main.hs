@@ -1,19 +1,19 @@
 module Main (main) where
 
-import Data.Text qualified as T
-import Main.Utf8 (withUtf8)
-import PlutusLedgerApi.Common.Versions (PlutusLedgerLanguage (PlutusV1, PlutusV2, PlutusV3))
-import PlutusLedgerApi.Envelope qualified as Envelope
-import PlutusScripts.Batch6.Array.V1_100 qualified as Array_V1_100
-import PlutusScripts.Batch6.Array.V1_110 qualified as Array_V1_110
-import PlutusScripts.Batch6.Array.V2_100 qualified as Array_V2_100
-import PlutusScripts.Batch6.Array.V2_110 qualified as Array_V2_110
-import PlutusScripts.Batch6.Array.V3_100 qualified as Array_V3_100
-import PlutusScripts.Batch6.Array.V3_110 qualified as Array_V3_110
-import PlutusScripts.Basic.V_1_1 qualified as Basic
 import Control.Monad (zipWithM_)
+import Data.Text qualified as T
+import Helpers.Envelopes (
+  VersionedScript (VersionedScript),
+  formatCoreVersion,
+  formatPlutusVersion,
+ )
 import Helpers.ScriptUtils (ScriptGroup (ScriptGroup, sgBaseName, sgScripts))
+import Main.Utf8 (withUtf8)
 import PlutusCore.Default (DefaultFun, DefaultUni)
+import PlutusLedgerApi.Common.Versions (PlutusLedgerLanguage (PlutusV2, PlutusV3))
+import PlutusLedgerApi.Envelope qualified as Envelope
+import PlutusScripts.Basic.V_1_1 qualified as Basic
+import PlutusScripts.Batch6.Array qualified as Array
 import PlutusScripts.Bitwise.V_1_0 qualified as BitwiseV0
 import PlutusScripts.Bitwise.V_1_1 qualified as BitwiseV1
 import PlutusScripts.Hashing.V_1_1 qualified as Hashing
@@ -46,53 +46,8 @@ main = withUtf8 do
   -- Hashing scripts (PlutusV3)
   writeEnvelopeV3 "succeedingRipemd_160Policy" Hashing.succeedingRipemd_160PolicyCompiled
 
-  -- Array builtin scripts (V1/1.0.0)
-  writeEnvelopeV1 "succeedingIndexArrayPolicyScript_V1_100"
-    Array_V1_100.succeedingIndexArrayPolicy
-  writeEnvelopeV1 "succeedingLengthOfArrayPolicyScript_V1_100"
-    Array_V1_100.succeedingLengthOfArrayPolicy
-  writeEnvelopeV1 "succeedingListToArrayPolicyScript_V1_100"
-    Array_V1_100.succeedingListToArrayPolicy
-
-  -- Array builtin scripts (V1/1.1.0)
-  writeEnvelopeV1 "succeedingIndexArrayPolicyScript_V1_110"
-    Array_V1_110.succeedingIndexArrayPolicy
-  writeEnvelopeV1 "succeedingLengthOfArrayPolicyScript_V1_110"
-    Array_V1_110.succeedingLengthOfArrayPolicy
-  writeEnvelopeV1 "succeedingListToArrayPolicyScript_V1_110"
-    Array_V1_110.succeedingListToArrayPolicy
-
-  -- Array builtin scripts (V2/1.0.0)
-  writeEnvelopeV2 "succeedingIndexArrayPolicyScript_V2_100"
-    Array_V2_100.succeedingIndexArrayPolicy
-  writeEnvelopeV2 "succeedingLengthOfArrayPolicyScript_V2_100"
-    Array_V2_100.succeedingLengthOfArrayPolicy
-  writeEnvelopeV2 "succeedingListToArrayPolicyScript_V2_100"
-    Array_V2_100.succeedingListToArrayPolicy
-
-  -- Array builtin scripts (V2/1.1.0)
-  writeEnvelopeV2 "succeedingIndexArrayPolicyScript_V2_110"
-    Array_V2_110.succeedingIndexArrayPolicy
-  writeEnvelopeV2 "succeedingLengthOfArrayPolicyScript_V2_110"
-    Array_V2_110.succeedingLengthOfArrayPolicy
-  writeEnvelopeV2 "succeedingListToArrayPolicyScript_V2_110"
-    Array_V2_110.succeedingListToArrayPolicy
-
-  -- Array builtin scripts (V3/1.0.0)
-  writeEnvelopeV3 "succeedingIndexArrayPolicyScript_V3_100"
-    Array_V3_100.succeedingIndexArrayPolicy
-  writeEnvelopeV3 "succeedingLengthOfArrayPolicyScript_V3_100"
-    Array_V3_100.succeedingLengthOfArrayPolicy
-  writeEnvelopeV3 "succeedingListToArrayPolicyScript_V3_100"
-    Array_V3_100.succeedingListToArrayPolicy
-
-  -- Array builtin scripts (V3/1.1.0)
-  writeEnvelopeV3 "succeedingIndexArrayPolicyScript_V3_110"
-    Array_V3_110.succeedingIndexArrayPolicy
-  writeEnvelopeV3 "succeedingLengthOfArrayPolicyScript_V3_110"
-    Array_V3_110.succeedingLengthOfArrayPolicy
-  writeEnvelopeV3 "succeedingListToArrayPolicyScript_V3_110"
-    Array_V3_110.succeedingListToArrayPolicy
+  -- Array builtin scripts (18 scripts via VersionedScript list)
+  mapM_ writeVersionedScript Array.allArrayScripts
 
   -- Bitwise V1.1 scripts (PlutusV3)
   writeEnvelopeV3
@@ -144,9 +99,9 @@ writeEnvelope lang filename compiledCode = do
   createDirectoryIfMissing True dir
   Envelope.writeCodeEnvelopeForVersion lang description compiledCode filePath
 
--- | Write PlutusV1 script
-writeEnvelopeV1 :: FilePath -> CompiledCode a -> IO ()
-writeEnvelopeV1 = writeEnvelope PlutusV1
+-- -- | Write PlutusV1 script
+-- writeEnvelopeV1 :: FilePath -> CompiledCode a -> IO ()
+-- writeEnvelopeV1 = writeEnvelope PlutusV1
 
 -- | Write PlutusV2 script
 writeEnvelopeV2 :: FilePath -> CompiledCode a -> IO ()
@@ -156,9 +111,18 @@ writeEnvelopeV2 = writeEnvelope PlutusV2
 writeEnvelopeV3 :: FilePath -> CompiledCode a -> IO ()
 writeEnvelopeV3 = writeEnvelope PlutusV3
 
+-- | Write versioned script with automatic filename generation
+writeVersionedScript :: VersionedScript a -> IO ()
+writeVersionedScript (VersionedScript lang coreVer name code) = do
+  let versionSuffix = formatPlutusVersion lang <> "_" <> formatCoreVersion coreVer
+  let filename = T.unpack (name <> "_" <> versionSuffix)
+  writeEnvelope lang filename code
+
 -- | Write a group of numbered scripts (e.g., script_1.plutus, script_2.plutus, ...)
 writeScriptGroup :: ScriptGroup DefaultUni DefaultFun a -> IO ()
 writeScriptGroup ScriptGroup{..} =
   zipWithM_ writeNumbered [1 :: Integer ..] sgScripts
  where
   writeNumbered n = writeEnvelopeV3 (sgBaseName ++ "_" ++ show n)
+
+-- | Write versioned script group with automatic base name generation
