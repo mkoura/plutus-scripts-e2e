@@ -2,27 +2,29 @@
 
 module PlutusScripts.Batch6.V_1_1 where
 
+import Helpers.ScriptUtils (ScriptGroup (ScriptGroup, sgBaseName, sgScripts))
 import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusCore.Version (plcVersion110)
 import PlutusScripts.Batch6.DropList qualified as DropList
 import PlutusTx (compile, liftCode, unsafeApplyCode)
 import PlutusTx.Code (CompiledCodeIn)
 import PlutusTx.Prelude qualified as P
-import Helpers.ScriptUtils (ScriptGroup (ScriptGroup, sgBaseName, sgScripts))
 
 -- Compiled code values with parameters already applied for succeeding tests
 succeedingDropListPolicyCompiledV3
   :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
 succeedingDropListPolicyCompiledV3 =
-  $$(compile [|| DropList.mkDropListPolicy ||])
+  $$(compile [||DropList.mkDropListPolicy||])
     `unsafeApplyCode` liftCode plcVersion110 DropList.succeedingDropListParams
 
 -- These should fail due to exceeding the budget.
 expensiveDropListScriptGroupV3 :: ScriptGroup DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
-expensiveDropListScriptGroupV3 =  ScriptGroup
-      { sgBaseName = "expensiveDropListPolicyScriptV3"
-      , sgScripts = map compileDropList DropList.expensiveDropListParams
-      }
-  where compileDropList param =
-          $$(compile [|| DropList.mkDropListPolicy ||])
-          `unsafeApplyCode` liftCode plcVersion110 [param]
+expensiveDropListScriptGroupV3 =
+  ScriptGroup
+    { sgBaseName = "expensiveDropListPolicyScriptV3"
+    , sgScripts = map compileDropList DropList.expensiveDropListParams
+    }
+ where
+  compileDropList param =
+    $$(compile [||DropList.mkDropListPolicy||])
+      `unsafeApplyCode` liftCode plcVersion110 [param]
