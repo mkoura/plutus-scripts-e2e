@@ -4,12 +4,12 @@ import Data.Text qualified as T
 import Main.Utf8 (withUtf8)
 import PlutusLedgerApi.Common.Versions (PlutusLedgerLanguage (PlutusV1, PlutusV2, PlutusV3))
 import PlutusLedgerApi.Envelope qualified as Envelope
-import PlutusScripts.Array.V1_100 qualified as Array_V1_100
-import PlutusScripts.Array.V1_110 qualified as Array_V1_110
-import PlutusScripts.Array.V2_100 qualified as Array_V2_100
-import PlutusScripts.Array.V2_110 qualified as Array_V2_110
-import PlutusScripts.Array.V3_100 qualified as Array_V3_100
-import PlutusScripts.Array.V3_110 qualified as Array_V3_110
+import PlutusScripts.Batch6.Array.V1_100 qualified as Array_V1_100
+import PlutusScripts.Batch6.Array.V1_110 qualified as Array_V1_110
+import PlutusScripts.Batch6.Array.V2_100 qualified as Array_V2_100
+import PlutusScripts.Batch6.Array.V2_110 qualified as Array_V2_110
+import PlutusScripts.Batch6.Array.V3_100 qualified as Array_V3_100
+import PlutusScripts.Batch6.Array.V3_110 qualified as Array_V3_110
 import PlutusScripts.Basic.V_1_1 qualified as Basic
 import Control.Monad (zipWithM_)
 import Helpers.ScriptUtils (ScriptGroup (ScriptGroup, sgBaseName, sgScripts))

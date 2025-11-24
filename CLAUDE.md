@@ -105,8 +105,8 @@ expensiveDropListPolicyScript_V3_110_1.plutus
 **Qualified Import Aliases:** `{Category}_V{LedgerVersion}_{CoreCompact}`
 
 ```haskell
-import PlutusScripts.Array.V3_110 qualified as Array_V3_110
-import PlutusScripts.Batch6.V3_100 qualified as Batch6_V3_100
+import PlutusScripts.Batch6.Array.V3_110 qualified as Array_V3_110
+import PlutusScripts.Batch6.DropList.V3_110 qualified as DropList_V3_110
 ```
 
 **Rationale:**

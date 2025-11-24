@@ -75,13 +75,13 @@ library scripts
 
   exposed-modules:
     Helpers.ScriptUtils
-    PlutusScripts.Array.Common
-    PlutusScripts.Array.V1_100
-    PlutusScripts.Array.V1_110
-    PlutusScripts.Array.V2_100
-    PlutusScripts.Array.V2_110
-    PlutusScripts.Array.V3_100
-    PlutusScripts.Array.V3_110
+    PlutusScripts.Batch6.Array.Common
+    PlutusScripts.Batch6.Array.V1_100
+    PlutusScripts.Batch6.Array.V1_110
+    PlutusScripts.Batch6.Array.V2_100
+    PlutusScripts.Batch6.Array.V2_110
+    PlutusScripts.Batch6.Array.V3_100
+    PlutusScripts.Batch6.Array.V3_110
     PlutusScripts.Basic.Common
     PlutusScripts.Basic.V_1_0
     PlutusScripts.Basic.V_1_1

@@ -1,9 +1,9 @@
 {-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.0.0 #-}
 
-module PlutusScripts.Array.V1_100 where
+module PlutusScripts.Batch6.Array.V1_100 where
 
 import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
-import PlutusScripts.Array.Common (
+import PlutusScripts.Batch6.Array.Common (
   mkIndexArrayPolicy,
   mkLengthOfArrayPolicy,
   mkListToArrayPolicy,

@@ -1,6 +1,6 @@
 -- editorconfig-checker-disable-file
 
-module PlutusScripts.Array.Common (
+module PlutusScripts.Batch6.Array.Common (
   mkIndexArrayPolicy,
   mkLengthOfArrayPolicy,
   mkListToArrayPolicy,
