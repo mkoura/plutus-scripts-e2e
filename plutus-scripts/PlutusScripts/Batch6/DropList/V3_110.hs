@@ -11,8 +11,7 @@ import PlutusTx.Code (CompiledCodeIn)
 import PlutusTx.Prelude qualified as P
 
 -- Compiled code values with parameters already applied for succeeding tests
-succeedingDropListPolicy
-  :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+succeedingDropListPolicy :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
 succeedingDropListPolicy =
   $$(compile [||DropList.mkDropListPolicy||])
     `unsafeApplyCode` liftCode plcVersion110 DropList.succeedingDropListParams

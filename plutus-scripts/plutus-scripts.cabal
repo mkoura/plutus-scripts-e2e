@@ -72,12 +72,18 @@ library scripts
     , plutus-ledger-api  ^>=1.53.1.0
     , plutus-tx          ^>=1.53.1.0
     , plutus-tx-plugin   ^>=1.53.1.0
+    , text
 
   exposed-modules:
+    Helpers.Envelopes
     Helpers.ScriptUtils
     PlutusScripts.Basic.Common
     PlutusScripts.Basic.V_1_0
     PlutusScripts.Basic.V_1_1
+    PlutusScripts.Batch6.DropList
+    PlutusScripts.Batch6.DropList.Common
+    PlutusScripts.Batch6.DropList.V3_100
+    PlutusScripts.Batch6.DropList.V3_110
     PlutusScripts.Bitwise.Complement
     PlutusScripts.Bitwise.Conversions
     PlutusScripts.Bitwise.CountFindFirstSet
@@ -118,9 +124,6 @@ library scripts
     PlutusScripts.SECP256k1.Common
     PlutusScripts.SECP256k1.V_1_0
     PlutusScripts.SECP256k1.V_1_1
-    PlutusScripts.Batch6.DropList.Common
-    PlutusScripts.Batch6.DropList.V3_100
-    PlutusScripts.Batch6.DropList.V3_110
 
 executable envelopes
   import:         ghc-options
