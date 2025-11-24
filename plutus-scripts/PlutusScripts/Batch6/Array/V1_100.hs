@@ -2,7 +2,6 @@
 
 module PlutusScripts.Batch6.Array.V1_100 where
 
-import PlutusLedgerApi.Common (SerialisedScript, serialiseCompiledCode)
 import PlutusScripts.Batch6.Array.Common (
   mkIndexArrayPolicy,
   mkLengthOfArrayPolicy,
@@ -11,29 +10,20 @@ import PlutusScripts.Batch6.Array.Common (
 import PlutusTx qualified
 import PlutusTx.Prelude qualified as P
 
-succeedingIndexArrayPolicyCompiled_V1_100
+succeedingIndexArrayPolicy
   :: PlutusTx.CompiledCode (PlutusTx.BuiltinData -> P.BuiltinUnit)
-succeedingIndexArrayPolicyCompiled_V1_100 =
+succeedingIndexArrayPolicy =
   $$(PlutusTx.compile [||mkIndexArrayPolicy||])
 
-succeedingIndexArrayPolicyScript_V1_100 :: SerialisedScript
-succeedingIndexArrayPolicyScript_V1_100 =
-  serialiseCompiledCode succeedingIndexArrayPolicyCompiled_V1_100
 
-succeedingLengthOfArrayPolicyCompiled_V1_100
+succeedingLengthOfArrayPolicy
   :: PlutusTx.CompiledCode (PlutusTx.BuiltinData -> P.BuiltinUnit)
-succeedingLengthOfArrayPolicyCompiled_V1_100 =
+succeedingLengthOfArrayPolicy =
   $$(PlutusTx.compile [||mkLengthOfArrayPolicy||])
 
-succeedingLengthOfArrayPolicyScript_V1_100 :: SerialisedScript
-succeedingLengthOfArrayPolicyScript_V1_100 =
-  serialiseCompiledCode succeedingLengthOfArrayPolicyCompiled_V1_100
 
-succeedingListToArrayPolicyCompiled_V1_100
+succeedingListToArrayPolicy
   :: PlutusTx.CompiledCode (PlutusTx.BuiltinData -> P.BuiltinUnit)
-succeedingListToArrayPolicyCompiled_V1_100 =
+succeedingListToArrayPolicy =
   $$(PlutusTx.compile [||mkListToArrayPolicy||])
 
-succeedingListToArrayPolicyScript_V1_100 :: SerialisedScript
-succeedingListToArrayPolicyScript_V1_100 =
-  serialiseCompiledCode succeedingListToArrayPolicyCompiled_V1_100

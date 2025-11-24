@@ -48,51 +48,51 @@ main = withUtf8 do
 
   -- Array builtin scripts (V1/1.0.0)
   writeEnvelopeV1 "succeedingIndexArrayPolicyScript_V1_100"
-    Array_V1_100.succeedingIndexArrayPolicyCompiled_V1_100
+    Array_V1_100.succeedingIndexArrayPolicy
   writeEnvelopeV1 "succeedingLengthOfArrayPolicyScript_V1_100"
-    Array_V1_100.succeedingLengthOfArrayPolicyCompiled_V1_100
+    Array_V1_100.succeedingLengthOfArrayPolicy
   writeEnvelopeV1 "succeedingListToArrayPolicyScript_V1_100"
-    Array_V1_100.succeedingListToArrayPolicyCompiled_V1_100
+    Array_V1_100.succeedingListToArrayPolicy
 
   -- Array builtin scripts (V1/1.1.0)
   writeEnvelopeV1 "succeedingIndexArrayPolicyScript_V1_110"
-    Array_V1_110.succeedingIndexArrayPolicyCompiled_V1_110
+    Array_V1_110.succeedingIndexArrayPolicy
   writeEnvelopeV1 "succeedingLengthOfArrayPolicyScript_V1_110"
-    Array_V1_110.succeedingLengthOfArrayPolicyCompiled_V1_110
+    Array_V1_110.succeedingLengthOfArrayPolicy
   writeEnvelopeV1 "succeedingListToArrayPolicyScript_V1_110"
-    Array_V1_110.succeedingListToArrayPolicyCompiled_V1_110
+    Array_V1_110.succeedingListToArrayPolicy
 
   -- Array builtin scripts (V2/1.0.0)
   writeEnvelopeV2 "succeedingIndexArrayPolicyScript_V2_100"
-    Array_V2_100.succeedingIndexArrayPolicyCompiled_V2_100
+    Array_V2_100.succeedingIndexArrayPolicy
   writeEnvelopeV2 "succeedingLengthOfArrayPolicyScript_V2_100"
-    Array_V2_100.succeedingLengthOfArrayPolicyCompiled_V2_100
+    Array_V2_100.succeedingLengthOfArrayPolicy
   writeEnvelopeV2 "succeedingListToArrayPolicyScript_V2_100"
-    Array_V2_100.succeedingListToArrayPolicyCompiled_V2_100
+    Array_V2_100.succeedingListToArrayPolicy
 
   -- Array builtin scripts (V2/1.1.0)
   writeEnvelopeV2 "succeedingIndexArrayPolicyScript_V2_110"
-    Array_V2_110.succeedingIndexArrayPolicyCompiled_V2_110
+    Array_V2_110.succeedingIndexArrayPolicy
   writeEnvelopeV2 "succeedingLengthOfArrayPolicyScript_V2_110"
-    Array_V2_110.succeedingLengthOfArrayPolicyCompiled_V2_110
+    Array_V2_110.succeedingLengthOfArrayPolicy
   writeEnvelopeV2 "succeedingListToArrayPolicyScript_V2_110"
-    Array_V2_110.succeedingListToArrayPolicyCompiled_V2_110
+    Array_V2_110.succeedingListToArrayPolicy
 
   -- Array builtin scripts (V3/1.0.0)
   writeEnvelopeV3 "succeedingIndexArrayPolicyScript_V3_100"
-    Array_V3_100.succeedingIndexArrayPolicyCompiled_V3_100
+    Array_V3_100.succeedingIndexArrayPolicy
   writeEnvelopeV3 "succeedingLengthOfArrayPolicyScript_V3_100"
-    Array_V3_100.succeedingLengthOfArrayPolicyCompiled_V3_100
+    Array_V3_100.succeedingLengthOfArrayPolicy
   writeEnvelopeV3 "succeedingListToArrayPolicyScript_V3_100"
-    Array_V3_100.succeedingListToArrayPolicyCompiled_V3_100
+    Array_V3_100.succeedingListToArrayPolicy
 
   -- Array builtin scripts (V3/1.1.0)
   writeEnvelopeV3 "succeedingIndexArrayPolicyScript_V3_110"
-    Array_V3_110.succeedingIndexArrayPolicyCompiled_V3_110
+    Array_V3_110.succeedingIndexArrayPolicy
   writeEnvelopeV3 "succeedingLengthOfArrayPolicyScript_V3_110"
-    Array_V3_110.succeedingLengthOfArrayPolicyCompiled_V3_110
+    Array_V3_110.succeedingLengthOfArrayPolicy
   writeEnvelopeV3 "succeedingListToArrayPolicyScript_V3_110"
-    Array_V3_110.succeedingListToArrayPolicyCompiled_V3_110
+    Array_V3_110.succeedingListToArrayPolicy
 
   -- Bitwise V1.1 scripts (PlutusV3)
   writeEnvelopeV3
