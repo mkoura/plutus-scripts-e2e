@@ -133,3 +133,10 @@ writeScriptGroup ScriptGroup{..} =
   writeNumbered n = writeEnvelopeV3 (sgBaseName ++ "_" ++ show n)
 
 -- | Write versioned script group with automatic base name generation
+writeVersionedScriptGroup :: VersionedScriptGroup a -> IO ()
+writeVersionedScriptGroup (VersionedScriptGroup lang coreVer baseName scriptGroup) = do
+  let versionSuffix = formatPlutusVersion lang <> "_" <> formatCoreVersion coreVer
+  let baseWithVersion = T.unpack (baseName <> "_" <> versionSuffix)
+  zipWithM_ (writeNumbered lang baseWithVersion) [1 :: Integer ..] (sgScripts scriptGroup)
+ where
+  writeNumbered l base n = writeEnvelope l (base ++ "_" ++ show n) 
