@@ -9,6 +9,7 @@ Originally based on the [Antaeus repository](https://github.com/IntersectMBO/ant
 This repository provides serialized Plutus scripts compiled for **Plutus Core 1.0.0 and 1.1.0** targeting **PlutusV2** and **PlutusV3** ledger APIs. The scripts are generated as `.plutus` envelope files consumed by the [cardano-node-tests](https://github.com/IntersectMBO/cardano-node-tests) E2E test suite.
 
 **Key Features:**
+
 - Comprehensive script library covering basic validators, bitwise operations, cryptography, and governance
 - Plutus Core 1.0.0 and 1.1.0 support with PlutusV2 and PlutusV3 targeting
 - Modular architecture with Common/Versioned module pattern
@@ -40,6 +41,7 @@ cabal run envelopes
 The generated `.plutus` files are JSON envelopes containing the serialized Plutus scripts, ready for use in cardano-node-tests.
 
 **Generated Scripts**:
+
 - PlutusV2 scripts (bytestring/integer conversions)
 - Basic PlutusV3 scripts (always succeed/fail, token names, time ranges, redeemers)
 - SECP256k1 scripts (Schnorr and ECDSA signature verification)
@@ -87,12 +89,14 @@ Core testing scripts for fundamental blockchain operations:
 Scripts demonstrating Plutus bitwise primitives (Plutus Core 1.1.0+):
 
 **Succeeding Tests**:
+
 - Logical operations: `andByteString`, `orByteString`, `xorByteString`, `complementByteString`
 - Shifts and rotates: `shiftByteString`, `rotateByteString`
 - Bit manipulation: `readBit`, `writeBits`, `countSetBits`, `findFirstSetBit`
 - Byte operations: `replicateByte`, conversions between integers and bytestrings
 
 **Failing Tests**:
+
 - ReadBit edge cases: empty bytestring, negative indices, out of bounds, Int64 limits
 - WriteBits edge cases: empty bytestring, negative indices, out of bounds
 - ReplicateByte edge cases: negative count, invalid byte values, size limits
@@ -145,17 +149,20 @@ alwaysSucceedPolicyCompiled = $$(PlutusTx.compile [||mkAlwaysSucceedPolicyV3||])
 Scripts are compiled for both **Plutus Core 1.0.0** (PlutusV2) and **Plutus Core 1.1.0** (PlutusV3):
 
 **Plutus Core 1.0.0 scripts:**
+
 ```haskell
 {-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.0.0 #-}
 ```
 
 **Plutus Core 1.1.0 scripts:**
+
 ```haskell
 {-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:conservative-optimisation #-}
 {-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.1.0 #-}
 ```
 
 PlutusV3 (1.1.0) validators receive enhanced `ScriptContext` with governance support:
+
 - Committee actions and voting
 - Proposal transactions
 - Constitutional committee hot key operations
@@ -292,6 +299,7 @@ Example envelope structure:
 5. **Validation**: Cardano node validates scripts during E2E tests
 
 The scripts enable comprehensive testing of:
+
 - Plutus V2 and V3 features (including governance)
 - Bitwise operations introduced in Plutus Core 1.1.0
 - Cryptographic primitives (BLS, SECP256k1)
@@ -302,18 +310,21 @@ The scripts enable comprehensive testing of:
 ### Adding New Scripts
 
 1. **Create validator logic** in `PlutusScripts/<Category>/Common.hs`:
+
    ```haskell
    {-# INLINEABLE myValidator #-}
    myValidator :: BuiltinData -> BuiltinData -> BuiltinData -> ()
    ```
 
 2. **Add versioned module** `PlutusScripts/<Category>/V_1_1.hs`:
+
    ```haskell
    myValidatorCompiled :: CompiledCode (BuiltinData -> BuiltinData -> BuiltinData -> ())
    myValidatorCompiled = $$(PlutusTx.compile [||myValidator||])
    ```
 
 3. **Update envelopes executable** in `app/Main.hs`:
+
    ```haskell
    writeEnvelopeV3 "myValidatorScript" MyCategory.myValidatorCompiled
    ```

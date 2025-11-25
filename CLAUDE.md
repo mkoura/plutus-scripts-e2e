@@ -77,10 +77,12 @@ Scripts support multiple Plutus Ledger versions (V1, V2, V3) and Plutus Core lan
 **Module Naming Pattern:** `V{LedgerVersion}_{CoreCompact}.hs`
 
 Where `CoreCompact` is Plutus Core version with digits compacted (no separators):
+
 - 1.0.0 → 100
 - 1.1.0 → 110
 
 **Examples:**
+
 - `V1_100.hs` = PlutusV1 + Plutus Core 1.0.0
 - `V2_110.hs` = PlutusV2 + Plutus Core 1.1.0
 - `V3_100.hs` = PlutusV3 + Plutus Core 1.0.0
@@ -112,11 +114,13 @@ import PlutusScripts.Batch6.DropList.V3_110 qualified as DropList_V3_110
 **Rationale:**
 
 This convention provides clear separation of concerns:
+
 - **Underscore** separates distinct version concepts (Plutus Ledger vs Core)
 - **No separator** within Core version digits (compacted for clarity)
 - Removes ambiguity about which separator indicates what
 
 **Benefits:**
+
 - Visual clarity: `V3_110` vs verbose `V3_1_1_0`
 - Less verbose: 6 characters vs 8 characters
 - Clear hierarchy: version concepts (separated) vs version digits (compact)
@@ -174,6 +178,7 @@ mapM_ writeScriptGroup Bitwise_V3_110.failingBitwiseScriptGroups_V3_110
 ```
 
 This pattern:
+
 - ✅ Encapsulates parameter iteration in the library
 - ✅ Keeps executable unaware of Params types
 - ✅ Generates numbered script files automatically
@@ -292,6 +297,7 @@ cabal run envelopes
 Output: Multiple `.plutus` files in `serialised-plutus-scripts/` (git-ignored)
 
 **Generated Scripts**:
+
 - PlutusV2 scripts (bytestring/integer conversions)
 - Basic PlutusV3 scripts (always succeed/fail, token names, time ranges, redeemers)
 - SECP256k1 scripts (Schnorr and ECDSA signature verification)
@@ -317,12 +323,14 @@ To add a simple script:
 For parameterized tests (e.g., failing tests with multiple edge cases):
 
 1. Define test parameters in the `Common` module:
+
    ```haskell
    data Params = Params { input :: ByteString, expected :: Bool }
    testParams :: [Params]
    ```
 
 2. Create a `ScriptGroup` in the versioned module:
+
    ```haskell
    myScriptGroup :: [ScriptGroup DefaultUni DefaultFun (BuiltinData -> BuiltinUnit)]
    myScriptGroup = [ScriptGroup
@@ -332,7 +340,7 @@ For parameterized tests (e.g., failing tests with multiple edge cases):
    ```
 
 3. Use `mapM_ writeScriptGroup` in `app/Main.hs`
-4. Run `cabal run envelopes` - generates numbered files (myTestScript_1.plutus, _2.plutus, ...)
+4. Run `cabal run envelopes` - generates numbered files (myTestScript_1.plutus, \_2.plutus, ...)
 
 ## Nix Binary Cache
 

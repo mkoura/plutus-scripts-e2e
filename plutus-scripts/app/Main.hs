@@ -4,6 +4,7 @@ import Control.Monad (zipWithM_)
 import Data.Text qualified as T
 import Helpers.Envelopes (
   VersionedScript (VersionedScript),
+  VersionedScriptGroup (VersionedScriptGroup),
   formatCoreVersion,
   formatPlutusVersion,
  )
@@ -13,6 +14,7 @@ import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusLedgerApi.Common.Versions (PlutusLedgerLanguage (PlutusV2, PlutusV3))
 import PlutusLedgerApi.Envelope qualified as Envelope
 import PlutusScripts.Basic.V_1_1 qualified as Basic
+import PlutusScripts.Batch6.DropList qualified as DropList
 import PlutusScripts.Batch6.Array qualified as Array
 import PlutusScripts.Bitwise.V_1_0 qualified as BitwiseV0
 import PlutusScripts.Bitwise.V_1_1 qualified as BitwiseV1
@@ -20,7 +22,6 @@ import PlutusScripts.Hashing.V_1_1 qualified as Hashing
 import PlutusScripts.SECP256k1.V_1_1 qualified as SECP
 import PlutusTx.Code (CompiledCode)
 import System.Directory (createDirectoryIfMissing)
-
 
 --------------------------------------------------------------------------------
 -- Main ------------------------------------------------------------------------
@@ -45,9 +46,6 @@ main = withUtf8 do
 
   -- Hashing scripts (PlutusV3)
   writeEnvelopeV3 "succeedingRipemd_160Policy" Hashing.succeedingRipemd_160PolicyCompiled
-
-  -- Array builtin scripts (18 scripts via VersionedScript list)
-  mapM_ writeVersionedScript Array.allArrayScripts
 
   -- Bitwise V1.1 scripts (PlutusV3)
   writeEnvelopeV3
@@ -86,6 +84,15 @@ main = withUtf8 do
 
   -- Failing Bitwise Tests (ReadBit, WriteBits, ReplicateByte variants)
   mapM_ writeScriptGroup BitwiseV1.failingBitwiseScriptGroupsV3
+
+  -- Batch6 (PV11) builtins
+  -- `dropList`
+  mapM_ writeVersionedScript DropList.allDropListScripts
+  mapM_ writeVersionedScriptGroup DropList.allDropListScriptGroups
+
+  -- Array builtin scripts (18 scripts via VersionedScript list)
+  mapM_ writeVersionedScript Array.allArrayScripts
+
 
 --------------------------------------------------------------------------------
 -- IO helpers ------------------------------------------------------------------
@@ -126,3 +133,10 @@ writeScriptGroup ScriptGroup{..} =
   writeNumbered n = writeEnvelopeV3 (sgBaseName ++ "_" ++ show n)
 
 -- | Write versioned script group with automatic base name generation
+writeVersionedScriptGroup :: VersionedScriptGroup a -> IO ()
+writeVersionedScriptGroup (VersionedScriptGroup lang coreVer baseName scriptGroup) = do
+  let versionSuffix = formatPlutusVersion lang <> "_" <> formatCoreVersion coreVer
+  let baseWithVersion = T.unpack (baseName <> "_" <> versionSuffix)
+  zipWithM_ (writeNumbered lang baseWithVersion) [1 :: Integer ..] (sgScripts scriptGroup)
+ where
+  writeNumbered l base n = writeEnvelope l (base ++ "_" ++ show n) 
