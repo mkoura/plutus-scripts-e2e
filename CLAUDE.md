@@ -66,18 +66,72 @@ plutus-scripts/
 
 ### Plutus Version Targeting
 
-All scripts target **Plutus Core 1.1.0** and use **PlutusV3** ledger API:
+Scripts support multiple Plutus Ledger versions (V1, V2, V3) and Plutus Core language versions (1.0.0, 1.1.0):
 
-- Scripts use `{-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.1.0 #-}`
+- Scripts use `{-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=X.Y.Z #-}`
 - V3 validators receive `ScriptContext` with enhanced governance support
-- Scripts are organized by Plutus version: `V_1_0.hs` and `V_1_1.hs` modules
+- Scripts are organized by version matrix using explicit naming convention (see below)
+
+### Plutus Script Versioning Naming Convention
+
+**Module Naming Pattern:** `V{LedgerVersion}_{CoreCompact}.hs`
+
+Where `CoreCompact` is Plutus Core version with digits compacted (no separators):
+
+- 1.0.0 → 100
+- 1.1.0 → 110
+
+**Examples:**
+
+- `V1_100.hs` = PlutusV1 + Plutus Core 1.0.0
+- `V2_110.hs` = PlutusV2 + Plutus Core 1.1.0
+- `V3_100.hs` = PlutusV3 + Plutus Core 1.0.0
+- `V3_110.hs` = PlutusV3 + Plutus Core 1.1.0
+
+**Identifier Naming:** `{function}_V{LedgerVersion}_{CoreCompact}`
+
+```haskell
+succeedingIndexArrayPolicyCompiled_V3_110
+succeedingLengthOfArrayPolicyScript_V1_100
+expensiveDropListScriptGroup_V3_110
+```
+
+**Script Output Files:** `{scriptName}_V{LedgerVersion}_{CoreCompact}.plutus`
+
+```
+succeedingIndexArrayPolicyScript_V3_110.plutus
+succeedingDropListPolicyScript_V3_100.plutus
+expensiveDropListPolicyScript_V3_110_1.plutus
+```
+
+**Qualified Import Aliases:** `{Category}_V{LedgerVersion}_{CoreCompact}`
+
+```haskell
+import PlutusScripts.Batch6.Array.V3_110 qualified as Array_V3_110
+import PlutusScripts.Batch6.DropList.V3_110 qualified as DropList_V3_110
+```
+
+**Rationale:**
+
+This convention provides clear separation of concerns:
+
+- **Underscore** separates distinct version concepts (Plutus Ledger vs Core)
+- **No separator** within Core version digits (compacted for clarity)
+- Removes ambiguity about which separator indicates what
+
+**Benefits:**
+
+- Visual clarity: `V3_110` vs verbose `V3_1_1_0`
+- Less verbose: 6 characters vs 8 characters
+- Clear hierarchy: version concepts (separated) vs version digits (compact)
+- Easy grepping: `V3_*` finds all V3 scripts, `*_110` finds all 1.1.0 scripts
 
 ### Script Organization Pattern
 
 Each script category follows a consistent pattern:
 
 1. **Common module** (`Common.hs`): Contains `INLINEABLE` validator logic and test parameters
-2. **Versioned modules** (`V_1_0.hs`, `V_1_1.hs`): Compile scripts with Plutus Core target versions
+2. **Versioned modules** (e.g., `V3_100.hs`, `V3_110.hs`): Compile scripts with specific Plutus version combinations
 3. **Library exports**: Pure `CompiledCode` values (no IO operations)
 4. **Executable serialization**: `app/Main.hs` handles all file writing
 
@@ -87,15 +141,15 @@ For simple scripts without test variants:
 
 ```haskell
 -- PlutusScripts/Basic/Common.hs
-{-# INLINEABLE mkAlwaysSucceedPolicyV3 #-}
-mkAlwaysSucceedPolicyV3 :: P.BuiltinData -> P.BuiltinUnit
+{-# INLINEABLE mkAlwaysSucceedPolicy #-}
+mkAlwaysSucceedPolicy :: P.BuiltinData -> P.BuiltinUnit
 
--- PlutusScripts/Basic/V_1_1.hs
-alwaysSucceedPolicyCompiled :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
-alwaysSucceedPolicyCompiled = $$(compile [||mkAlwaysSucceedPolicyV3||])
+-- PlutusScripts/Basic/V3_110.hs
+alwaysSucceedPolicyCompiled_V3_110 :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
+alwaysSucceedPolicyCompiled_V3_110 = $$(compile [||mkAlwaysSucceedPolicy||])
 
 -- app/Main.hs
-writeEnvelopeV3 "alwaysSucceedPolicyScriptV3" Basic.alwaysSucceedPolicyCompiled
+writeEnvelopeV3 "alwaysSucceedPolicyScript_V3_110" Basic_V3_110.alwaysSucceedPolicyCompiled_V3_110
 ```
 
 #### Script Group Pattern (For Test Variants)
@@ -107,11 +161,11 @@ For scripts with multiple parameter combinations (e.g., failing tests):
 data Params = Params { s :: BuiltinByteString, i :: Integer, output :: Bool }
 failingReadBitParams :: [Params]  -- Test cases for edge conditions
 
--- PlutusScripts/Bitwise/V_1_1.hs
-failingBitwiseScriptGroupsV3 :: [ScriptGroup DefaultUni DefaultFun (BuiltinData -> BuiltinUnit)]
-failingBitwiseScriptGroupsV3 =
+-- PlutusScripts/Bitwise/V3_110.hs
+failingBitwiseScriptGroups_V3_110 :: [ScriptGroup DefaultUni DefaultFun (BuiltinData -> BuiltinUnit)]
+failingBitwiseScriptGroups_V3_110 =
   [ ScriptGroup
-      { sgBaseName = "failingReadBitPolicyScriptV3"
+      { sgBaseName = "failingReadBitPolicyScript_V3_110"
       , sgScripts = map compileReadBit failingReadBitParams  -- Iteration in library
       }
   ]
@@ -119,8 +173,8 @@ failingBitwiseScriptGroupsV3 =
     compileReadBit param = $$(compile [||mkReadBitPolicy||]) `unsafeApplyCode` liftCode plcVersion110 [param]
 
 -- app/Main.hs
-mapM_ writeScriptGroup BitwiseV1.failingBitwiseScriptGroupsV3
--- Generates: failingReadBitPolicyScriptV3_1.plutus, _2.plutus, ..., _14.plutus
+mapM_ writeScriptGroup Bitwise_V3_110.failingBitwiseScriptGroups_V3_110
+-- Generates: failingReadBitPolicyScript_V3_110_1.plutus, _2.plutus, ..., _14.plutus
 ```
 
 This pattern:
@@ -260,8 +314,8 @@ These serialized scripts are consumed by external E2E tests (e.g., `cardano-node
 To add a simple script:
 
 1. Create the validator logic in a `Common.hs` module with `INLINEABLE` pragma
-2. Add versioned modules (`V_1_0.hs`, `V_1_1.hs`) that compile and export the script as `CompiledCode`
-3. Update `app/Main.hs` to add a `writeEnvelopeV3` call
+2. Add versioned modules (e.g., `V3_100.hs`, `V3_110.hs`) that compile and export the script as `CompiledCode`
+3. Update `app/Main.hs` to add a `writeEnvelopeV3` call with versioned filename
 4. Run `cabal run envelopes` to generate the `.plutus` file
 
 #### Multiple Test Variants (Script Group Pattern)

@@ -2,13 +2,19 @@ module Main (main) where
 
 import Control.Monad (zipWithM_)
 import Data.Text qualified as T
+import Helpers.Envelopes (
+  VersionedScript (VersionedScript),
+  VersionedScriptGroup (VersionedScriptGroup),
+  formatCoreVersion,
+  formatPlutusVersion,
+ )
 import Helpers.ScriptUtils (ScriptGroup (ScriptGroup, sgBaseName, sgScripts))
 import Main.Utf8 (withUtf8)
 import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusLedgerApi.Common.Versions (PlutusLedgerLanguage (PlutusV2, PlutusV3))
 import PlutusLedgerApi.Envelope qualified as Envelope
 import PlutusScripts.Basic.V_1_1 qualified as Basic
-import PlutusScripts.Batch6.V_1_1 qualified as Batch6_1_1
+import PlutusScripts.Batch6.DropList qualified as DropList
 import PlutusScripts.Bitwise.V_1_0 qualified as BitwiseV0
 import PlutusScripts.Bitwise.V_1_1 qualified as BitwiseV1
 import PlutusScripts.Hashing.V_1_1 qualified as Hashing
@@ -19,12 +25,28 @@ import System.Directory (createDirectoryIfMissing)
 --------------------------------------------------------------------------------
 -- Script Group Helpers --------------------------------------------------------
 
+-- | Write versioned script with automatic filename generation
+writeVersionedScript :: VersionedScript a -> IO ()
+writeVersionedScript (VersionedScript lang coreVer name code) = do
+  let versionSuffix = formatPlutusVersion lang <> "_" <> formatCoreVersion coreVer
+  let filename = T.unpack (name <> "_" <> versionSuffix)
+  writeEnvelope lang filename code
+
+-- | Write versioned script group with automatic base name generation
+writeVersionedScriptGroup :: VersionedScriptGroup a -> IO ()
+writeVersionedScriptGroup (VersionedScriptGroup lang coreVer baseName scriptGroup) = do
+  let versionSuffix = formatPlutusVersion lang <> "_" <> formatCoreVersion coreVer
+  let baseWithVersion = T.unpack (baseName <> "_" <> versionSuffix)
+  zipWithM_ (writeNumbered lang baseWithVersion) [1 :: Integer ..] (sgScripts scriptGroup)
+ where
+  writeNumbered l base n = writeEnvelope l (base ++ "_" ++ show n) 
+
 -- | Write a group of numbered scripts (e.g., script_1.plutus, script_2.plutus, ...)
 writeScriptGroup :: ScriptGroup DefaultUni DefaultFun a -> IO ()
 writeScriptGroup ScriptGroup{..} =
   zipWithM_ writeNumbered [1 :: Integer ..] sgScripts
  where
-  writeNumbered n code = writeEnvelopeV3 (sgBaseName ++ "_" ++ show n) code
+  writeNumbered n = writeEnvelopeV3 (sgBaseName ++ "_" ++ show n)
 
 --------------------------------------------------------------------------------
 -- Main ------------------------------------------------------------------------
@@ -88,12 +110,9 @@ main = withUtf8 do
   -- Failing Bitwise Tests (ReadBit, WriteBits, ReplicateByte variants)
   mapM_ writeScriptGroup BitwiseV1.failingBitwiseScriptGroupsV3
 
-  -- \** Batch 6 (protocol version 11) **
-  writeEnvelopeV3
-    "succeedingDropListPolicyScriptV3"
-    Batch6_1_1.succeedingDropListPolicyCompiledV3
-
-  writeScriptGroup Batch6_1_1.expensiveDropListScriptGroupV3
+  -- Batch6 (PV11) builtins
+  mapM_ writeVersionedScript DropList.allDropListScripts
+  mapM_ writeVersionedScriptGroup DropList.allDropListScriptGroups
 
 --------------------------------------------------------------------------------
 -- IO helpers ------------------------------------------------------------------
