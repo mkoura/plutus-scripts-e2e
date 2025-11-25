@@ -15,38 +15,13 @@ import PlutusLedgerApi.Common.Versions (PlutusLedgerLanguage (PlutusV2, PlutusV3
 import PlutusLedgerApi.Envelope qualified as Envelope
 import PlutusScripts.Basic.V_1_1 qualified as Basic
 import PlutusScripts.Batch6.DropList qualified as DropList
+import PlutusScripts.Batch6.Array qualified as Array
 import PlutusScripts.Bitwise.V_1_0 qualified as BitwiseV0
 import PlutusScripts.Bitwise.V_1_1 qualified as BitwiseV1
 import PlutusScripts.Hashing.V_1_1 qualified as Hashing
 import PlutusScripts.SECP256k1.V_1_1 qualified as SECP
 import PlutusTx.Code (CompiledCode)
 import System.Directory (createDirectoryIfMissing)
-
---------------------------------------------------------------------------------
--- Script Group Helpers --------------------------------------------------------
-
--- | Write versioned script with automatic filename generation
-writeVersionedScript :: VersionedScript a -> IO ()
-writeVersionedScript (VersionedScript lang coreVer name code) = do
-  let versionSuffix = formatPlutusVersion lang <> "_" <> formatCoreVersion coreVer
-  let filename = T.unpack (name <> "_" <> versionSuffix)
-  writeEnvelope lang filename code
-
--- | Write versioned script group with automatic base name generation
-writeVersionedScriptGroup :: VersionedScriptGroup a -> IO ()
-writeVersionedScriptGroup (VersionedScriptGroup lang coreVer baseName scriptGroup) = do
-  let versionSuffix = formatPlutusVersion lang <> "_" <> formatCoreVersion coreVer
-  let baseWithVersion = T.unpack (baseName <> "_" <> versionSuffix)
-  zipWithM_ (writeNumbered lang baseWithVersion) [1 :: Integer ..] (sgScripts scriptGroup)
- where
-  writeNumbered l base n = writeEnvelope l (base ++ "_" ++ show n) 
-
--- | Write a group of numbered scripts (e.g., script_1.plutus, script_2.plutus, ...)
-writeScriptGroup :: ScriptGroup DefaultUni DefaultFun a -> IO ()
-writeScriptGroup ScriptGroup{..} =
-  zipWithM_ writeNumbered [1 :: Integer ..] sgScripts
- where
-  writeNumbered n = writeEnvelopeV3 (sgBaseName ++ "_" ++ show n)
 
 --------------------------------------------------------------------------------
 -- Main ------------------------------------------------------------------------
@@ -111,8 +86,13 @@ main = withUtf8 do
   mapM_ writeScriptGroup BitwiseV1.failingBitwiseScriptGroupsV3
 
   -- Batch6 (PV11) builtins
+  -- `dropList`
   mapM_ writeVersionedScript DropList.allDropListScripts
   mapM_ writeVersionedScriptGroup DropList.allDropListScriptGroups
+
+  -- Array builtin scripts (18 scripts via VersionedScript list)
+  mapM_ writeVersionedScript Array.allArrayScripts
+
 
 --------------------------------------------------------------------------------
 -- IO helpers ------------------------------------------------------------------
@@ -126,6 +106,10 @@ writeEnvelope lang filename compiledCode = do
   createDirectoryIfMissing True dir
   Envelope.writeCodeEnvelopeForVersion lang description compiledCode filePath
 
+-- -- | Write PlutusV1 script
+-- writeEnvelopeV1 :: FilePath -> CompiledCode a -> IO ()
+-- writeEnvelopeV1 = writeEnvelope PlutusV1
+
 -- | Write PlutusV2 script
 writeEnvelopeV2 :: FilePath -> CompiledCode a -> IO ()
 writeEnvelopeV2 = writeEnvelope PlutusV2
@@ -133,3 +117,19 @@ writeEnvelopeV2 = writeEnvelope PlutusV2
 -- | Write PlutusV3 script
 writeEnvelopeV3 :: FilePath -> CompiledCode a -> IO ()
 writeEnvelopeV3 = writeEnvelope PlutusV3
+
+-- | Write versioned script with automatic filename generation
+writeVersionedScript :: VersionedScript a -> IO ()
+writeVersionedScript (VersionedScript lang coreVer name code) = do
+  let versionSuffix = formatPlutusVersion lang <> "_" <> formatCoreVersion coreVer
+  let filename = T.unpack (name <> "_" <> versionSuffix)
+  writeEnvelope lang filename code
+
+-- | Write a group of numbered scripts (e.g., script_1.plutus, script_2.plutus, ...)
+writeScriptGroup :: ScriptGroup DefaultUni DefaultFun a -> IO ()
+writeScriptGroup ScriptGroup{..} =
+  zipWithM_ writeNumbered [1 :: Integer ..] sgScripts
+ where
+  writeNumbered n = writeEnvelopeV3 (sgBaseName ++ "_" ++ show n)
+
+-- | Write versioned script group with automatic base name generation
