@@ -20,6 +20,7 @@ import PlutusScripts.Bitwise.V_1_0 qualified as BitwiseV0
 import PlutusScripts.Bitwise.V_1_1 qualified as BitwiseV1
 import PlutusScripts.Hashing.V_1_1 qualified as Hashing
 import PlutusScripts.SECP256k1.V_1_1 qualified as SECP
+import PlutusScripts.Casing.Casing qualified as Casing
 import PlutusTx.Code (CompiledCode)
 import System.Directory (createDirectoryIfMissing)
 
@@ -93,6 +94,9 @@ main = withUtf8 do
   -- Array builtin scripts (18 scripts via VersionedScript list)
   mapM_ writeVersionedScript Array.allArrayScripts
 
+  -- Builtin casing
+  mapM_ writeVersionedScript Casing.allCasingScripts
+
 
 --------------------------------------------------------------------------------
 -- IO helpers ------------------------------------------------------------------
@@ -139,4 +143,4 @@ writeVersionedScriptGroup (VersionedScriptGroup lang coreVer baseName scriptGrou
   let baseWithVersion = T.unpack (baseName <> "_" <> versionSuffix)
   zipWithM_ (writeNumbered lang baseWithVersion) [1 :: Integer ..] (sgScripts scriptGroup)
  where
-  writeNumbered l base n = writeEnvelope l (base ++ "_" ++ show n) 
+  writeNumbered l base n = writeEnvelope l (base ++ "_" ++ show n)
