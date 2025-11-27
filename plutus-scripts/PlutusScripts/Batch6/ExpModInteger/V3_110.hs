@@ -21,7 +21,7 @@ import PlutusScripts.Batch6.ExpModInteger.Common (
   succeedingSimpleExpModIntegerParams,
  )
 import PlutusTx (compile, liftCode, unsafeApplyCode)
-import PlutusTx.Code (CompiledCodeIn)
+import PlutusTx.Code (CompiledCode)
 import PlutusTx.Prelude qualified as P
 
 -- Compiled code values with parameters already applied for succeeding tests
