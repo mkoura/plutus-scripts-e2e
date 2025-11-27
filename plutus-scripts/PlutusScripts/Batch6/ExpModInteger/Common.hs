@@ -3,8 +3,8 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE ViewPatterns #-}
 
-{- | Simple end-to-end tests for the Plutus Core `dropList` builtin.  These are
-adapted from the `plutus-conformance` tests.
+{- | Simple end-to-end unit tests for the Plutus Core `expModInteger` builtin.
+These are adapted from the `plutus-conformance` tests.
 -}
 module PlutusScripts.Batch6.ExpModInteger.Common (
   mkSimpleExpModIntegerPolicy,
@@ -41,7 +41,9 @@ mkSimpleExpModIntegerPolicy l _ctx = go l
       then go rest
       else P.traceError "mkSimpleExpModIntegerPolicy"
 
--- Succeeding inputs for lists of UPLC integers; `dropList` can only fail for cost reasons.
+-- Checks that `expModInteger` gives the correct results in typical use.  Some
+-- of these are checking cases that were incorrectly handled by the GHC library
+-- function: see https://gitlab.haskell.org/ghc/ghc/-/issues/26017)
 succeedingSimpleExpModIntegerParams :: [SimpleParams]
 succeedingSimpleExpModIntegerParams =
   [ SimpleParams -- m = 1 -> return 0
@@ -269,7 +271,7 @@ mkExpModIntegerInversePolicy l _ctx = go l
       then go rest
       else P.traceError "mkExpModIntegerInversePolicy"
 
--- Result is always 1 here
+-- The result is always 1 here
 succeedingInverseParams :: [SimpleParams]
 succeedingInverseParams =
   [ SimpleParams -- m > 1, e = -1, gcd a m = 1 -> compute inverse
