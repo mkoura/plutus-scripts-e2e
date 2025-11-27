@@ -25,8 +25,7 @@ import PlutusTx.Code (CompiledCodeIn)
 import PlutusTx.Prelude qualified as P
 
 -- Compiled code values with parameters already applied for succeeding tests
-succeedingExpModIntegerPolicy
-  :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+succeedingExpModIntegerPolicy :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
 succeedingExpModIntegerPolicy =
   $$(compile [||mkSimpleExpModIntegerPolicy||])
     `unsafeApplyCode` liftCode plcVersion110 succeedingSimpleExpModIntegerParams
