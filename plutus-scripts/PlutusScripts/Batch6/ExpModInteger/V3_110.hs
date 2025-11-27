@@ -1,0 +1,56 @@
+{-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.1.0 #-}
+
+module PlutusScripts.Batch6.ExpModInteger.V3_110 (
+  failingExpModIntegerScriptGroup,
+  succeedingExpModIntegerPolicy,
+  succeedingExpModIntegerInversePolicy,
+  succeedingExponentOnePolicy,
+)
+where
+
+import Helpers.ScriptUtils (ScriptGroup (ScriptGroup, sgBaseName, sgScripts))
+import PlutusCore.Default (DefaultFun, DefaultUni)
+import PlutusCore.Version (plcVersion110)
+import PlutusScripts.Batch6.ExpModInteger.Common (
+  failingExpModIntegerParams,
+  mkExpModIntegerInversePolicy,
+  mkExponentOnePolicy,
+  mkSimpleExpModIntegerPolicy,
+  succeedingExponentOneParams,
+  succeedingInverseParams,
+  succeedingSimpleExpModIntegerParams,
+ )
+import PlutusTx (compile, liftCode, unsafeApplyCode)
+import PlutusTx.Code (CompiledCodeIn)
+import PlutusTx.Prelude qualified as P
+
+-- Compiled code values with parameters already applied for succeeding tests
+succeedingExpModIntegerPolicy
+  :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+succeedingExpModIntegerPolicy =
+  $$(compile [||mkSimpleExpModIntegerPolicy||])
+    `unsafeApplyCode` liftCode plcVersion110 succeedingSimpleExpModIntegerParams
+
+succeedingExpModIntegerInversePolicy
+  :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+succeedingExpModIntegerInversePolicy =
+  $$(compile [||mkExpModIntegerInversePolicy||])
+    `unsafeApplyCode` liftCode plcVersion110 succeedingInverseParams
+
+succeedingExponentOnePolicy
+  :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+succeedingExponentOnePolicy =
+  $$(compile [||mkExponentOnePolicy||])
+    `unsafeApplyCode` liftCode plcVersion110 succeedingExponentOneParams
+
+failingExpModIntegerScriptGroup
+  :: ScriptGroup DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+failingExpModIntegerScriptGroup =
+  ScriptGroup
+    { sgBaseName = "failingExpModIntegerPolicyScript_V3_110"
+    , sgScripts = map compileScript failingExpModIntegerParams
+    }
+ where
+  compileScript param =
+    $$(compile [||mkSimpleExpModIntegerPolicy||])
+      `unsafeApplyCode` liftCode plcVersion110 [param]
