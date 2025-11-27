@@ -35,8 +35,7 @@ succeedingExpModIntegerInversePolicy =
   $$(compile [||mkExpModIntegerInversePolicy||])
     `unsafeApplyCode` liftCode plcVersion100 succeedingInverseParams
 
-succeedingExponentOnePolicy
-  :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+succeedingExponentOnePolicy :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
 succeedingExponentOnePolicy =
   $$(compile [||mkExponentOnePolicy||])
     `unsafeApplyCode` liftCode plcVersion100 succeedingExponentOneParams
