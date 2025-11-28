@@ -54,7 +54,7 @@ import PlutusScripts.Bitwise.WriteBits (
   succeedingWriteBitsParams,
  )
 import PlutusTx (compile, liftCode, unsafeApplyCode)
-import PlutusTx.Code (CompiledCodeIn)
+import PlutusTx.Code (CompiledCode)
 import PlutusTx.Prelude qualified as P
 
 -- ByteString to Integer --
@@ -90,67 +90,67 @@ byteStringToIntegerRoundtripPolicyV3 =
 
 -- Compiled code values with parameters already applied for succeeding tests
 succeedingAndByteStringPolicyCompiledV3
-  :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+  :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
 succeedingAndByteStringPolicyCompiledV3 =
   $$(compile [||mkAndByteStringPolicy||])
     `unsafeApplyCode` liftCode plcVersion110 succeedingAndByteStringParams
 
 succeedingOrByteStringPolicyCompiledV3
-  :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+  :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
 succeedingOrByteStringPolicyCompiledV3 =
   $$(compile [||mkOrByteStringPolicy||])
     `unsafeApplyCode` liftCode plcVersion110 succeedingOrByteStringParams
 
 succeedingXorByteStringPolicyCompiledV3
-  :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+  :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
 succeedingXorByteStringPolicyCompiledV3 =
   $$(compile [||mkXorByteStringPolicy||])
     `unsafeApplyCode` liftCode plcVersion110 succeedingXorByteStringParams
 
 succeedingComplementByteStringPolicyCompiledV3
-  :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+  :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
 succeedingComplementByteStringPolicyCompiledV3 =
   $$(compile [||mkComplementByteStringPolicy||])
     `unsafeApplyCode` liftCode plcVersion110 succeedingComplementByteStringParams
 
 succeedingShiftByteStringPolicyCompiledV3
-  :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+  :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
 succeedingShiftByteStringPolicyCompiledV3 =
   $$(compile [||mkShiftByteStringPolicy||])
     `unsafeApplyCode` liftCode plcVersion110 succeedingShiftByteStringParams
 
 succeedingRotateByteStringPolicyCompiledV3
-  :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+  :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
 succeedingRotateByteStringPolicyCompiledV3 =
   $$(compile [||mkRotateByteStringPolicy||])
     `unsafeApplyCode` liftCode plcVersion110 succeedingRotateByteStringParams
 
 succeedingCountSetBitsPolicyCompiledV3
-  :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+  :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
 succeedingCountSetBitsPolicyCompiledV3 =
   $$(compile [||mkCountSetBitsPolicy||])
     `unsafeApplyCode` liftCode plcVersion110 succeedingCountSetBitsParams
 
 succeedingFindFirstSetBitPolicyCompiledV3
-  :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+  :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
 succeedingFindFirstSetBitPolicyCompiledV3 =
   $$(compile [||mkFindFirstSetBitPolicy||])
     `unsafeApplyCode` liftCode plcVersion110 succeedingFindFirstSetBitParams
 
 succeedingReadBitPolicyCompiledV3
-  :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+  :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
 succeedingReadBitPolicyCompiledV3 =
   $$(compile [||mkReadBitPolicy||])
     `unsafeApplyCode` liftCode plcVersion110 succeedingReadBitParams
 
 succeedingWriteBitsPolicyCompiledV3
-  :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+  :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
 succeedingWriteBitsPolicyCompiledV3 =
   $$(compile [||mkWriteBitsPolicy||])
     `unsafeApplyCode` liftCode plcVersion110 succeedingWriteBitsParams
 
 succeedingReplicateBytePolicyCompiledV3
-  :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+  :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
 succeedingReplicateBytePolicyCompiledV3 =
   $$(compile [||mkReplicateBytePolicy||])
     `unsafeApplyCode` liftCode plcVersion110 succeedingReplicateByteParams

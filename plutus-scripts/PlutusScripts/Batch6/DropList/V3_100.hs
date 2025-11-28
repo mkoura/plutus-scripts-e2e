@@ -7,12 +7,12 @@ import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusCore.Version (plcVersion100)
 import PlutusScripts.Batch6.DropList.Common qualified as DropList
 import PlutusTx (compile, liftCode, unsafeApplyCode)
-import PlutusTx.Code (CompiledCodeIn)
+import PlutusTx.Code (CompiledCode)
 import PlutusTx.Prelude qualified as P
 
 -- Compiled code values with parameters already applied for succeeding tests
 succeedingDropListPolicy
-  :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+  :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
 succeedingDropListPolicy =
   $$(compile [||DropList.mkDropListPolicy||])
     `unsafeApplyCode` liftCode plcVersion100 DropList.succeedingDropListParams
