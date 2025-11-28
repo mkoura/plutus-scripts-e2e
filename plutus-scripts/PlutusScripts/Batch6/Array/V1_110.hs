@@ -15,15 +15,12 @@ succeedingIndexArrayPolicy
 succeedingIndexArrayPolicy =
   $$(PlutusTx.compile [||mkIndexArrayPolicy||])
 
-
 succeedingLengthOfArrayPolicy
   :: PlutusTx.CompiledCode (PlutusTx.BuiltinData -> P.BuiltinUnit)
 succeedingLengthOfArrayPolicy =
   $$(PlutusTx.compile [||mkLengthOfArrayPolicy||])
 
-
 succeedingListToArrayPolicy
   :: PlutusTx.CompiledCode (PlutusTx.BuiltinData -> P.BuiltinUnit)
 succeedingListToArrayPolicy =
   $$(PlutusTx.compile [||mkListToArrayPolicy||])
-

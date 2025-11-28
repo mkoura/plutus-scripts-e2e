@@ -37,7 +37,7 @@ mkDropListPolicy l _ctx = go l
   go (Params{..} : rest) =
     if BI.drop count (P.toOpaque input) `eqIntList` (P.toOpaque output)
       then go rest
-      else P.traceError "mkCountSetBitsPolicy"
+      else P.traceError "mkDropListPolicy"
 
 -- Succeeding inputs for lists of UPLC integers; `dropList` can only fail for cost reasons.
 succeedingDropListParams :: [Params]
