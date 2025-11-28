@@ -68,10 +68,10 @@ library scripts
   build-depends:
     , base               >=4.14      && <5
     , bytestring
-    , plutus-core        ^>=1.53.1.0
-    , plutus-ledger-api  ^>=1.53.1.0
-    , plutus-tx          ^>=1.53.1.0
-    , plutus-tx-plugin   ^>=1.53.1.0
+    , plutus-core        ^>=1.55.0.0
+    , plutus-ledger-api  ^>=1.55.0.0
+    , plutus-tx          ^>=1.55.0.0
+    , plutus-tx-plugin   ^>=1.55.0.0
     , text
 
   exposed-modules:
@@ -144,9 +144,9 @@ executable envelopes
   build-depends:
     , base               >=4.14      && <5
     , directory
-    , plutus-core        ^>=1.53.1.0
-    , plutus-ledger-api  ^>=1.53.1.0
-    , plutus-tx          ^>=1.53.1.0
+    , plutus-core        ^>=1.55.0.0
+    , plutus-ledger-api  ^>=1.55.0.0
+    , plutus-tx          ^>=1.55.0.0
     , scripts
     , text
     , with-utf8
