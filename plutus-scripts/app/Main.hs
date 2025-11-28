@@ -14,8 +14,9 @@ import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusLedgerApi.Common.Versions (PlutusLedgerLanguage (PlutusV2, PlutusV3))
 import PlutusLedgerApi.Envelope qualified as Envelope
 import PlutusScripts.Basic.V_1_1 qualified as Basic
-import PlutusScripts.Batch6.DropList qualified as DropList
 import PlutusScripts.Batch6.Array qualified as Array
+import PlutusScripts.Batch6.DropList qualified as DropList
+import PlutusScripts.Batch6.ExpModInteger qualified as ExpModInteger
 import PlutusScripts.Bitwise.V_1_0 qualified as BitwiseV0
 import PlutusScripts.Bitwise.V_1_1 qualified as BitwiseV1
 import PlutusScripts.Hashing.V_1_1 qualified as Hashing
@@ -97,6 +98,9 @@ main = withUtf8 do
   -- Builtin casing
   mapM_ writeVersionedScript Casing.allCasingScripts
 
+  -- `expModInteger`
+  mapM_ writeVersionedScript ExpModInteger.allExpModIntegerScripts
+  mapM_ writeVersionedScriptGroup ExpModInteger.allExpModIntegerScriptGroups
 
 --------------------------------------------------------------------------------
 -- IO helpers ------------------------------------------------------------------

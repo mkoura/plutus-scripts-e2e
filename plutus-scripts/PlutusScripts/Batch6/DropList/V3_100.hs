@@ -10,11 +10,6 @@ import PlutusTx (compile, liftCode, unsafeApplyCode)
 import PlutusTx.Code (CompiledCodeIn)
 import PlutusTx.Prelude qualified as P
 
--- Tests for `dropList` with PlutusV2 and Plutus 1.0.0
-
--- FIXME: these are currently unused until we work out how to deal with the fact
--- that SoPs and all builtins will be enabled in PlutusV1 and PlutusV2 at PV11.
-
 -- Compiled code values with parameters already applied for succeeding tests
 succeedingDropListPolicy
   :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
@@ -26,10 +21,10 @@ succeedingDropListPolicy =
 expensiveDropListScriptGroup :: ScriptGroup DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
 expensiveDropListScriptGroup =
   ScriptGroup
-    { sgBaseName = "expensiveDropListPolicyScript_V2_100"
-    , sgScripts = map compileDropList DropList.expensiveDropListParams
+    { sgBaseName = "expensiveDropListPolicyScript_V3_100"
+    , sgScripts = map compileScript DropList.expensiveDropListParams
     }
  where
-  compileDropList param =
+  compileScript param =
     $$(compile [||DropList.mkDropListPolicy||])
       `unsafeApplyCode` liftCode plcVersion100 [param]

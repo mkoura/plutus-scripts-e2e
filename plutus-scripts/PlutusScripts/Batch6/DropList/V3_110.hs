@@ -11,7 +11,7 @@ import PlutusTx.Code (CompiledCodeIn)
 import PlutusTx.Prelude qualified as P
 
 -- Compiled code values with parameters already applied for succeeding tests
-succeedingDropListPolicy :: CompiledCodeIn DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
+succeedingDropListPolicy :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
 succeedingDropListPolicy =
   $$(compile [||DropList.mkDropListPolicy||])
     `unsafeApplyCode` liftCode plcVersion110 DropList.succeedingDropListParams
@@ -21,9 +21,9 @@ expensiveDropListScriptGroup :: ScriptGroup DefaultUni DefaultFun (P.BuiltinData
 expensiveDropListScriptGroup =
   ScriptGroup
     { sgBaseName = "expensiveDropListPolicyScript_V3_110"
-    , sgScripts = map compileDropList DropList.expensiveDropListParams
+    , sgScripts = map compileScript DropList.expensiveDropListParams
     }
  where
-  compileDropList param =
+  compileScript param =
     $$(compile [||DropList.mkDropListPolicy||])
       `unsafeApplyCode` liftCode plcVersion110 [param]
