@@ -1,30 +1,28 @@
 {-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.1.0 #-}
+-- Compiled code values with parameters already applied for succeeding tests
+{-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.1.0 #-}
 
-module PlutusScripts.Batch6.DropList.V3_110 where
+module PlutusScripts.Batch6.BLS12_381_MultiScalarMul.G2.V3_110 where
 
-import Helpers.ScriptUtils (ScriptGroup (ScriptGroup, sgBaseName, sgScripts))
-import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusCore.Version (plcVersion110)
-import PlutusScripts.Batch6.DropList.Common qualified as DropList
+import PlutusScripts.Batch6.BLS12_381_MultiScalarMul.G2.Common (
+  mkSucceedingMultiScalarMulPolicy1,
+  mkSucceedingMultiScalarMulPolicy2,
+  succeedingMultiScalarMulParams1,
+  succeedingMultiScalarMulParams2,
+ )
 import PlutusTx (compile, liftCode, unsafeApplyCode)
 import PlutusTx.Code (CompiledCode)
 import PlutusTx.Prelude qualified as P
 
--- Compiled code values with parameters already applied for succeeding tests
-succeedingDropListPolicy
+succeedingMultiScalarMulPolicyScript1
   :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
-succeedingDropListPolicy =
-  $$(compile [||DropList.mkDropListPolicy||])
-    `unsafeApplyCode` liftCode plcVersion110 DropList.succeedingDropListParams
+succeedingMultiScalarMulPolicyScript1 =
+  $$(compile [||mkSucceedingMultiScalarMulPolicy1||])
+    `unsafeApplyCode` liftCode plcVersion110 succeedingMultiScalarMulParams1
 
--- These should fail due to exceeding the budget.
-expensiveDropListScriptGroup :: ScriptGroup DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
-expensiveDropListScriptGroup =
-  ScriptGroup
-    { sgBaseName = "expensiveDropListPolicyScript_V3_110"
-    , sgScripts = map compileScript DropList.expensiveDropListParams
-    }
- where
-  compileScript param =
-    $$(compile [||DropList.mkDropListPolicy||])
-      `unsafeApplyCode` liftCode plcVersion110 [param]
+succeedingMultiScalarMulPolicyScript2
+  :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
+succeedingMultiScalarMulPolicyScript2 =
+  $$(compile [||mkSucceedingMultiScalarMulPolicy2||])
+    `unsafeApplyCode` liftCode plcVersion110 succeedingMultiScalarMulParams2
