@@ -20,6 +20,11 @@ import PlutusTx.Builtins qualified as BI
 import PlutusTx.Builtins.Internal qualified as BI (unitval)
 import PlutusTx.Prelude qualified as P
 
+zero :: BI.BuiltinByteString
+zero =
+  hxs
+    "c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+
 -- Tests which perform one multi-scalar multiplication and check that the result
 -- is equal to an expected result.
 data Params1 = Params1
@@ -40,11 +45,6 @@ mkSucceedingMultiScalarMulPolicy1 l _ctx = go l
       `BI.bls12_381_G1_equals` (BI.bls12_381_G1_uncompress output)
       then go rest
       else P.traceError "mkSucceedingMultiScalarMulPolicy"
-
-zero :: BI.BuiltinByteString
-zero =
-  hxs
-    "c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
 
 succeedingMultiScalarMulParams1 :: [Params1]
 succeedingMultiScalarMulParams1 =

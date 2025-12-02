@@ -21,6 +21,17 @@ import PlutusTx.Builtins qualified as BI
 import PlutusTx.Builtins.Internal qualified as BI (unitval)
 import PlutusTx.Prelude qualified as P
 
+-- Infix operator to allow us to split large literal bytestrings over multiple lines
+infixr 9 +++
+(+++) :: BS.ByteString -> BS.ByteString -> BS.ByteString
+(+++) = BS.append
+
+zero :: BI.BuiltinByteString
+zero =
+  hxs $
+    "c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+      +++ "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+
 -- Tests which perform one multi-scalar multiplication and check that the result
 -- is equal to an expected result.
 data Params1 = Params1
@@ -41,17 +52,6 @@ mkSucceedingMultiScalarMulPolicy1 l _ctx = go l
       `BI.bls12_381_G2_equals` (BI.bls12_381_G2_uncompress output)
       then go rest
       else P.traceError "mkSucceedingMultiScalarMulPolicy"
-
--- Infix operator to allow us to split large literal bytestrings over multiple lines
-infixr 9 +++
-(+++) :: BS.ByteString -> BS.ByteString -> BS.ByteString
-(+++) = BS.append
-
-zero :: BI.BuiltinByteString
-zero =
-  hxs $
-    "c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-      +++ "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
 
 succeedingMultiScalarMulParams1 :: [Params1]
 succeedingMultiScalarMulParams1 =
