@@ -42,7 +42,7 @@ mkSucceedingMultiScalarMulPolicy1 l _ctx = go l
       then go rest
       else P.traceError "mkSucceedingMultiScalarMulPolicy"
 
--- Infix operator to allow us to split large literal bytestrings over multipl lines
+-- Infix operator to allow us to split large literal bytestrings over multiple lines
 infixr 9 +++
 (+++) :: BS.ByteString -> BS.ByteString -> BS.ByteString
 (+++) = BS.append
