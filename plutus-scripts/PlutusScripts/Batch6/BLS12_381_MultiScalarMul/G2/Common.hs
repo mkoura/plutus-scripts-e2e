@@ -3,8 +3,9 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 {- | Simple end-to-end tests for the Plutus Core `BLS12_381_G2_MultiScalarMul`
-builtin.  Some of these are adapted from `plutus-conformance` tests (see numbers
-in parentheses).
+builtin.  Some of these are adapted from `plutus-conformance` tests: see the
+numbers in parentheses.  There are no inputs which would cause
+`BLS12_381_G2_MultiScalarMul` to fail, so we only provide succeeding tests.
 -}
 module PlutusScripts.Batch6.BLS12_381_MultiScalarMul.G2.Common (
   mkSucceedingMultiScalarMulPolicy1,
