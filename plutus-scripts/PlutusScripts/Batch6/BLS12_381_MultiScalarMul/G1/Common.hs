@@ -233,7 +233,7 @@ mkSucceedingMultiScalarMulPolicy2 l _ctx = go l
     if BI.bls12_381_G1_multiScalarMul scalars1 (fmap BI.bls12_381_G1_uncompress points1)
       `BI.bls12_381_G1_equals` BI.bls12_381_G1_multiScalarMul scalars2 (fmap BI.bls12_381_G1_uncompress points2)
       then go rest
-      else P.traceError "mkSucceedingMultiScalarMulPolicy"
+      else P.traceError "mkSucceedingMultiScalarMulPolicy2"
 
 succeedingMultiScalarMulParams2 :: [Params2]
 succeedingMultiScalarMulParams2 =
