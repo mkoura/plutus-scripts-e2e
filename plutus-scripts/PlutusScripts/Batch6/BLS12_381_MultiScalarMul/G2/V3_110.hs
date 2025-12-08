@@ -1,6 +1,4 @@
 {-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.1.0 #-}
--- Compiled code values with parameters already applied for succeeding tests
-{-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.1.0 #-}
 
 module PlutusScripts.Batch6.BLS12_381_MultiScalarMul.G2.V3_110 where
 
