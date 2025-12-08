@@ -88,6 +88,13 @@ library scripts
     PlutusScripts.Batch6.Array.V2_110
     PlutusScripts.Batch6.Array.V3_100
     PlutusScripts.Batch6.Array.V3_110
+    PlutusScripts.Batch6.BLS12_381_MultiScalarMul
+    PlutusScripts.Batch6.BLS12_381_MultiScalarMul.G1.Common
+    PlutusScripts.Batch6.BLS12_381_MultiScalarMul.G1.V3_100
+    PlutusScripts.Batch6.BLS12_381_MultiScalarMul.G1.V3_110
+    PlutusScripts.Batch6.BLS12_381_MultiScalarMul.G2.Common
+    PlutusScripts.Batch6.BLS12_381_MultiScalarMul.G2.V3_100
+    PlutusScripts.Batch6.BLS12_381_MultiScalarMul.G2.V3_110
     PlutusScripts.Batch6.DropList
     PlutusScripts.Batch6.DropList.Common
     PlutusScripts.Batch6.DropList.V3_100
