@@ -73,6 +73,7 @@ library scripts
     , plutus-tx          ^>=1.55.0.0
     , plutus-tx-plugin   ^>=1.55.0.0
     , text
+    , containers
 
   exposed-modules:
     Helpers.Envelopes
@@ -143,6 +144,8 @@ library scripts
     PlutusScripts.SECP256k1.Common
     PlutusScripts.SECP256k1.V_1_0
     PlutusScripts.SECP256k1.V_1_1
+    PlutusScripts.Casing.Common
+    PlutusScripts.Casing.Casing
 
 executable envelopes
   import:         ghc-options
