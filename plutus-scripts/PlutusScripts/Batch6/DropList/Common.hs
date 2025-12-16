@@ -58,7 +58,7 @@ succeedingDropListParams =
       , output = []
       }
   , Params -- Dropping a negative number of elements succeeds and returns the list unchanged.
-      { count = 07
+      { count = -7
       , input = [11, 22, 33, 44, 55, 66, 77, 88, 99]
       , output = [11, 22, 33, 44, 55, 66, 77, 88, 99]
       }
