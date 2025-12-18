@@ -10,9 +10,9 @@ module PlutusScripts.Batch6.ExpModInteger.Common (
   mkSimpleExpModIntegerPolicy,
   succeedingSimpleExpModIntegerParams,
   mkExpModIntegerInversePolicy,
-  succeedingInverseParams,
-  mkExponentOnePolicy,
-  succeedingExponentOneParams,
+  succeedingExpModIntegerInverseParams,
+  mkExpModIntegerExponentOnePolicy,
+  succeedingExpModIntegerExponentOneParams,
   failingExpModIntegerParams,
 )
 where
@@ -272,8 +272,8 @@ mkExpModIntegerInversePolicy l _ctx = go l
       else P.traceError "mkExpModIntegerInversePolicy"
 
 -- The result is always 1 here
-succeedingInverseParams :: [SimpleParams]
-succeedingInverseParams =
+succeedingExpModIntegerInverseParams :: [SimpleParams]
+succeedingExpModIntegerInverseParams =
   [ SimpleParams -- m > 1, e = -1, gcd a m = 1 -> compute inverse
       18
       (-1)
@@ -329,18 +329,18 @@ PlutusTx.unstableMakeIsData ''ExponentOneParams
 PlutusTx.makeLift ''ExponentOneParams
 
 -- m > 1, e = 1 -> return b modulo m
-{-# INLINEABLE mkExponentOnePolicy #-}
-mkExponentOnePolicy :: [ExponentOneParams] -> P.BuiltinData -> P.BuiltinUnit
-mkExponentOnePolicy l _ctx = go l
+{-# INLINEABLE mkExpModIntegerExponentOnePolicy #-}
+mkExpModIntegerExponentOnePolicy :: [ExponentOneParams] -> P.BuiltinData -> P.BuiltinUnit
+mkExpModIntegerExponentOnePolicy l _ctx = go l
  where
   go [] = BI.unitval
   go (ExponentOneParams{..} : rest) =
     if BI.expModInteger a1 1 m1 == BI.modInteger a1 m1
       then go rest
-      else P.traceError "mkExponentOnePolicy"
+      else P.traceError "mkExpModIntegerExponentOnePolicy"
 
-succeedingExponentOneParams :: [ExponentOneParams]
-succeedingExponentOneParams =
+succeedingExpModIntegerExponentOneParams :: [ExponentOneParams]
+succeedingExpModIntegerExponentOneParams =
   [ ExponentOneParams 117 1000
   , ExponentOneParams 4123213117 1000
   , ExponentOneParams (-883) 1000

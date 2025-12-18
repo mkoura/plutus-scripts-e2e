@@ -4,7 +4,7 @@ module PlutusScripts.Batch6.ExpModInteger.V3_100 (
   failingExpModIntegerScriptGroup,
   succeedingExpModIntegerPolicy,
   succeedingExpModIntegerInversePolicy,
-  succeedingExponentOnePolicy,
+  succeedingExpModIntegerExponentOnePolicy,
 )
 where
 
@@ -13,11 +13,11 @@ import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusCore.Version (plcVersion100)
 import PlutusScripts.Batch6.ExpModInteger.Common (
   failingExpModIntegerParams,
+  mkExpModIntegerExponentOnePolicy,
   mkExpModIntegerInversePolicy,
-  mkExponentOnePolicy,
   mkSimpleExpModIntegerPolicy,
-  succeedingExponentOneParams,
-  succeedingInverseParams,
+  succeedingExpModIntegerExponentOneParams,
+  succeedingExpModIntegerInverseParams,
   succeedingSimpleExpModIntegerParams,
  )
 import PlutusTx (compile, liftCode, unsafeApplyCode)
@@ -33,12 +33,12 @@ succeedingExpModIntegerPolicy =
 succeedingExpModIntegerInversePolicy :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
 succeedingExpModIntegerInversePolicy =
   $$(compile [||mkExpModIntegerInversePolicy||])
-    `unsafeApplyCode` liftCode plcVersion100 succeedingInverseParams
+    `unsafeApplyCode` liftCode plcVersion100 succeedingExpModIntegerInverseParams
 
-succeedingExponentOnePolicy :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
-succeedingExponentOnePolicy =
-  $$(compile [||mkExponentOnePolicy||])
-    `unsafeApplyCode` liftCode plcVersion100 succeedingExponentOneParams
+succeedingExpModIntegerExponentOnePolicy :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
+succeedingExpModIntegerExponentOnePolicy =
+  $$(compile [||mkExpModIntegerExponentOnePolicy||])
+    `unsafeApplyCode` liftCode plcVersion100 succeedingExpModIntegerExponentOneParams
 
 failingExpModIntegerScriptGroup
   :: ScriptGroup DefaultUni DefaultFun (P.BuiltinData -> P.BuiltinUnit)
