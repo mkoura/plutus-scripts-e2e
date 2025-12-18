@@ -28,8 +28,8 @@ allExpModIntegerScripts =
   , VersionedScript
       PlutusV3
       plc110
-      "succeedingExponentOnePolicyScript"
-      V3_110.succeedingExponentOnePolicy
+      "succeedingExpModIntegerExponentOnePolicyScript"
+      V3_110.succeedingExpModIntegerExponentOnePolicy
   ]
 
 allExpModIntegerScriptGroups :: [VersionedScriptGroup (P.BuiltinData -> P.BuiltinUnit)]
