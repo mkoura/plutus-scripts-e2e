@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.1.0 #-}
+{-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:no-simplifier-evaluate-builtins #-}
 
 module PlutusScripts.Batch6.Value.V3_110 where
 
