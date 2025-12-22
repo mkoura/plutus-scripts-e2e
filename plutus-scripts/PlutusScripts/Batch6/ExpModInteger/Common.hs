@@ -37,7 +37,7 @@ mkSimpleExpModIntegerPolicy l _ctx = go l
  where
   go [] = BI.unitval
   go (SimpleParams{..} : rest) =
-    if BI.expModInteger a e m == result
+    if BI.expModInteger a e m P.== result
       then go rest
       else P.traceError "mkSimpleExpModIntegerPolicy"
 
@@ -267,7 +267,7 @@ mkExpModIntegerInversePolicy l _ctx = go l
  where
   go [] = BI.unitval
   go (SimpleParams{..} : rest) =
-    if BI.modInteger (BI.multiplyInteger (BI.expModInteger a e m) (BI.expModInteger a (-e) m)) m == result
+    if BI.modInteger (BI.multiplyInteger (BI.expModInteger a e m) (BI.expModInteger a (-e) m)) m P.== result
       then go rest
       else P.traceError "mkExpModIntegerInversePolicy"
 
@@ -335,7 +335,7 @@ mkExpModIntegerExponentOnePolicy l _ctx = go l
  where
   go [] = BI.unitval
   go (ExponentOneParams{..} : rest) =
-    if BI.expModInteger a1 1 m1 == BI.modInteger a1 m1
+    if BI.expModInteger a1 1 m1 P.== BI.modInteger a1 m1
       then go rest
       else P.traceError "mkExpModIntegerExponentOnePolicy"
 
