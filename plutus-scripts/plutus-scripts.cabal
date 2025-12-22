@@ -44,13 +44,16 @@ common ghc-options
     NamedFieldPuns
     NumericUnderscores
     OverloadedStrings
+    PatternSynonyms
     RecordWildCards
     ScopedTypeVariables
     StandaloneDeriving
+    Strict
     TemplateHaskell
     TypeApplications
     TypeFamilies
     ViewPatterns
+    UndecidableInstances
 
 -- These options are required for Plinth builds
 common plinth-options
@@ -60,6 +63,7 @@ common plinth-options
     -fno-omit-interface-pragmas -fno-spec-constr -fno-specialise
     -fno-strictness -fno-unbox-small-strict-fields
     -fno-unbox-strict-fields
+    -fplugin-opts: PlutusTx.Plugin:no-simplifier-evaluate-builtins -- Prevent constant folding of builtins
 
 library scripts
   import:          plinth-options
