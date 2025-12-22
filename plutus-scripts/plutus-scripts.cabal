@@ -56,6 +56,7 @@ common ghc-options
     UndecidableInstances
 
 -- These options are required for Plinth builds
+-- no-simplifier-evaluate-builtins is needed to prevent constant folding of builtins
 common plinth-options
   import:      ghc-options
   ghc-options:
@@ -63,7 +64,8 @@ common plinth-options
     -fno-omit-interface-pragmas -fno-spec-constr -fno-specialise
     -fno-strictness -fno-unbox-small-strict-fields
     -fno-unbox-strict-fields
-    -fplugin-opts: PlutusTx.Plugin:no-simplifier-evaluate-builtins -- Prevent constant folding of builtins
+    -fplugin-opts: PlutusTx.Plugin:no-simplifier-evaluate-builtins
+  
 
 library scripts
   import:          plinth-options
