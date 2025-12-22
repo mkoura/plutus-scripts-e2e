@@ -1,10 +1,40 @@
 -- editorconfig-checker-disable-file
+{-# OPTIONS_GHC -fno-warn-unused-binds #-}
 
 module PlutusScripts.Batch6.Value.Common (
+  mkLookupMissingCoinPolicy,
   mkInsertNewCoinPolicy,
   mkInsertExistingCoinPolicy,
   mkDeleteExistingCoinPolicy,
   mkDeleteMissingCoinPolicy,
+  mkInsertInvalidCurrencySymbolPolicy,
+  mkInsertInvalidTokenNamePolicy,
+  mkInsertOverflowQuantityPolicy,
+  mkInsertUnderflowQuantityPolicy,
+  mkValueContainsEmptyPolicy,
+  mkValueContainsLeftNegativePolicy,
+  mkValueContainsRightNegativePolicy,
+  mkValueContainsReflexivePolicy,
+  mkValueContainsDisjointPolicy,
+  mkValueContainsRightExtraKeyPolicy,
+  mkValueContainsRightHigherAmountPolicy,
+  mkValueContainsIsSubValuePolicy,
+  mkValueContainsIsSubValueSmallerAmountPolicy,
+  mkUnionValueEmptyIdentityPolicy,
+  mkUnionValueAssociativePolicy,
+  mkUnionValueAssociativeSingleCoinPolicy,
+  mkUnionValueCommutativePolicy,
+  mkUnionValueCommutativeSingleCoinPolicy,
+  mkUnionValueInversablePolicy,
+  mkUnionValueOverflowPolicy,
+  mkUnionValueUnderflowPolicy,
+  mkScaleValueZeroPolicy,
+  mkScaleValuePositivePolicy,
+  mkScaleValueNegativePolicy,
+  mkScaleValueOverflowPolicy,
+  mkScaleValueUnderflowPolicy,
+  mkValueDataRoundTripPolicy,
+  mkUnValueDataInvalidDataPolicy,
 )
 where
 
@@ -12,16 +42,6 @@ import PlutusTx.Builtins qualified as B
 import PlutusTx.Builtins.Internal qualified as BI
 import PlutusTx.Builtins.HasOpaque qualified as HO
 import PlutusTx.Prelude qualified as P
-
--- A key larger than 32-bit, which is not allowed
--- (program 1.0.0
---   [ (builtin insertCoin)
---     (con bytestring #aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa)
---     (con bytestring #)
---     (con integer 1)
---     (con value [])
---   ]
--- )
 
 -------------------------------------------------------------
 -- LookupCoin tests
@@ -108,6 +128,42 @@ mkDeleteMissingCoinPolicy _ctx =
           else P.traceError "mkDeleteMissingCoinPolicy"
 {-# INLINEABLE mkDeleteMissingCoinPolicy #-}
 
+mkInsertInvalidCurrencySymbolPolicy :: P.BuiltinData -> P.BuiltinUnit
+mkInsertInvalidCurrencySymbolPolicy _ctx =
+  let invalidCurrSymbol = "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff" :: B.BuiltinByteString
+      tokenName = P.encodeUtf8 "bar"
+      amount = 100 :: Integer
+      val = BI.insertCoin invalidCurrSymbol tokenName amount emptyValue -- Plinth is strict, should cause evaluation failure
+   in BI.unitval
+{-# INLINEABLE mkInsertInvalidCurrencySymbolPolicy #-}
+
+mkInsertInvalidTokenNamePolicy :: P.BuiltinData -> P.BuiltinUnit
+mkInsertInvalidTokenNamePolicy _ctx =
+  let currSymbol = P.encodeUtf8 "foo"
+      invalidTokenName = "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff" :: B.BuiltinByteString
+      amount = 100 :: Integer
+      val = BI.insertCoin currSymbol invalidTokenName amount emptyValue -- Plinth is strict, should cause evaluation failure
+   in BI.unitval
+{-# INLINEABLE mkInsertInvalidTokenNamePolicy #-}
+
+mkInsertOverflowQuantityPolicy :: P.BuiltinData -> P.BuiltinUnit
+mkInsertOverflowQuantityPolicy _ctx =
+  let currSymbol = P.encodeUtf8 "foo"
+      tokenName = P.encodeUtf8 "bar"
+      invalidAmount = 99999999999999999999999999999999999999999999999999 :: Integer 
+      val = BI.insertCoin currSymbol tokenName invalidAmount emptyValue -- Plinth is strict, should cause evaluation failure
+   in BI.unitval
+{-# INLINEABLE mkInsertOverflowQuantityPolicy #-}
+
+mkInsertUnderflowQuantityPolicy :: P.BuiltinData -> P.BuiltinUnit
+mkInsertUnderflowQuantityPolicy _ctx =
+  let currSymbol = P.encodeUtf8 "foo"
+      tokenName = P.encodeUtf8 "bar"
+      invalidAmount = -99999999999999999999999999999999999999999999999999 :: Integer
+      val = BI.insertCoin currSymbol tokenName invalidAmount emptyValue -- Plinth is strict, should cause evaluation failure
+   in BI.unitval
+{-# INLINEABLE mkInsertUnderflowQuantityPolicy #-}
+
 -------------------------------------------------------------
 -- ValueContains tests
 -------------------------------------------------------------
@@ -138,9 +194,8 @@ mkValueContainsLeftNegativePolicy _ctx =
       amount2 = 50 :: Integer
       leftVal = BI.insertCoin currSymbol1 tokenName1 amount1 emptyValue
       rightVal = BI.insertCoin currSymbol2 tokenName2 amount2 emptyValue
-   in if BI.valueContains leftVal rightVal -- should cause evaluation failure
-        then BI.unitval
-        else P.traceError "mkValueContainsLeftNegativePolicy"
+      result = BI.valueContains leftVal rightVal -- Plinth is strict, should cause evaluation failure
+   in BI.unitval 
 {-# INLINEABLE mkValueContainsLeftNegativePolicy #-}
 
 mkValueContainsRightNegativePolicy :: P.BuiltinData -> P.BuiltinUnit
@@ -153,9 +208,8 @@ mkValueContainsRightNegativePolicy _ctx =
       amount2 = -50 :: Integer
       leftVal = BI.insertCoin currSymbol1 tokenName1 amount1 emptyValue
       rightVal = BI.insertCoin currSymbol2 tokenName2 amount2 emptyValue
-   in if BI.valueContains leftVal rightVal -- should cause evaluation failure
-        then BI.unitval
-        else P.traceError "mkValueContainsRightNegativePolicy"
+      result = BI.valueContains leftVal rightVal -- Plinth is strict, should cause evaluation failure
+   in BI.unitval 
 {-# INLINEABLE mkValueContainsRightNegativePolicy #-}
 
 mkValueContainsReflexivePolicy :: P.BuiltinData -> P.BuiltinUnit
@@ -319,9 +373,104 @@ mkUnionValueInversablePolicy _ctx =
         else P.traceError "mkUnionValueInversablePolicy"
 {-# INLINEABLE mkUnionValueInversablePolicy #-}
 
+mkUnionValueOverflowPolicy :: P.BuiltinData -> P.BuiltinUnit
+mkUnionValueOverflowPolicy _ctx =
+  let currSymbol = P.encodeUtf8 "foo"
+      tokenName = P.encodeUtf8 "bar"
+      val1 = BI.insertCoin currSymbol tokenName (2 ^ (127 :: Integer) - 1) emptyValue
+      val2 = BI.insertCoin currSymbol tokenName 1 emptyValue
+      unioned = BI.unionValue val1 val2 -- Plinth is strict, should cause evaluation failure
+   in BI.unitval
+{-# INLINEABLE mkUnionValueOverflowPolicy #-}
+
+mkUnionValueUnderflowPolicy :: P.BuiltinData -> P.BuiltinUnit
+mkUnionValueUnderflowPolicy _ctx =
+  let currSymbol = P.encodeUtf8 "foo"
+      tokenName = P.encodeUtf8 "bar"
+      val1 = BI.insertCoin currSymbol tokenName (-(2 ^ (127 :: Integer))) emptyValue
+      val2 = BI.insertCoin currSymbol tokenName (-1) emptyValue
+      unioned = BI.unionValue val1 val2 -- Plinth is strict, should cause evaluation failure
+   in BI.unitval
+{-# INLINEABLE mkUnionValueUnderflowPolicy #-}
+
 -------------------------------------------------------------
 -- ScaleValue tests
 -------------------------------------------------------------
+
+mkScaleValueZeroPolicy :: P.BuiltinData -> P.BuiltinUnit
+mkScaleValueZeroPolicy _ctx =
+  let val = BI.insertCoin (P.encodeUtf8 "foo") (P.encodeUtf8 "bar") 100 emptyValue
+      scaled = BI.scaleValue 0 val
+   in if scaled `valueEqual` emptyValue
+        then BI.unitval
+        else P.traceError "mkScaleValueZeroPolicy"
+{-# INLINEABLE mkScaleValueZeroPolicy #-}
+
+mkScaleValuePositivePolicy :: P.BuiltinData -> P.BuiltinUnit
+mkScaleValuePositivePolicy _ctx =
+  let val = BI.insertCoin (P.encodeUtf8 "foo") (P.encodeUtf8 "bar") 100 emptyValue
+      factor = 3 :: Integer
+      scaled = BI.scaleValue factor val
+      expected = BI.insertCoin (P.encodeUtf8 "foo") (P.encodeUtf8 "bar") (100 P.* factor) emptyValue
+   in if scaled `valueEqual` expected
+        then BI.unitval
+        else P.traceError "mkScaleValuePositivePolicy"
+{-# INLINEABLE mkScaleValuePositivePolicy #-}
+
+mkScaleValueNegativePolicy :: P.BuiltinData -> P.BuiltinUnit
+mkScaleValueNegativePolicy _ctx =
+  let val = BI.insertCoin (P.encodeUtf8 "foo") (P.encodeUtf8 "bar") 100 emptyValue
+      factor = -2 :: Integer
+      scaled = BI.scaleValue factor val
+      expected = BI.insertCoin (P.encodeUtf8 "foo") (P.encodeUtf8 "bar") (100 P.* factor) emptyValue
+   in if scaled `valueEqual` expected
+        then BI.unitval
+        else P.traceError "mkScaleValueNegativePolicy"
+{-# INLINEABLE mkScaleValueNegativePolicy #-}
+
+mkScaleValueOverflowPolicy :: P.BuiltinData -> P.BuiltinUnit
+mkScaleValueOverflowPolicy _ctx =
+  let currSymbol = P.encodeUtf8 "foo"
+      tokenName = P.encodeUtf8 "bar"
+      val = BI.insertCoin currSymbol tokenName (2 ^ (126 :: Integer)) emptyValue
+      factor = 2 :: Integer
+      scaled = BI.scaleValue factor val -- Plinth is strict, should cause evaluation failure
+   in BI.unitval
+{-# INLINEABLE mkScaleValueOverflowPolicy #-}
+
+mkScaleValueUnderflowPolicy :: P.BuiltinData -> P.BuiltinUnit
+mkScaleValueUnderflowPolicy _ctx =
+  let currSymbol = P.encodeUtf8 "foo"
+      tokenName = P.encodeUtf8 "bar"
+      val = BI.insertCoin currSymbol tokenName (-(2 ^ (126 :: Integer)) - 1) emptyValue
+      factor = 2 :: Integer
+      scaled = BI.scaleValue factor val -- Plinth is strict, should cause evaluation failure
+   in BI.unitval
+{-# INLINEABLE mkScaleValueUnderflowPolicy #-}
+
+-------------------------------------------------------------
+-- ValueData/UnValueData tests
+-------------------------------------------------------------
+
+mkValueDataRoundTripPolicy :: P.BuiltinData -> P.BuiltinUnit
+mkValueDataRoundTripPolicy _ctx =
+  let currSymbol = P.encodeUtf8 "foo"
+      tokenName = P.encodeUtf8 "bar"
+      amount = 100 :: Integer
+      val = BI.insertCoin currSymbol tokenName amount emptyValue
+      valData = BI.mkValue val
+      valRoundTripped = BI.unsafeDataAsValue valData
+   in if val `valueEqual` valRoundTripped
+        then BI.unitval
+        else P.traceError "mkValueDataRoundTripPolicy"
+{-# INLINEABLE mkValueDataRoundTripPolicy #-}
+
+mkUnValueDataInvalidDataPolicy :: P.BuiltinData -> P.BuiltinUnit
+mkUnValueDataInvalidDataPolicy _ctx =
+  let invalidData = BI.mkList (P.toOpaque [B.mkI 1, B.mkI 2])
+      val = BI.unsafeDataAsValue invalidData -- Plinth is strict, should cause evaluation failure
+   in BI.unitval
+{-# INLINEABLE mkUnValueDataInvalidDataPolicy #-}
 
 -------------------------------------------------------------
 -- Helpers
