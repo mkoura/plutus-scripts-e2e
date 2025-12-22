@@ -35,7 +35,7 @@ cabal build plutus-scripts
 # Generate serialized script envelopes
 cabal run envelopes
 
-# Output: serialised-plutus-scripts/*.plutus (59 scripts total)
+# Output: serialised-plutus-scripts/*.plutus
 ```
 
 The generated `.plutus` files are JSON envelopes containing the serialized Plutus scripts, ready for use in cardano-node-tests.
