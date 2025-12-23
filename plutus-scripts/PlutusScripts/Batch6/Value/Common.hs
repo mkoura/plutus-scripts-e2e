@@ -1,4 +1,5 @@
 -- editorconfig-checker-disable-file
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# OPTIONS_GHC -fno-warn-unused-binds #-}
 
 module PlutusScripts.Batch6.Value.Common (
@@ -40,7 +41,7 @@ where
 
 import PlutusTx.Builtins qualified as B
 import PlutusTx.Builtins.Internal qualified as BI
-import PlutusTx.Builtins.HasOpaque qualified as HO
+import PlutusTx.Prelude ( Integer, ($), negate) 
 import PlutusTx.Prelude qualified as P
 
 -------------------------------------------------------------
@@ -159,7 +160,7 @@ mkInsertUnderflowQuantityPolicy :: P.BuiltinData -> P.BuiltinUnit
 mkInsertUnderflowQuantityPolicy _ctx =
   let currSymbol = P.encodeUtf8 "foo"
       tokenName = P.encodeUtf8 "bar"
-      invalidAmount = -99999999999999999999999999999999999999999999999999 :: Integer
+      invalidAmount = negate 99999999999999999999999999999999999999999999999999 :: Integer
       val = BI.insertCoin currSymbol tokenName invalidAmount emptyValue -- Plinth is strict, should cause evaluation failure
    in BI.unitval
 {-# INLINEABLE mkInsertUnderflowQuantityPolicy #-}
@@ -190,7 +191,7 @@ mkValueContainsLeftNegativePolicy _ctx =
       currSymbol2 = P.encodeUtf8 "foo2"
       tokenName1 = P.encodeUtf8 "bar1"
       tokenName2 = P.encodeUtf8 "bar2"
-      amount1 = -100 :: Integer
+      amount1 = negate 100 :: Integer
       amount2 = 50 :: Integer
       leftVal = BI.insertCoin currSymbol1 tokenName1 amount1 emptyValue
       rightVal = BI.insertCoin currSymbol2 tokenName2 amount2 emptyValue
@@ -205,7 +206,7 @@ mkValueContainsRightNegativePolicy _ctx =
       tokenName1 = P.encodeUtf8 "bar1"
       tokenName2 = P.encodeUtf8 "bar2"
       amount1 = 100 :: Integer
-      amount2 = -50 :: Integer
+      amount2 = negate 50 :: Integer
       leftVal = BI.insertCoin currSymbol1 tokenName1 amount1 emptyValue
       rightVal = BI.insertCoin currSymbol2 tokenName2 amount2 emptyValue
       result = BI.valueContains leftVal rightVal -- Plinth is strict, should cause evaluation failure
@@ -377,7 +378,7 @@ mkUnionValueOverflowPolicy :: P.BuiltinData -> P.BuiltinUnit
 mkUnionValueOverflowPolicy _ctx =
   let currSymbol = P.encodeUtf8 "foo"
       tokenName = P.encodeUtf8 "bar"
-      val1 = BI.insertCoin currSymbol tokenName (2 ^ (127 :: Integer) - 1) emptyValue
+      val1 = BI.insertCoin currSymbol tokenName 170141183460469231731687303715884105727 emptyValue
       val2 = BI.insertCoin currSymbol tokenName 1 emptyValue
       unioned = BI.unionValue val1 val2 -- Plinth is strict, should cause evaluation failure
    in BI.unitval
@@ -387,8 +388,8 @@ mkUnionValueUnderflowPolicy :: P.BuiltinData -> P.BuiltinUnit
 mkUnionValueUnderflowPolicy _ctx =
   let currSymbol = P.encodeUtf8 "foo"
       tokenName = P.encodeUtf8 "bar"
-      val1 = BI.insertCoin currSymbol tokenName (-(2 ^ (127 :: Integer))) emptyValue
-      val2 = BI.insertCoin currSymbol tokenName (-1) emptyValue
+      val1 = BI.insertCoin currSymbol tokenName (negate 170141183460469231731687303715884105728) emptyValue
+      val2 = BI.insertCoin currSymbol tokenName (negate 1) emptyValue
       unioned = BI.unionValue val1 val2 -- Plinth is strict, should cause evaluation failure
    in BI.unitval
 {-# INLINEABLE mkUnionValueUnderflowPolicy #-}
@@ -432,7 +433,7 @@ mkScaleValueOverflowPolicy :: P.BuiltinData -> P.BuiltinUnit
 mkScaleValueOverflowPolicy _ctx =
   let currSymbol = P.encodeUtf8 "foo"
       tokenName = P.encodeUtf8 "bar"
-      val = BI.insertCoin currSymbol tokenName (2 ^ (126 :: Integer)) emptyValue
+      val = BI.insertCoin currSymbol tokenName 85070591730234615865843651857942052864 emptyValue
       factor = 2 :: Integer
       scaled = BI.scaleValue factor val -- Plinth is strict, should cause evaluation failure
    in BI.unitval
@@ -442,7 +443,7 @@ mkScaleValueUnderflowPolicy :: P.BuiltinData -> P.BuiltinUnit
 mkScaleValueUnderflowPolicy _ctx =
   let currSymbol = P.encodeUtf8 "foo"
       tokenName = P.encodeUtf8 "bar"
-      val = BI.insertCoin currSymbol tokenName (-(2 ^ (126 :: Integer)) - 1) emptyValue
+      val = BI.insertCoin currSymbol tokenName (negate 85070591730234615865843651857942052865) emptyValue
       factor = 2 :: Integer
       scaled = BI.scaleValue factor val -- Plinth is strict, should cause evaluation failure
    in BI.unitval
@@ -477,7 +478,7 @@ mkUnValueDataInvalidDataPolicy _ctx =
 -------------------------------------------------------------
 
 emptyValue :: BI.BuiltinValue
-emptyValue = BI.unsafeDataAsValue $ BI.mkMap HO.mkNil
+emptyValue = BI.unsafeDataAsValue $ B.mkMap []
 {-# INLINEABLE emptyValue #-}
 
 -- (Value, union) is antisymmetric
