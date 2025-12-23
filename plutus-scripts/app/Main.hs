@@ -15,6 +15,7 @@ import PlutusLedgerApi.Common.Versions (PlutusLedgerLanguage (PlutusV2, PlutusV3
 import PlutusLedgerApi.Envelope qualified as Envelope
 import PlutusScripts.Basic.V_1_1 qualified as Basic
 import PlutusScripts.Batch6.Array qualified as Array
+import PlutusScripts.Batch6.Value qualified as Value
 import PlutusScripts.Batch6.BLS12_381_MultiScalarMul qualified as BLS_MSM
 import PlutusScripts.Batch6.DropList qualified as DropList
 import PlutusScripts.Batch6.ExpModInteger qualified as ExpModInteger
@@ -105,6 +106,9 @@ main = withUtf8 do
 
   -- BLS `multiScalarMul` functions
   mapM_ writeVersionedScript BLS_MSM.allMultiScalarMulScripts
+
+  -- Value builtin scripts
+  mapM_ writeVersionedScript Value.v3ValueScripts
 
 --------------------------------------------------------------------------------
 -- IO helpers ------------------------------------------------------------------
