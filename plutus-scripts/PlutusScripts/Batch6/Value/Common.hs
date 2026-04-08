@@ -482,7 +482,6 @@ emptyValue :: BI.BuiltinValue
 emptyValue = BI.unsafeDataAsValue $ B.mkMap []
 {-# INLINEABLE emptyValue #-}
 
--- (Value, union) is antisymmetric
 valueEqual :: BI.BuiltinValue -> BI.BuiltinValue -> P.Bool
 valueEqual v1 v2 = BI.mkValue v1 P.== BI.mkValue v2
 {-# INLINEABLE valueEqual #-}
