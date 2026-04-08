@@ -2,46 +2,46 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# OPTIONS_GHC -fno-warn-unused-binds #-}
 
-module PlutusScripts.Batch6.Value.Common (
-  mkLookupMissingCoinPolicy,
-  mkInsertNewCoinPolicy,
-  mkInsertExistingCoinPolicy,
-  mkDeleteExistingCoinPolicy,
-  mkDeleteMissingCoinPolicy,
-  mkInsertInvalidCurrencySymbolPolicy,
-  mkInsertInvalidTokenNamePolicy,
-  mkInsertOverflowQuantityPolicy,
-  mkInsertUnderflowQuantityPolicy,
-  mkValueContainsEmptyPolicy,
-  mkValueContainsLeftNegativePolicy,
-  mkValueContainsRightNegativePolicy,
-  mkValueContainsReflexivePolicy,
-  mkValueContainsDisjointPolicy,
-  mkValueContainsRightExtraKeyPolicy,
-  mkValueContainsRightHigherAmountPolicy,
-  mkValueContainsIsSubValuePolicy,
-  mkValueContainsIsSubValueSmallerAmountPolicy,
-  mkUnionValueEmptyIdentityPolicy,
-  mkUnionValueAssociativePolicy,
-  mkUnionValueAssociativeSingleCoinPolicy,
-  mkUnionValueCommutativePolicy,
-  mkUnionValueCommutativeSingleCoinPolicy,
-  mkUnionValueInversablePolicy,
-  mkUnionValueOverflowPolicy,
-  mkUnionValueUnderflowPolicy,
-  mkScaleValueZeroPolicy,
-  mkScaleValuePositivePolicy,
-  mkScaleValueNegativePolicy,
-  mkScaleValueOverflowPolicy,
-  mkScaleValueUnderflowPolicy,
-  mkValueDataRoundTripPolicy,
-  mkUnValueDataInvalidDataPolicy,
-)
+module PlutusScripts.Batch6.Value.Common
+  ( mkLookupMissingCoinPolicy
+  , mkInsertNewCoinPolicy
+  , mkInsertExistingCoinPolicy
+  , mkDeleteExistingCoinPolicy
+  , mkDeleteMissingCoinPolicy
+  , mkInsertInvalidCurrencySymbolPolicy
+  , mkInsertInvalidTokenNamePolicy
+  , mkInsertOverflowQuantityPolicy
+  , mkInsertUnderflowQuantityPolicy
+  , mkValueContainsEmptyPolicy
+  , mkValueContainsLeftNegativePolicy
+  , mkValueContainsRightNegativePolicy
+  , mkValueContainsReflexivePolicy
+  , mkValueContainsDisjointPolicy
+  , mkValueContainsRightExtraKeyPolicy
+  , mkValueContainsRightHigherAmountPolicy
+  , mkValueContainsIsSubValuePolicy
+  , mkValueContainsIsSubValueSmallerAmountPolicy
+  , mkUnionValueEmptyIdentityPolicy
+  , mkUnionValueAssociativePolicy
+  , mkUnionValueAssociativeSingleCoinPolicy
+  , mkUnionValueCommutativePolicy
+  , mkUnionValueCommutativeSingleCoinPolicy
+  , mkUnionValueInversablePolicy
+  , mkUnionValueOverflowPolicy
+  , mkUnionValueUnderflowPolicy
+  , mkScaleValueZeroPolicy
+  , mkScaleValuePositivePolicy
+  , mkScaleValueNegativePolicy
+  , mkScaleValueOverflowPolicy
+  , mkScaleValueUnderflowPolicy
+  , mkValueDataRoundTripPolicy
+  , mkUnValueDataInvalidDataPolicy
+  )
 where
 
 import PlutusTx.Builtins qualified as B
 import PlutusTx.Builtins.Internal qualified as BI
-import PlutusTx.Prelude ( Integer, ($), negate) 
+import PlutusTx.Prelude (Integer, negate, ($))
 import PlutusTx.Prelude qualified as P
 
 -------------------------------------------------------------
@@ -80,16 +80,17 @@ mkInsertExistingCoinPolicy _ctx =
   let currSymbol = P.encodeUtf8 "foo"
       tokenName = P.encodeUtf8 "bar"
       amount = 100 :: Integer
+      newAmount = 50 :: Integer
       val =
         BI.insertCoin
           currSymbol
           tokenName
-          amount
+          newAmount
           (BI.insertCoin currSymbol tokenName amount emptyValue)
-      expected = amount P.+ amount
+      expected = newAmount
    in if expected P.== BI.lookupCoin currSymbol tokenName val
-          then BI.unitval
-          else P.traceError "mkInsertExistingCoinPolicy"
+        then BI.unitval
+        else P.traceError "mkInsertExistingCoinPolicy"
 {-# INLINEABLE mkInsertExistingCoinPolicy #-}
 
 mkDeleteExistingCoinPolicy :: P.BuiltinData -> P.BuiltinUnit
@@ -108,7 +109,7 @@ mkDeleteExistingCoinPolicy _ctx =
    in if expected P.== BI.lookupCoin currSymbol tokenName val
         then BI.unitval
         else P.traceError "mkDeleteExistingCoinPolicy"
-{-# INLINEABLE mkDeleteExistingCoinPolicy #-} 
+{-# INLINEABLE mkDeleteExistingCoinPolicy #-}
 
 mkDeleteMissingCoinPolicy :: P.BuiltinData -> P.BuiltinUnit
 mkDeleteMissingCoinPolicy _ctx =
@@ -124,9 +125,9 @@ mkDeleteMissingCoinPolicy _ctx =
           deleteCoin
           (BI.insertCoin currSymbol tokenName2 amount emptyValue)
       expected = amount
-    in if expected P.== BI.lookupCoin currSymbol tokenName2 val
-          then BI.unitval
-          else P.traceError "mkDeleteMissingCoinPolicy"
+   in if expected P.== BI.lookupCoin currSymbol tokenName2 val
+        then BI.unitval
+        else P.traceError "mkDeleteMissingCoinPolicy"
 {-# INLINEABLE mkDeleteMissingCoinPolicy #-}
 
 mkInsertInvalidCurrencySymbolPolicy :: P.BuiltinData -> P.BuiltinUnit
@@ -151,7 +152,7 @@ mkInsertOverflowQuantityPolicy :: P.BuiltinData -> P.BuiltinUnit
 mkInsertOverflowQuantityPolicy _ctx =
   let currSymbol = P.encodeUtf8 "foo"
       tokenName = P.encodeUtf8 "bar"
-      invalidAmount = 99999999999999999999999999999999999999999999999999 :: Integer 
+      invalidAmount = 99999999999999999999999999999999999999999999999999 :: Integer
       val = BI.insertCoin currSymbol tokenName invalidAmount emptyValue -- Plinth is strict, should cause evaluation failure
    in BI.unitval
 {-# INLINEABLE mkInsertOverflowQuantityPolicy #-}
@@ -196,7 +197,7 @@ mkValueContainsLeftNegativePolicy _ctx =
       leftVal = BI.insertCoin currSymbol1 tokenName1 amount1 emptyValue
       rightVal = BI.insertCoin currSymbol2 tokenName2 amount2 emptyValue
       result = BI.valueContains leftVal rightVal -- Plinth is strict, should cause evaluation failure
-   in BI.unitval 
+   in BI.unitval
 {-# INLINEABLE mkValueContainsLeftNegativePolicy #-}
 
 mkValueContainsRightNegativePolicy :: P.BuiltinData -> P.BuiltinUnit
@@ -210,7 +211,7 @@ mkValueContainsRightNegativePolicy _ctx =
       leftVal = BI.insertCoin currSymbol1 tokenName1 amount1 emptyValue
       rightVal = BI.insertCoin currSymbol2 tokenName2 amount2 emptyValue
       result = BI.valueContains leftVal rightVal -- Plinth is strict, should cause evaluation failure
-   in BI.unitval 
+   in BI.unitval
 {-# INLINEABLE mkValueContainsRightNegativePolicy #-}
 
 mkValueContainsReflexivePolicy :: P.BuiltinData -> P.BuiltinUnit
@@ -250,11 +251,11 @@ mkValueContainsRightExtraKeyPolicy _ctx =
       amount1Right = 70 :: Integer
       amount2Right = 80 :: Integer
       leftVal =
-        BI.insertCoin currSymbol tokenName1 amount1Left $
-          BI.insertCoin currSymbol tokenName2 amount2Left emptyValue
+        BI.insertCoin currSymbol tokenName1 amount1Left
+          $ BI.insertCoin currSymbol tokenName2 amount2Left emptyValue
       rightVal =
-        BI.insertCoin currSymbol tokenName1 amount1Right $
-          BI.insertCoin currSymbol2 tokenName2 amount2Right emptyValue
+        BI.insertCoin currSymbol tokenName1 amount1Right
+          $ BI.insertCoin currSymbol2 tokenName2 amount2Right emptyValue
    in if P.not (BI.valueContains leftVal rightVal)
         then BI.unitval
         else P.traceError "mkValueContainsRightExtraKeyPolicy"
@@ -281,8 +282,8 @@ mkValueContainsIsSubValuePolicy _ctx =
       amount1 = 100 :: Integer
       amount2 = 50 :: Integer
       leftVal =
-        BI.insertCoin currSymbol tokenName1 amount1 $
-          BI.insertCoin currSymbol tokenName2 amount2 emptyValue
+        BI.insertCoin currSymbol tokenName1 amount1
+          $ BI.insertCoin currSymbol tokenName2 amount2 emptyValue
       rightVal = BI.insertCoin currSymbol tokenName1 amount1 emptyValue
    in if BI.valueContains leftVal rightVal
         then BI.unitval
@@ -298,8 +299,8 @@ mkValueContainsIsSubValueSmallerAmountPolicy _ctx =
       amount2 = 50 :: Integer
       amount3 = 30 :: Integer
       leftVal =
-        BI.insertCoin currSymbol tokenName1 amount1 $
-          BI.insertCoin currSymbol tokenName2 amount2 emptyValue
+        BI.insertCoin currSymbol tokenName1 amount1
+          $ BI.insertCoin currSymbol tokenName2 amount2 emptyValue
       rightVal = BI.insertCoin currSymbol tokenName1 amount3 emptyValue
    in if BI.valueContains leftVal rightVal
         then BI.unitval
@@ -483,5 +484,5 @@ emptyValue = BI.unsafeDataAsValue $ B.mkMap []
 
 -- (Value, union) is antisymmetric
 valueEqual :: BI.BuiltinValue -> BI.BuiltinValue -> P.Bool
-valueEqual v1 v2 = BI.valueContains v1 v2 P.&& BI.valueContains v2 v1
+valueEqual v1 v2 = BI.mkValue v1 P.== BI.mkValue v2
 {-# INLINEABLE valueEqual #-}
