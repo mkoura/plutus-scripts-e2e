@@ -6,21 +6,35 @@ import PlutusCore.Version (plcVersion110)
 import PlutusScripts.Batch6.BLS12_381_MultiScalarMul.G2.Common (
   mkSucceedingMultiScalarMulPolicy1,
   mkSucceedingMultiScalarMulPolicy2,
-  succeedingMultiScalarMulParams1,
-  succeedingMultiScalarMulParams2,
+  succeedingMultiScalarMulParams1a,
+  succeedingMultiScalarMulParams1b,
+  succeedingMultiScalarMulParams2a,
+  succeedingMultiScalarMulParams2b,
  )
 import PlutusTx (compile, liftCode, unsafeApplyCode)
 import PlutusTx.Code (CompiledCode)
 import PlutusTx.Prelude qualified as P
 
-succeedingMultiScalarMulPolicyScript1
+succeedingMultiScalarMulPolicyScript1a
   :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
-succeedingMultiScalarMulPolicyScript1 =
+succeedingMultiScalarMulPolicyScript1a =
   $$(compile [||mkSucceedingMultiScalarMulPolicy1||])
-    `unsafeApplyCode` liftCode plcVersion110 succeedingMultiScalarMulParams1
+    `unsafeApplyCode` liftCode plcVersion110 succeedingMultiScalarMulParams1a
 
-succeedingMultiScalarMulPolicyScript2
+succeedingMultiScalarMulPolicyScript1b
   :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
-succeedingMultiScalarMulPolicyScript2 =
+succeedingMultiScalarMulPolicyScript1b =
+  $$(compile [||mkSucceedingMultiScalarMulPolicy1||])
+    `unsafeApplyCode` liftCode plcVersion110 succeedingMultiScalarMulParams1b
+
+succeedingMultiScalarMulPolicyScript2a
+  :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
+succeedingMultiScalarMulPolicyScript2a =
   $$(compile [||mkSucceedingMultiScalarMulPolicy2||])
-    `unsafeApplyCode` liftCode plcVersion110 succeedingMultiScalarMulParams2
+    `unsafeApplyCode` liftCode plcVersion110 succeedingMultiScalarMulParams2a
+
+succeedingMultiScalarMulPolicyScript2b
+  :: CompiledCode (P.BuiltinData -> P.BuiltinUnit)
+succeedingMultiScalarMulPolicyScript2b =
+  $$(compile [||mkSucceedingMultiScalarMulPolicy2||])
+    `unsafeApplyCode` liftCode plcVersion110 succeedingMultiScalarMulParams2b
