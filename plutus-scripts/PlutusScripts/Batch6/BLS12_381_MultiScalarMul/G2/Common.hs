@@ -9,9 +9,11 @@ numbers in parentheses.  There are no inputs which would cause
 -}
 module PlutusScripts.Batch6.BLS12_381_MultiScalarMul.G2.Common (
   mkSucceedingMultiScalarMulPolicy1,
-  succeedingMultiScalarMulParams1,
+  succeedingMultiScalarMulParams1a,
+  succeedingMultiScalarMulParams1b,
   mkSucceedingMultiScalarMulPolicy2,
-  succeedingMultiScalarMulParams2,
+  succeedingMultiScalarMulParams2a,
+  succeedingMultiScalarMulParams2b,
 )
 where
 
@@ -54,8 +56,11 @@ mkSucceedingMultiScalarMulPolicy1 l _ctx = go l
       then go rest
       else P.traceError "mkSucceedingMultiScalarMulPolicy"
 
-succeedingMultiScalarMulParams1 :: [Params1]
-succeedingMultiScalarMulParams1 =
+-- If we use the entire list of parameters in a single script then it exceeds
+-- the on-chain CPU limit, so we split the parameters into two and produce two
+-- scripts that fit below the limit.
+succeedingMultiScalarMulParams1a :: [Params1]
+succeedingMultiScalarMulParams1a =
   [ Params1 -- Hash of 0x01 (empty DST)), answer known from scalarMul
       [1234]
       [ hxs $
@@ -161,7 +166,11 @@ succeedingMultiScalarMulParams1 =
       , zero
       ]
       zero
-  , Params1 -- All entries in the first list are zero => result is the zero point. (12a)
+  ]
+
+succeedingMultiScalarMulParams1b :: [Params1]
+succeedingMultiScalarMulParams1b =
+  [ Params1 -- All entries in the first list are zero => result is the zero point. (12a)
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
       ( fmap
           hxs
@@ -314,8 +323,9 @@ mkSucceedingMultiScalarMulPolicy2 l _ctx = go l
       then go rest
       else P.traceError "mkSucceedingMultiScalarMulPolicy"
 
-succeedingMultiScalarMulParams2 :: [Params2]
-succeedingMultiScalarMulParams2 =
+-- We again split everyting in two to fit below the on-chain CPU limit.
+succeedingMultiScalarMulParams2a :: [Params2]
+succeedingMultiScalarMulParams2a =
   [ Params2 -- a*p+b*p = (a+b)*p, p = hash of 0x01 (empty DST)).
       [1234, -234]
       [ hxs $
@@ -438,7 +448,11 @@ succeedingMultiScalarMulParams2 =
               +++ "1479aec5736853f591095cf15ab9507c71a77bd579bb2e5f4cab94d8ff33bc43fcf336136aa2face28f1886b62f3cca9"
           ]
       )
-  , Params2 -- Extra entries at end of second list are ignored (10a)
+  ]
+
+succeedingMultiScalarMulParams2b :: [Params2]
+succeedingMultiScalarMulParams2b =
+  [ Params2 -- Extra entries at end of second list are ignored (10a)
       [ -7843724524521392138901923801823923123123454352157
       , 34527457238
       , 941957124591735785278457826354751745783452348102412301239547134528453782352345235423452345234523452345234512341423412341234

@@ -27,11 +27,21 @@ allMultiScalarMulScripts =
   , VersionedScript
       PlutusV3
       plc110
-      "succeedingG2MultiScalarMulPolicyScript1"
-      G2_V3_110.succeedingMultiScalarMulPolicyScript1
+      "succeedingG2MultiScalarMulPolicyScript1a"
+      G2_V3_110.succeedingMultiScalarMulPolicyScript1a
   , VersionedScript
       PlutusV3
       plc110
-      "succeedingG2MultiScalarMulPolicyScript2"
-      G2_V3_110.succeedingMultiScalarMulPolicyScript2
+      "succeedingG2MultiScalarMulPolicyScript1b"
+      G2_V3_110.succeedingMultiScalarMulPolicyScript1b
+  , VersionedScript
+      PlutusV3
+      plc110
+      "succeedingG2MultiScalarMulPolicyScript2a"
+      G2_V3_110.succeedingMultiScalarMulPolicyScript2a
+  , VersionedScript
+      PlutusV3
+      plc110
+      "succeedingG2MultiScalarMulPolicyScript2b"
+      G2_V3_110.succeedingMultiScalarMulPolicyScript2b
   ]
