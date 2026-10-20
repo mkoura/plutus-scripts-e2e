@@ -64,20 +64,20 @@ common plinth-options
     -fno-omit-interface-pragmas -fno-spec-constr -fno-specialise
     -fno-strictness -fno-unbox-small-strict-fields
     -fno-unbox-strict-fields
-    -fplugin-opts: PlutusTx.Plugin:no-simplifier-evaluate-builtins
+    -fplugin-opt Plinth.Plugin:no-simplifier-evaluate-builtins
   
 
 library scripts
   import:          plinth-options
   hs-source-dirs:  ./
-  ghc-options:     -fplugin PlutusTx.Plugin
+  ghc-options:     -fplugin Plinth.Plugin
   build-depends:
     , base               >=4.14      && <5
     , bytestring
-    , plutus-core        ^>=1.55.0.0
-    , plutus-ledger-api  ^>=1.55.0.0
-    , plutus-tx          ^>=1.55.0.0
-    , plutus-tx-plugin   ^>=1.55.0.0
+    , plutus-core        ^>=1.72.0.0
+    , plutus-ledger-api  ^>=1.72.0.0
+    , plutus-tx          ^>=1.72.0.0
+    , plutus-tx-plugin   ^>=1.72.0.0
     , text
     , containers
 
@@ -164,9 +164,9 @@ executable envelopes
   build-depends:
     , base               >=4.14      && <5
     , directory
-    , plutus-core        ^>=1.55.0.0
-    , plutus-ledger-api  ^>=1.55.0.0
-    , plutus-tx          ^>=1.55.0.0
+    , plutus-core        ^>=1.72.0.0
+    , plutus-ledger-api  ^>=1.72.0.0
+    , plutus-tx          ^>=1.72.0.0
     , scripts
     , text
     , with-utf8

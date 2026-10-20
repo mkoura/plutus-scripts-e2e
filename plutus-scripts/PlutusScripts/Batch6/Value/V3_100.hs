@@ -1,4 +1,4 @@
-{-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.0.0 #-}
+{-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:target-version=1.0.0 #-}
 
 module PlutusScripts.Batch6.Value.V3_100 where
 
