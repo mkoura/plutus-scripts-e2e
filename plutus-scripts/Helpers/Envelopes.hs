@@ -4,6 +4,7 @@ module Helpers.Envelopes (
   VersionedScriptGroup (..),
   plc100,
   plc110,
+  plc120,
   formatCoreVersion,
   formatPlutusVersion,
 )
@@ -14,7 +15,7 @@ import Data.Text qualified as T
 import Helpers.ScriptUtils (ScriptGroup)
 import PlutusCore.Default (DefaultFun, DefaultUni)
 import PlutusLedgerApi.Common.Versions (
-  PlutusLedgerLanguage (PlutusV1, PlutusV2, PlutusV3),
+  PlutusLedgerLanguage (PlutusV1, PlutusV2, PlutusV3, PlutusV4),
  )
 import PlutusTx.Code (CompiledCode)
 
@@ -26,9 +27,10 @@ data PlutusCore = PlutusCore Int Int Int
   deriving (Eq, Show)
 
 -- | Common Plutus Core versions
-plc100, plc110 :: PlutusCore
+plc100, plc110, plc120 :: PlutusCore
 plc100 = PlutusCore 1 0 0
 plc110 = PlutusCore 1 1 0
+plc120 = PlutusCore 1 2 0
 
 -- | A compiled script with version metadata
 data VersionedScript a = VersionedScript
@@ -54,8 +56,9 @@ formatCoreVersion :: PlutusCore -> Text
 formatCoreVersion (PlutusCore major minor micro) =
   T.pack $ show major ++ show minor ++ show micro
 
--- | Format Plutus ledger version as string (e.g., "V1", "V2", "V3")
+-- | Format Plutus ledger version as string (e.g., "V1", "V2", "V3", "V4")
 formatPlutusVersion :: PlutusLedgerLanguage -> Text
 formatPlutusVersion PlutusV1 = "V1"
 formatPlutusVersion PlutusV2 = "V2"
 formatPlutusVersion PlutusV3 = "V3"
+formatPlutusVersion PlutusV4 = "V4"

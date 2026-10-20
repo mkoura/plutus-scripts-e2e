@@ -99,6 +99,7 @@ main = withUtf8 do
 
   -- Builtin casing
   mapM_ writeVersionedScript Casing.allCasingScripts
+  mapM_ writeVersionedScript Casing.allCasingScriptsV1V2
 
   -- `expModInteger`
   mapM_ writeVersionedScript ExpModInteger.allExpModIntegerScripts

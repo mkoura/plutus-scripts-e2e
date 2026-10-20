@@ -12,6 +12,11 @@ Unhappy cases WILL NOT cover the cases when branches have incorrect types; for e
 the "uncons" branch for builtin list casing not being two nested lamAbs. We can safely skip this
 tests because each branch taking correct number of arguments is indirectly checked by the happy
 cases.
+
+Casing on builtin data is only available from the Dijkstra hard fork onwards and only for
+Plutus Core 1.2.0 and later, for every ledger language. Hence the data cases are meant to be
+built as Plutus Core 1.2.0 scripts, except for 'caseDataUnhappyUnsupportedVersion' which is meant
+to be built as a Plutus Core 1.1.0 script, where casing on data is expected to fail.
 -}
 
 module PlutusScripts.Casing.Common (
@@ -32,10 +37,18 @@ module PlutusScripts.Casing.Common (
   caseUnitHappy,
   caseUnitUnhappyNoBranches,
   caseUnitUnhappyMoreBranches,
-  asV3,
+  caseDataHappy,
+  caseDataUnhappyNoMatchOver,
+  caseDataUnhappyNoMatchHuge,
+  caseDataUnhappyNoBranches,
+  caseDataUnhappyInteger,
+  caseDataUnhappyByteString,
+  caseDataUnhappyList,
+  caseDataUnhappyMap,
+  caseDataUnhappyUnsupportedVersion,
+  asVersioned,
 ) where
 
-import PlutusTx.Prelude qualified as P
 import PlutusTx.Code (CompiledCodeIn (DeserializedCode))
 
 import PlutusCore qualified as PLC
@@ -43,12 +56,14 @@ import PlutusCore.Annotation qualified as PLC
 import UntypedPlutusCore qualified as UPLC
 import UntypedPlutusCore.Parser qualified as UPLC
 
-import PlutusLedgerApi.Common.Versions (PlutusLedgerLanguage (PlutusV3))
+import PlutusLedgerApi.Common.Versions (
+  PlutusLedgerLanguage (PlutusV1, PlutusV2, PlutusV3, PlutusV4),
+ )
 
 import Data.Set qualified as S
 import Data.Text qualified as T
 
-import Helpers.Envelopes (VersionedScript (VersionedScript), plc110)
+import Helpers.Envelopes (PlutusCore (PlutusCore), VersionedScript (VersionedScript))
 
 parse :: T.Text -> UPLC.Term UPLC.NamedDeBruijn PLC.DefaultUni PLC.DefaultFun PLC.SrcSpans
 parse src =
@@ -59,20 +74,36 @@ parse src =
         Left deBruijinErr -> error $ show deBruijinErr
         Right t' -> PLC.SrcSpans . S.singleton <$> t'
 
-asV3
-  :: T.Text
+{-| Make a minting policy of given ledger language and Plutus Core version out of given UPLC term.
+PlutusV1 and PlutusV2 minting policies receive the redeemer and the script context, while PlutusV3
+and PlutusV4 minting policies receive only the script context. Arguments are ignored.
+-}
+asVersioned
+  :: PlutusLedgerLanguage
+  -> PlutusCore
   -> T.Text
-  -> VersionedScript (P.BuiltinData -> P.BuiltinUnit)
-asV3 name src =
+  -> T.Text
+  -> VersionedScript a
+asVersioned ll plcVersion@(PlutusCore major minor patch) name src =
   let
+    args :: [T.Text]
+    args = case ll of
+      PlutusV1 -> ["redeemer", "ctx"]
+      PlutusV2 -> ["redeemer", "ctx"]
+      PlutusV3 -> ["ctx"]
+      PlutusV4 -> ["ctx"]
+
     parsed :: UPLC.Term UPLC.NamedDeBruijn PLC.DefaultUni PLC.DefaultFun PLC.SrcSpans
-    parsed = UPLC.LamAbs mempty (UPLC.NamedDeBruijn "ctx" 0) $ parse src
+    parsed = foldr (\arg -> UPLC.LamAbs mempty (UPLC.NamedDeBruijn arg 0)) (parse src) args
+
+    version :: UPLC.Version
+    version = UPLC.Version (fromIntegral major) (fromIntegral minor) (fromIntegral patch)
   in
     VersionedScript
-      PlutusV3
-      plc110
+      ll
+      plcVersion
       name
-      (DeserializedCode (UPLC.Program mempty (UPLC.Version 1 1 0) parsed) Nothing mempty)
+      (DeserializedCode (UPLC.Program mempty version parsed) Nothing mempty)
 
 --------------------------------------------------------------------------------
 -- Integer
@@ -349,5 +380,182 @@ caseUnitUnhappyMoreBranches =
     [ "(case (con unit ())"
     , "  (con unit ())"
     , "  (con unit ())"
+    , ")"
+    ]
+
+--------------------------------------------------------------------------------
+-- Data
+
+-- There is no case for a negative tag, since such constructor can't exist at runtime: it can't be
+-- deserialised from a constant and @constrData@ fails on tags that don't fit into 'Word64'.
+
+{-| @caseConstrStep desc scrutinee tag branches fields next@ cases on @scrutinee@ using @branches@
+branches, expecting the branch at index @tag@ to be selected and to receive @fields@. Every other
+branch fails. When the selected branch received the expected fields, continue with @next@.
+-}
+caseConstrStep :: T.Text -> T.Text -> Int -> Int -> T.Text -> [T.Text] -> [T.Text]
+caseConstrStep desc scrutinee tag branches fields next =
+  [ "[(lam wrong"
+  , "  (case " <> scrutinee
+  ]
+    <> replicate tag "    wrong"
+    <> [ "    (lam fields"
+       , "      (force [ (force (builtin ifThenElse))"
+       , "        [(builtin equalsData) (con data (List " <> fields <> ")) [(builtin listData) fields]]"
+       , "        (delay"
+       ]
+    <> map ("          " <>) next
+    <> [ "        )"
+       , "        (delay [err (con string \"casing " <> desc <> " gave incorrect fields\")])"
+       , "      ])"
+       , "    )"
+       ]
+    <> replicate (branches - tag - 1) "    wrong"
+    <> [ "  )"
+       , " )"
+       , " (lam fields [err (con string \"casing " <> desc <> " went to wrong branch\")])"
+       , "]"
+       ]
+
+{-| Case on a constructor nested in the fields of another constructor, checking that the fields
+given to the branch are proper data values which can be cased on again.
+-}
+caseNestedConstrStep :: [T.Text] -> [T.Text]
+caseNestedConstrStep next =
+  [ "(case (con data (Constr 0 [Constr 1 [I 5]]))"
+  , "  (lam fields"
+  , "    (case fields"
+  , "      (lam inner (lam rest"
+  , "        (case rest"
+  , "          (lam x (lam xs"
+  , "            [err (con string \"casing outer Constr 0 gave incorrect fields: too many\")]"
+  , "          ))"
+  ]
+    <> map ("          " <>) (caseConstrStep "nested Constr 1" "inner" 1 2 "[I 5]" next)
+    <> [ "        )"
+       , "      ))"
+       , "      [err (con string \"casing outer Constr 0 gave incorrect fields: nil\")]"
+       , "    )"
+       , "  )"
+       , ")"
+       ]
+
+{- | Case on various constructors, checking the right branch is selected and it receives the
+constructor fields. This covers:
+
+* Constructor with no fields and a single branch.
+* Extraneous branches, which are allowed as long as the tag is in bounds.
+* Tags on the boundaries of the different CBOR encodings of constructor tags: 6 and 7
+  (CBOR tags 121-127 and 1280-1400) as well as 127 and 128 (CBOR tags 1280-1400 and 102).
+* Constructor built at runtime with @constrData@.
+* Constructor nested in the fields of another constructor.
+-}
+caseDataHappy :: T.Text
+caseDataHappy =
+  T.intercalate "\n" $
+    [ "[(lam err"
+    ]
+      <> map ("   " <>) (foldr ($) ["(con unit ())"] steps)
+      <> [ " )"
+         , " (lam str [(lam e (error)) [(force (builtin trace)) str (con unit ())]])"
+         , "]"
+         ]
+  where
+    steps :: [[T.Text] -> [T.Text]]
+    steps =
+      [ caseConstrStep "Constr 0" "(con data (Constr 0 []))" 0 1 "[]"
+      , caseConstrStep
+          "Constr 1"
+          "(con data (Constr 1 [I 42, B #abcd, List [I 7], Map [(I 1, B #00)], Constr 3 []]))"
+          1
+          3
+          "[I 42, B #abcd, List [I 7], Map [(I 1, B #00)], Constr 3 []]"
+      , caseConstrStep "Constr 6" "(con data (Constr 6 [I 6]))" 6 7 "[I 6]"
+      , caseConstrStep "Constr 7" "(con data (Constr 7 [I 7]))" 7 8 "[I 7]"
+      , caseConstrStep "Constr 127" "(con data (Constr 127 [I 127]))" 127 128 "[I 127]"
+      , caseConstrStep "Constr 128" "(con data (Constr 128 [I 128]))" 128 129 "[I 128]"
+      , caseConstrStep
+          "runtime Constr 2"
+          "[(builtin constrData) (con integer 2) (con (list data) [I 1, B #ff])]"
+          2
+          3
+          "[I 1, B #ff]"
+      , caseNestedConstrStep
+      ]
+
+-- | Tag is greater than the index of the last branch.
+caseDataUnhappyNoMatchOver :: T.Text
+caseDataUnhappyNoMatchOver =
+  T.intercalate "\n"
+    [ "(case (con data (Constr 3 []))"
+    , "  (lam fields (con unit ()))"
+    , "  (lam fields (con unit ()))"
+    , "  (lam fields (con unit ()))"
+    , ")"
+    ]
+
+{- | Largest tag a constructor can have, it doesn't fit into a signed 64-bit integer. Such constant
+is serialised using the CBOR tag 102.
+-}
+caseDataUnhappyNoMatchHuge :: T.Text
+caseDataUnhappyNoMatchHuge =
+  T.intercalate "\n"
+    [ "(case (con data (Constr 18446744073709551615 []))"
+    , "  (lam fields (con unit ()))"
+    , ")"
+    ]
+
+-- | No branches given.
+caseDataUnhappyNoBranches :: T.Text
+caseDataUnhappyNoBranches =
+  T.intercalate "\n"
+    [ "(case (con data (Constr 0 []))"
+    , ")"
+    ]
+
+-- | Casing only supports constructors, not integers.
+caseDataUnhappyInteger :: T.Text
+caseDataUnhappyInteger =
+  T.intercalate "\n"
+    [ "(case (con data (I 0))"
+    , "  (lam fields (con unit ()))"
+    , ")"
+    ]
+
+-- | Casing only supports constructors, not bytestrings.
+caseDataUnhappyByteString :: T.Text
+caseDataUnhappyByteString =
+  T.intercalate "\n"
+    [ "(case (con data (B #00))"
+    , "  (lam fields (con unit ()))"
+    , ")"
+    ]
+
+-- | Casing only supports constructors, not lists.
+caseDataUnhappyList :: T.Text
+caseDataUnhappyList =
+  T.intercalate "\n"
+    [ "(case (con data (List [I 0]))"
+    , "  (lam fields (con unit ()))"
+    , ")"
+    ]
+
+-- | Casing only supports constructors, not maps.
+caseDataUnhappyMap :: T.Text
+caseDataUnhappyMap =
+  T.intercalate "\n"
+    [ "(case (con data (Map [(I 0, I 0)]))"
+    , "  (lam fields (con unit ()))"
+    , ")"
+    ]
+
+{- | Well-formed casing on data, meant to be built as a Plutus Core 1.1.0 script where casing on
+data is not available.
+-}
+caseDataUnhappyUnsupportedVersion :: T.Text
+caseDataUnhappyUnsupportedVersion =
+  T.intercalate "\n"
+    [ "(case (con data (Constr 0 []))"
+    , "  (lam fields (con unit ()))"
     , ")"
     ]

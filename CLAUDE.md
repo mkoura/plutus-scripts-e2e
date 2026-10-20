@@ -66,9 +66,9 @@ plutus-scripts/
 
 ### Plutus Version Targeting
 
-Scripts support multiple Plutus Ledger versions (V1, V2, V3) and Plutus Core language versions (1.0.0, 1.1.0):
+Scripts support multiple Plutus Ledger versions (V1, V2, V3, V4) and Plutus Core language versions (1.0.0, 1.1.0, 1.2.0):
 
-- Scripts use `{-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=X.Y.Z #-}`
+- Scripts use `{-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:target-version=X.Y.Z #-}`
 - V3 validators receive `ScriptContext` with enhanced governance support
 - Scripts are organized by version matrix using explicit naming convention (see below)
 
@@ -80,6 +80,7 @@ Where `CoreCompact` is Plutus Core version with digits compacted (no separators)
 
 - 1.0.0 → 100
 - 1.1.0 → 110
+- 1.2.0 → 120
 
 **Examples:**
 
@@ -240,8 +241,8 @@ Key Plutus ecosystem dependencies (from CHaP):
 Scripts consistently use:
 
 ```haskell
-{-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:conservative-optimisation #-}
-{-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.1.0 #-}
+{-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:conservative-optimisation #-}
+{-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:target-version=1.1.0 #-}
 ```
 
 Common language extensions (defined in `cabal.project`):
