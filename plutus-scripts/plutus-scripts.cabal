@@ -52,8 +52,8 @@ common ghc-options
     TemplateHaskell
     TypeApplications
     TypeFamilies
-    ViewPatterns
     UndecidableInstances
+    ViewPatterns
 
 -- These options are required for Plinth builds
 -- no-simplifier-evaluate-builtins is needed to prevent constant folding of builtins
@@ -64,8 +64,7 @@ common plinth-options
     -fno-omit-interface-pragmas -fno-spec-constr -fno-specialise
     -fno-strictness -fno-unbox-small-strict-fields
     -fno-unbox-strict-fields
-    -fplugin-opt Plinth.Plugin:no-simplifier-evaluate-builtins
-  
+    -fplugin-opt=Plinth.Plugin:no-simplifier-evaluate-builtins
 
 library scripts
   import:          plinth-options
@@ -74,12 +73,12 @@ library scripts
   build-depends:
     , base               >=4.14      && <5
     , bytestring
+    , containers
     , plutus-core        ^>=1.72.0.0
     , plutus-ledger-api  ^>=1.72.0.0
     , plutus-tx          ^>=1.72.0.0
     , plutus-tx-plugin   ^>=1.72.0.0
     , text
-    , containers
 
   exposed-modules:
     Helpers.Envelopes
@@ -112,8 +111,10 @@ library scripts
     PlutusScripts.Batch6.ExpModInteger.V3_110
     PlutusScripts.Batch6.Value
     PlutusScripts.Batch6.Value.Common
-    PlutusScripts.Batch6.Value.V3_110
     PlutusScripts.Batch6.Value.V3_100
+    PlutusScripts.Batch6.Value.V3_110
+    PlutusScripts.Batch7.MultiIndexArray.Common
+    PlutusScripts.Batch7.MultiIndexArray.V3_110
     PlutusScripts.Bitwise.Complement
     PlutusScripts.Bitwise.Conversions
     PlutusScripts.Bitwise.CountFindFirstSet
@@ -144,6 +145,8 @@ library scripts
     PlutusScripts.BLS.VerifyOverG2.V_1_1
     PlutusScripts.BLS.Vrf.Common
     PlutusScripts.BLS.Vrf.V_1_1
+    PlutusScripts.Casing.Casing
+    PlutusScripts.Casing.Common
     PlutusScripts.Governance.Common
     PlutusScripts.Governance.V_1_1
     PlutusScripts.Hashing.Common
@@ -154,8 +157,6 @@ library scripts
     PlutusScripts.SECP256k1.Common
     PlutusScripts.SECP256k1.V_1_0
     PlutusScripts.SECP256k1.V_1_1
-    PlutusScripts.Casing.Common
-    PlutusScripts.Casing.Casing
 
 executable envelopes
   import:         ghc-options
