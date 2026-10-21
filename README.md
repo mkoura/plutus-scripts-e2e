@@ -138,7 +138,7 @@ mkAlwaysSucceedPolicyV3 :: BuiltinData -> BuiltinUnit
 mkAlwaysSucceedPolicyV3 _ = ()
 
 -- PlutusScripts/Basic/V_1_1.hs
-{-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.1.0 #-}
+{-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:target-version=1.1.0 #-}
 
 alwaysSucceedPolicyCompiled :: CompiledCode (BuiltinData -> BuiltinUnit)
 alwaysSucceedPolicyCompiled = $$(PlutusTx.compile [||mkAlwaysSucceedPolicyV3||])
@@ -151,14 +151,14 @@ Scripts are compiled for both **Plutus Core 1.0.0** (PlutusV2) and **Plutus Core
 **Plutus Core 1.0.0 scripts:**
 
 ```haskell
-{-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.0.0 #-}
+{-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:target-version=1.0.0 #-}
 ```
 
 **Plutus Core 1.1.0 scripts:**
 
 ```haskell
-{-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:conservative-optimisation #-}
-{-# OPTIONS_GHC -fplugin-opt PlutusTx.Plugin:target-version=1.1.0 #-}
+{-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:conservative-optimisation #-}
+{-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:target-version=1.1.0 #-}
 ```
 
 PlutusV3 (1.1.0) validators receive enhanced `ScriptContext` with governance support:
