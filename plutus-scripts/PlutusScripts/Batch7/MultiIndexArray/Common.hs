@@ -19,13 +19,13 @@ import PlutusTx.Prelude qualified as P
 {-# INLINEABLE mkIntegerPolicy #-}
 mkIntegerPolicy :: P.BuiltinData -> P.BuiltinUnit
 mkIntegerPolicy _ctx =
-  let arr = BI.listToArray (P.toOpaque [10 :: Integer, 20, 30, 40])
+  let arr = BI.listToArray (P.toOpaque ([10, 20, 30, 40] :: [Integer]))
       selected = P.fromOpaque (BI.multiIndexArray arr (P.toOpaque ([3, 0, 2, 3] :: [Integer])))
       noElements = BI.multiIndexArray arr (P.toOpaque ([] :: [Integer]))
       emptyArray = BI.listToArray (P.toOpaque ([] :: [Integer]))
       emptyBoth = BI.multiIndexArray emptyArray (P.toOpaque ([] :: [Integer]))
    in if selected
-        P.== [40 :: Integer, 10, 30, 40]
+        P.== ([40, 10, 30, 40] :: [Integer])
         P.&& BI.null noElements
         P.&& BI.null emptyBoth
         then BI.unitval
@@ -48,7 +48,7 @@ mkDataPolicy _ctx =
 {-# INLINEABLE mkRepeatedPolicy #-}
 mkRepeatedPolicy :: Integer -> P.BuiltinData -> P.BuiltinUnit
 mkRepeatedPolicy count _ctx =
-  let arr = BI.listToArray (P.toOpaque [42 :: Integer])
+  let arr = BI.listToArray (P.toOpaque ([42] :: [Integer]))
       indices = P.toOpaque (List.replicate count (0 :: Integer))
       selected = P.fromOpaque (BI.multiIndexArray arr indices) :: [Integer]
    in if List.length selected P.== count P.&& List.all (P.== 42) selected
@@ -86,7 +86,7 @@ The huge indices are 2^64 and -2^64: narrowing either to a 64-bit machine
 integer before the bounds check would yield 0, which is in bounds. -}
 failingLookups :: [(Text, [Integer], [Integer])]
 failingLookups =
-  [ ("failingMultiIndexArrayNegativePolicyScript", [10, 20, 30], [-1])
+  [ ("failingMultiIndexArrayNegativePolicyScript", [10, 20, 30], [0, 1, -1])
   , ("failingMultiIndexArrayUpperBoundPolicyScript", [10, 20, 30], [3])
   , ("failingMultiIndexArrayEmptyPolicyScript", [], [0])
   , ("failingMultiIndexArrayLateInvalidPolicyScript", [10, 20, 30], [0, 1, 3])
