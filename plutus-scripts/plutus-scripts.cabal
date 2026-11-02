@@ -113,8 +113,8 @@ library scripts
     PlutusScripts.Batch6.Value.Common
     PlutusScripts.Batch6.Value.V3_100
     PlutusScripts.Batch6.Value.V3_110
+    PlutusScripts.Batch7.MultiIndexArray
     PlutusScripts.Batch7.MultiIndexArray.Common
-    PlutusScripts.Batch7.MultiIndexArray.V3_110
     PlutusScripts.Bitwise.Complement
     PlutusScripts.Bitwise.Conversions
     PlutusScripts.Bitwise.CountFindFirstSet
