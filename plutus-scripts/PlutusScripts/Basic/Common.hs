@@ -3,6 +3,8 @@ module PlutusScripts.Basic.Common where
 import Helpers.ScriptUtils (check, constrArgs)
 import PlutusLedgerApi.V1 qualified as V1
 import PlutusLedgerApi.V3 qualified as V3
+import PlutusLedgerApi.V4 qualified as V4
+import PlutusLedgerApi.V4.Contexts qualified as V4Contexts
 import PlutusTx.Builtins.Internal qualified as BI (
   BuiltinList,
   head,
@@ -146,3 +148,63 @@ mkWitnessRedeemerPolicyV3 arg =
 
   checkWitness :: Bool
   checkWitness = txSignedBy txInfo redeemer
+
+-- PlutusV4 policies --
+
+-- V4 contexts and transaction information are list-encoded, unlike V3.
+{-# INLINEABLE mkMintTokenNamePolicyV4 #-}
+mkMintTokenNamePolicyV4 :: P.BuiltinData -> P.BuiltinUnit
+mkMintTokenNamePolicyV4 arg =
+  if checkTokenName then BI.unitval else P.traceError "wrong token name"
+ where
+  context :: V4.ScriptContext
+  context = V4.unsafeFromBuiltinData arg
+
+  V4.Redeemer redeemerData = V4.scriptContextRedeemer context
+
+  redeemer :: V4.TokenName
+  redeemer = V4.unsafeFromBuiltinData redeemerData
+
+  checkTokenName :: Bool
+  checkTokenName =
+    V4.valueOf
+      (V4.mintValueMinted (V4.txInfoMint (V4.scriptContextTxInfo context)))
+      (V4Contexts.ownCurrencySymbol context)
+      redeemer
+      P.> 0
+
+{-# INLINEABLE mkTimeRangePolicyV4 #-}
+mkTimeRangePolicyV4 :: P.BuiltinData -> P.BuiltinUnit
+mkTimeRangePolicyV4 arg =
+  if checkRange then BI.unitval else P.traceError "not in valid range"
+ where
+  context :: V4.ScriptContext
+  context = V4.unsafeFromBuiltinData arg
+
+  V4.Redeemer redeemerData = V4.scriptContextRedeemer context
+
+  redeemer :: V4.POSIXTime
+  redeemer = V4.unsafeFromBuiltinData redeemerData
+
+  -- V4 validity ranges have an inclusive lower and an exclusive upper bound.
+  checkRange :: Bool
+  checkRange = case V4.untilExclusive (V4.txInfoValidRange (V4.scriptContextTxInfo context)) of
+    P.Just upper -> upper P.<= redeemer
+    P.Nothing -> P.False
+
+{-# INLINEABLE mkWitnessRedeemerPolicyV4 #-}
+mkWitnessRedeemerPolicyV4 :: P.BuiltinData -> P.BuiltinUnit
+mkWitnessRedeemerPolicyV4 arg =
+  if checkWitness then BI.unitval else P.traceError "not signed by redeemer pubkeyhash"
+ where
+  context :: V4.ScriptContext
+  context = V4.unsafeFromBuiltinData arg
+
+  V4.Redeemer redeemerData = V4.scriptContextRedeemer context
+
+  redeemer :: V4.PubKeyHash
+  redeemer = V4.unsafeFromBuiltinData redeemerData
+
+  -- V4 replaces txInfoSignatories with credentials in txInfoGuards.
+  checkWitness :: Bool
+  checkWitness = V4Contexts.txSignedBy (V4.scriptContextTxInfo context) redeemer

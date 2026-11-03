@@ -11,8 +11,9 @@ import Helpers.Envelopes (
 import Helpers.ScriptUtils (ScriptGroup (ScriptGroup, sgBaseName, sgScripts))
 import Main.Utf8 (withUtf8)
 import PlutusCore.Default (DefaultFun, DefaultUni)
-import PlutusLedgerApi.Common.Versions (PlutusLedgerLanguage (PlutusV2, PlutusV3))
+import PlutusLedgerApi.Common.Versions (PlutusLedgerLanguage (PlutusV2, PlutusV3, PlutusV4))
 import PlutusLedgerApi.Envelope qualified as Envelope
+import PlutusScripts.Basic.V4_110 qualified as Basic_V4_110
 import PlutusScripts.Basic.V_1_1 qualified as Basic
 import PlutusScripts.Batch6.Array qualified as Array
 import PlutusScripts.Batch6.BLS12_381_MultiScalarMul qualified as BLS_MSM
@@ -44,6 +45,29 @@ main = withUtf8 do
   writeEnvelopeV3 "mintTokenNamePolicyScriptV3" Basic.mintTokenNamePolicyCompiledV3
   writeEnvelopeV3 "timeRangePolicyScriptV3" Basic.timeRangePolicyCompiledV3
   writeEnvelopeV3 "witnessRedeemerPolicyScriptV3" Basic.witnessRedeemerPolicyCompiledV3
+
+  -- Basic scripts (PlutusV4 / PLC 1.1.0)
+  writeEnvelope
+    PlutusV4
+    "alwaysSucceedPolicyScript_V4_110"
+    Basic_V4_110.alwaysSucceedPolicyCompiled_V4_110
+  writeEnvelope
+    PlutusV4
+    "alwaysSucceedSpendScript_V4_110"
+    Basic_V4_110.alwaysSucceedSpendCompiled_V4_110
+  writeEnvelope
+    PlutusV4
+    "alwaysFailsPolicyScript_V4_110"
+    Basic_V4_110.alwaysFailsPolicyCompiled_V4_110
+  writeEnvelope
+    PlutusV4
+    "mintTokenNamePolicyScript_V4_110"
+    Basic_V4_110.mintTokenNamePolicyCompiled_V4_110
+  writeEnvelope PlutusV4 "timeRangePolicyScript_V4_110" Basic_V4_110.timeRangePolicyCompiled_V4_110
+  writeEnvelope
+    PlutusV4
+    "witnessRedeemerPolicyScript_V4_110"
+    Basic_V4_110.witnessRedeemerPolicyCompiled_V4_110
 
   -- SECP256k1 scripts (PlutusV3)
   writeEnvelopeV3 "verifySchnorrPolicyScriptV3" SECP.verifySchnorrPolicyCompiledV3

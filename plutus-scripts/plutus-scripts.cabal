@@ -84,6 +84,7 @@ library scripts
     Helpers.Envelopes
     Helpers.ScriptUtils
     PlutusScripts.Basic.Common
+    PlutusScripts.Basic.V4_110
     PlutusScripts.Basic.V_1_0
     PlutusScripts.Basic.V_1_1
     PlutusScripts.Batch6.Array
