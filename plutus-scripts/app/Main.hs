@@ -20,6 +20,8 @@ import PlutusScripts.Batch6.DropList qualified as DropList
 import PlutusScripts.Batch6.ExpModInteger qualified as ExpModInteger
 import PlutusScripts.Batch6.Value qualified as Value
 import PlutusScripts.Batch7.MultiIndexArray qualified as MultiIndexArray
+import PlutusScripts.Batch7.Value.V_1_1 qualified as Value_1_1
+import PlutusScripts.Batch7.Value.V_1_2 qualified as Value_1_2
 import PlutusScripts.Bitwise.V_1_0 qualified as BitwiseV0
 import PlutusScripts.Bitwise.V_1_1 qualified as BitwiseV1
 import PlutusScripts.Casing.Casing qualified as Casing
@@ -114,6 +116,8 @@ main = withUtf8 do
 
   -- Batch7: multiIndexArray
   mapM_ writeVersionedScript MultiIndexArray.allMultiIndexArrayScripts
+  mapM_ writeVersionedScript Value_1_1.allValueScripts
+  mapM_ writeVersionedScript Value_1_2.allValueScripts
 
 --------------------------------------------------------------------------------
 -- IO helpers ------------------------------------------------------------------
