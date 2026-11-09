@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -fplugin-opt Plinth.Plugin:target-version=1.1.0 #-}
 
--- | PlutusV3 and PlutusV4 / PLC 1.1.0 policies for multiIndexArray (batch 7).
+-- | PlutusV3 and PlutusV4 / PLC 1.1.0 and 1.2.0 multiIndexArray policies.
 module PlutusScripts.Batch7.MultiIndexArray (allMultiIndexArrayScripts) where
 
 import Data.Text (Text)
@@ -16,12 +16,15 @@ import PlutusScripts.Batch7.MultiIndexArray.Common (
   mkRepeatedPolicy,
   repeatedSelections,
  )
+import PlutusScripts.Batch7.MultiIndexArray.V120 qualified as V120
 import PlutusTx (CompiledCode, compile, liftCode, unsafeApplyCode)
 import PlutusTx.Prelude qualified as P
 
 -- | The policies do not read the script context, so every ledger language gets the same code.
 allMultiIndexArrayScripts :: [VersionedScript (P.BuiltinData -> P.BuiltinUnit)]
-allMultiIndexArrayScripts = concatMap multiIndexArrayScripts [PlutusV3, PlutusV4]
+allMultiIndexArrayScripts =
+  concatMap multiIndexArrayScripts [PlutusV3, PlutusV4]
+    <> V120.allMultiIndexArrayScripts
 
 multiIndexArrayScripts :: PlutusLedgerLanguage -> [VersionedScript (P.BuiltinData -> P.BuiltinUnit)]
 multiIndexArrayScripts ll =
